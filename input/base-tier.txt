@@ -1,0 +1,416 @@
+
+
+########################################################################
+### 클래스 그룹 : 무기
+########################################################################
+
+########################################################################
+# [SECTION: gear_weapons_wands]
+# 무기 - 마법봉 | WEAPONS - Wands
+# [GROUP: gear][CLASS: Wands][MIN_ILVL: 79][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 중요 옵션 1 순위 : 주문 스킬 레벨
+# 중요 옵션 2 순위 : 시전 속도, 주문 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 주문 피해 % 증가, 원소 피해 % 증가, 최대 마나치
+# 중요 옵션 4 순위 : 주문 치명타
+
+# 마법봉 1 티어
+# [GROUP: gear] [CLASS: Wands] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Withered Wand" "Attuned Wand" "Siphoning Wand" "Galvanic Wand" "Dueling Wand"
+
+# 마법봉 2 티어
+# [GROUP: gear] [CLASS: Wands] [TIER: 2][MIN_ILVL: 79][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Bone Wand" "Volatile Wand"
+
+########################################################################
+# [SECTION: gear_weapons_staves]
+# 무기 - 지팡이 | WEAPONS - Staves
+# [GROUP: gear][CLASS: Staves][MIN_ILVL: 79][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 중요 옵션 1 순위 : 주문 스킬 레벨 (T1 : 81 레벨 / 완벽한 마술의 에센스 : 72 레벨)
+# 중요 옵션 2 순위 : 시전 속도, 주문 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 주문 피해 % 증가, 원소 피해 % 증가, 최대 마나치
+# 중요 옵션 4 순위 : 주문 치명타
+
+# 지팡이 1 티어
+# [GROUP: gear] [CLASS: Staves] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Voltaic Staff" "Chiming Staff" "Paralysing Staff" "Sanctified Staff"
+# 지팡이 2 티어
+# [GROUP: gear] [CLASS: Staves] [TIER: 2][MIN_ILVL: 79][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Ashen Staff" "Gelid Staff" "Pyrophyte Staff" "Reaping Staff" "Roaring Staff"
+
+########################################################################
+# [SECTION: gear_weapons_foci]
+# 무기 - 집중구 | WEAPONS - Foci
+# [GROUP: gear][CLASS: Foci][MIN_ILVL: 65][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+########################################################################
+# 중요 옵션 1 순위 : 주문 스킬 레벨 (T1: 42 레벨)
+# 중요 옵션 2 순위 : 시전 속도, 주문 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 주문 피해 % 증가, 원소 피해 % 증가, 최대 마나치
+# 중요 옵션 4 순위 : 주문 치명타
+# 모든 주문 스킬 레벨 T1 : 41 레벨
+# 모든 소환수 스킬 레벨 T1 : 65 레벨
+
+# 집중구 1 티어
+# [GROUP: gear] [CLASS: Foci] [TIER: 1][MIN_ILVL: 65][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+	BaseType == "Sacred Focus" "Tasalian Focus"
+# 집중구 2 티어
+# [GROUP: gear] [CLASS: Foci] [TIER: 2][MIN_ILVL: 65][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+	BaseType == "Druidic Focus" "Leyline Focus"
+# 집중구 3 티어
+# [GROUP: gear] [CLASS: Foci] [TIER: 3][MIN_ILVL: 65][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+	BaseType == "Runed Focus" "Whorl Focus" "Arrayed Focus" "Cultist Focus" "Hallowed Focus"
+
+########################################################################
+# [SECTION: gear_weapons_sceptres]
+# 무기 - 셉터 | WEAPONS - Sceptres
+# [GROUP: gear][CLASS: Sceptres][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 성소 셉터 82 레벨 일반/마법, 희귀 강조 : 희귀 등급도 제작에 사용된다 (부패의 징조와 보존된 턱뼈 사용)
+# 정신력 T1 : 82 레벨 | 모든 소환수 스킬 레벨 T1 : 78 레벨
+# 중요 옵션 1 순위 : 모든 소환수 스킬 레벨
+# 중요 옵션 2 순위 : 정신력
+# 중요 옵션 3 순위 : 마나 
+# 중요 옵션 4 순위 : 동료 관련 옵션
+
+# 셉터 1 티어
+# [GROUP: gear] [CLASS: Sceptres] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Rattling Sceptre" "Omen Sceptre" "Wrath Sceptre"
+# 셉터 2 티어
+# [GROUP: gear] [CLASS: Sceptres] [TIER: 2][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Stoic Sceptre" "Shrine Sceptre"
+
+########################################################################
+# [SECTION: gear_weapons_bows]
+# 무기 - 활 | WEAPONS - Bows
+# [GROUP: gear][CLASS: Bows][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+########################################################################
+# 중요 옵션 1 순위 : 모든 투사체 스킬 레벨 (T1 : 81)
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가. 공격 속도
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가, 치명타 관련 옵션
+# 중요 옵션 4 순위 : 화살 추가, 정확도
+
+# 활 1 티어
+# [GROUP: gear] [CLASS: Bows] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+	BaseType == "Guardian Bow" "Gemini Bow" "Warmonger Bow" "Obliterator Bow"
+# 활 2 티어
+# [GROUP: gear] [CLASS: Bows] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+	BaseType == "Twin Bow" "Ironwood Shortbow" "Cavalry Bow" "Fanatic Bow"
+# 활 3 티어
+# [GROUP: gear] [CLASS: Bows] [TIER: 3][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2,3]
+	BaseType == "Artillery Bow" "Tribal Bow" "Adherent Bow" "Militant Bow"
+
+########################################################################
+# [SECTION: gear_weapons_quivers]
+# 무기 - 화살통 | WEAPONS - Quivers
+# [GROUP: gear][CLASS: Quivers][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 중요 옵션 1 순위 : 모든 투사체 스킬 레벨(T1 : 41), 활 스킬로 주는 피해 % 증가
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가
+# 중요 옵션 4 순위 : 공격 속도, 치명타 관련, 정확도
+
+# 화살통 1 티어
+# [GROUP: gear] [CLASS: Quivers] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Primed Quiver" "Visceral Quiver"
+# 화살통 2 티어
+# [GROUP: gear] [CLASS: Quivers] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Penetrating Quiver" "Volant Quiver"
+
+########################################################################
+# [SECTION: gear_weapons_crossbows]
+# 무기 - 쇠뇌 | WEAPONS - Crossbows
+# [GROUP: gear][CLASS: Crossbows][MIN_ILVL: 75][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 중요 옵션 1 순위 : 투사체 스킬 레벨
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가
+# 중요 옵션 4 순위 : 치명타 피해 보너스, 공격 속도, 정확도
+
+# 석궁 1 티어
+# [GROUP: gear] [CLASS: Crossbows] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Flexed Crossbow" "Gemini Crossbow" "Siege Crossbow" "Desolate Crossbow" "Elegant Crossbow"
+# 석궁 2 티어
+# [GROUP: gear] [CLASS: Crossbows] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Stout Crossbow" "Engraved Crossbow"
+
+########################################################################
+# [SECTION: gear_weapons_quarterstaves]
+# 무기 - 육척봉 | WEAPONS - Quarterstaves
+# [GROUP: gear][CLASS: Quarterstaves][MIN_ILVL: 75][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 중요 옵션 1 순위 : 근접 스킬 레벨
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가
+# 중요 옵션 4 순위 : 공격 속도, 치명타 옵션, 정확도
+
+# 육척봉 1 티어
+# [GROUP: gear] [CLASS: Quarterstaves] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Striking Quarterstaff" "Aegis Quarterstaff" "Dreaming Quarterstaff" "Skullcrusher Quarterstaff"
+# 육척봉 2 티어
+# [GROUP: gear] [CLASS: Quarterstaves] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 81][TIERS_AVAILABLE: 1,2]
+	BaseType == "Sinister Quarterstaff" "Lunar Quarterstaff" "Bolting Quarterstaff" "Razor Quarterstaff"
+
+########################################################################
+# [SECTION: gear_weapons_spears]
+# 무기 - 창 | WEAPONS - Spears
+# [GROUP: gear][CLASS: Spears][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 중요 옵션 1 순위 : 근접 스킬 레벨
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가
+# 중요 옵션 4 순위 : 공격 속도, 치명타 옵션, 정확도
+
+# 창 1 티어
+# [GROUP: gear] [CLASS: Spears] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Spiked Spear" "Akoyan Spear" "Soaring Spear" "Guardian Spear"
+# 창 2 티어
+# [GROUP: gear] [CLASS: Spears] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Orichalcum Spear" "Pronged Spear" "Stalking Spear" "Flying Spear" "Grand Spear"
+
+########################################################################
+# [SECTION: gear_weapons_talismans]
+# 무기 - 부적 | WEAPONS - Talismans
+# [GROUP: gear][CLASS: Talismans][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+########################################################################
+# 중요 옵션 1 순위 : -
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가
+# 중요 옵션 4 순위 : 공격 속도, 치명타 옵션, 정확도
+
+# 부적 1 티어
+# [GROUP: gear] [CLASS: Talismans] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Spiny Talisman" "Wildwood Talisman" "Ashbark Talisman" "Alpha Talisman" "Thunder Talisman" "Fang Talisman" "Jade Talisman" "Fungal Talisman" "Maji Talisman"
+
+########################################################################
+# [SECTION: gear_weapons_one_Hand_Maces]
+# 무기 - 철퇴 | WEAPONS - One Hand Maces
+# [GROUP: gear][CLASS: One Hand Maces][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1, 2]
+########################################################################
+# 중요 옵션 1 순위 : -
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가
+# 중요 옵션 4 순위 : 공격 속도, 치명타 옵션, 정확도
+
+# 한손 철퇴 1 티어
+# [GROUP: gear] [CLASS: One Hand Maces] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Strife Pick" "Fortified Hammer" "Marauding Mace" "Akoyan Club"
+# 한손 철퇴 2 티어
+# [GROUP: gear] [CLASS: One Hand Maces] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Flanged Mace" "Crown Mace" "Molten Hammer"
+
+########################################################################
+# [SECTION: gear_weapons_two_Hand_Maces]
+# 무기 - 철퇴 | WEAPONS - Two Hand Maces
+# [GROUP: gear][CLASS: Two Hand Maces][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+########################################################################
+# 중요 옵션 1 순위 : -
+# 중요 옵션 2 순위 : 물리 피해 # 추가, 원소 피해 # 추가
+# 중요 옵션 3 순위 : 물리 피해 % 증가, 원소 피해 % 증가
+# 중요 옵션 4 순위 : 공격 속도, 치명타 옵션, 정확도
+
+# 양손 철퇴 1 티어
+# [GROUP: gear] [CLASS: Two Hand Maces] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Ironwood Greathammer" "Fanatic Greathammer" "Massive Greathammer" "Tawhoan Greatclub"
+
+# 양손 철퇴 2 티어
+# [GROUP: gear] [CLASS: Two Hand Maces] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Anvil Maul" "Sacred Maul" "Ruination Maul"
+
+########################################################################
+### 클래스 그룹 : 방어구
+########################################################################
+
+########################################################################
+# [SECTION: gear_armours_body_armours]
+# 방어구 - 갑옷 | ARMOUR - Body Armours
+# [GROUP: gear][CLASS: Armours][TIER: 1][MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+########################################################################
+
+# =============== 갑옷 1 티어
+
+# 방어도 기반 (AR)
+# [GROUP: gear] [CLASS: Armours][ARMOUR_TYPE: AR] [TIER: 1] [MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Soldier Cuirass" "Ornate Plate" "Utzaal Cuirass" "Warlord Cuirass"
+
+# 회피 보호막 타입 (EV)
+# [GROUP: gear] [CLASS: Armours][ARMOUR_TYPE: EV] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Swiftstalker Coat" "Slipstrike Vest" "Wyrmscale Coat" "Corsair Coat"
+
+# 에너지 보호막 타입 (ES)
+# [GROUP: gear] [CLASS: Armours][ARMOUR_TYPE: ES] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Vile Robe" "Flowing Raiment" "Sacramental Robe" "Feathered Raiment"
+
+# 방어도+회피 타입 (AR/EV)
+# [GROUP: gear] [CLASS: Armours][ARMOUR_TYPE: AR/EV] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Dastard Armour" "Shrouded Mail" "Death Mail" "Thane Mail"
+
+# 방어도+에너지 보호막 타입 (AR/ES)
+# [GROUP: gear] [CLASS: Armours][ARMOUR_TYPE: AR/ES] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Wolfskin Mantle" "Conjurer Mantle" "Death Mantle" "Seastorm Mantle"
+
+# 회피+에너지 보호막 타입 (EV/ES)
+# [GROUP: gear] [CLASS: Armours][ARMOUR_TYPE: EV/ES] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Sleek Jacket" "Rambler Jacket" "Falconer's Jacket" "Austere Garb"
+
+# 방어력+회피+에너지 보호막 타입
+# [GROUP: gear] [CLASS: Armours][ARMOUR_TYPE: AR/EV/ES] [TIER: 1][MIN_ILVL: 79][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Sacrificial Regalia"
+
+########################################################################
+# [SECTION: gear_armours_helmets]
+# 방어구 - 헬멧 | ARMOUR - Helmets
+# [GROUP: gear][CLASS: Helmets][TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+########################################################################
+
+# =============== 헬멧 1 티어
+
+# 방어도 기반 (AR)
+# [GROUP: gear] [CLASS: Helmets][ARMOUR_TYPE: AR] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Imperial Greathelm"
+
+# 회피 보호막 타입 (EV)
+# [GROUP: gear] [CLASS: Helmets][ARMOUR_TYPE: EV] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Freebooter Cap"
+
+# 에너지 보호막 타입 (ES)
+# [GROUP: gear] [CLASS: Helmets][ARMOUR_TYPE: ES] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Ancestral Tiara"
+
+# 방어도+회피 타입 (AR/EV)
+# [GROUP: gear] [CLASS: Helmets][ARMOUR_TYPE: AR/EV] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Gladiatorial Helm"
+
+# 방어도+에너지 보호막 타입 (AR/ES)
+# [GROUP: gear] [CLASS: Helmets][ARMOUR_TYPE: AR/ES] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Cryptic Crown"
+
+# 회피+에너지 보호막 타입 (EV/ES)
+# [GROUP: gear] [CLASS: Helmets][ARMOUR_TYPE: EV/ES] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Grinning Mask"
+
+########################################################################
+# [SECTION: gear_armours_gloves]
+# 방어구 - 장갑 | ARMOUR - Gloves
+# [GROUP: gear][CLASS: Gloves][TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+########################################################################
+# =============== 장갑 1 티어
+
+# 방어도 기반 (AR)
+# [GROUP: gear] [CLASS: Gloves][ARMOUR_TYPE: AR] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Massive Mitts"
+
+# 회피 보호막 타입 (EV)
+# [GROUP: gear] [CLASS: Gloves][ARMOUR_TYPE: EV] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Polished Bracers"
+
+# 에너지 보호막 타입 (ES )
+# [GROUP: gear] [CLASS: Gloves][ARMOUR_TYPE: ES] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Sirenscale Gloves"
+
+# 방어도+회피 타입 (AR/EV) 
+# [GROUP: gear] [CLASS: Gloves][ARMOUR_TYPE: AR/EV] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Blacksteel Gauntlets"
+
+# 방어도+에너지 보호막 타입 (AR/ES)
+# [GROUP: gear] [CLASS: Gloves][ARMOUR_TYPE: AR/ES] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Adherent Cuffs"
+
+# 회피+에너지 보호막 타입 (EV/ES)
+# [GROUP: gear] [CLASS: Gloves][ARMOUR_TYPE: EV/ES] [TIER: 1][MIN_ILVL: 78][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+	BaseType == "Secured Wraps"
+
+########################################################################
+# [SECTION: gear_armours_boots]
+# 방어구 - 장화 | ARMOUR - Boots
+# [GROUP: gear][CLASS: Boots][TIER: 1][MIN_ILVL: 74][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+########################################################################
+
+# =============== 장화 1 티어
+
+# 방어도 기반 (AR)
+# [GROUP: gear] [CLASS: Boots][ARMOUR_TYPE: AR] [TIER: 1] [MIN_ILVL: 74] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Tasalian Greaves"
+
+# 회피 보호막 타입 (EV)
+# [GROUP: gear] [CLASS: Boots][ARMOUR_TYPE: EV] [TIER: 1] [MIN_ILVL: 74] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Drakeskin Boots"
+
+# 에너지 보호막 타입 (ES)
+# [GROUP: gear] [CLASS: Boots][ARMOUR_TYPE: ES] [TIER: 1] [MIN_ILVL: 74] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Sekhema Sandals"
+
+# 방어도+회피 타입 (AR/EV)
+# [GROUP: gear] [CLASS: Boots][ARMOUR_TYPE: AR/EV] [TIER: 1] [MIN_ILVL: 74] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Blacksteel Sabatons"
+
+# 방어도+에너지 보호막 타입 (AR/ES)
+# [GROUP: gear] [CLASS: Boots][ARMOUR_TYPE: AR/ES] [TIER: 1] [MIN_ILVL: 74] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Cryptic Leggings"
+
+# 회피+에너지 보호막 타입 (EV/ES)
+# [GROUP: gear] [CLASS: Boots][ARMOUR_TYPE: EV/ES] [TIER: 1] [MIN_ILVL: 74] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Daggerfoot Shoes"
+
+########################################################################
+# [SECTION: gear_armours_shields]
+# 방어구 - 방패 | ARMOUR - Shields
+# [GROUP: gear][CLASS: Shields][TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1]
+########################################################################
+# =============== 방패 1 티어
+
+# 방어도 기반 (AR)
+# [GROUP: gear] [CLASS: Shields][ARMOUR_TYPE: AR] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Tawhoan Tower Shield"
+# 방어도+회피 타입 (AR/EV) 
+# [GROUP: gear] [CLASS: Shields][ARMOUR_TYPE: AR/EV] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Golden Targe" 
+# 방어도+에너지 보호막 타입 (AR/ES)
+# [GROUP: gear] [CLASS: Shields][ARMOUR_TYPE: AR/ES] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+	BaseType == "Blacksteel Crest Shield"
+
+########################################################################
+# [SECTION: gear_armours_bucklers]
+# 방어구 - 버클러| ARMOUR - Bucklers
+# [GROUP: gear][CLASS: Bucklers][TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+########################################################################
+
+# =============== 버클러 1 티어
+# [GROUP: gear] [CLASS: Bucklers][ARMOUR_TYPE: NONE] [TIER: 1][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Desert Buckler"
+
+# =============== 버클러 2 티어
+# [GROUP: gear] [CLASS: Bucklers][ARMOUR_TYPE: NONE] [TIER: 2][MIN_ILVL: 75][CAP_ILVL: 82][TIERS_AVAILABLE: 1,2]
+	BaseType == "Ornate Buckler" "Gutspike Buckler" "Ancient Buckler"
+
+########################################################################
+### 클래스 그룹 : 장신구
+########################################################################
+
+########################################################################
+# [SECTION: gear_armours_amulets]
+# 장신구 - 목걸이 | ACCESSORY - Amulets
+# [GROUP: gear] [CLASS: Amulets] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+########################################################################
+
+# [GROUP: gear] [CLASS: Amulets] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+  BaseType == "Gold Amulet" "Solar Amulet" "Dusk Amulet" "Gloam Amulet" "Penumbra Amulet" "Tenebrous Amulet" "Pearlescent Amulet"
+
+########################################################################
+# [SECTION: gear_armours_rings]
+# 장신구 - 반지 | ACCESSORY - Rings
+# [GROUP: gear] [CLASS: Rings] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+########################################################################
+
+# [GROUP: gear] [CLASS: Rings] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+  BaseType == "Gold Ring" "Prismatic Ring" "Amethyst Ring" "Dusk Ring" "Gloam Ring" "Penumbra Ring" "Tenebrous Ring" "Abyssal Signet"
+
+########################################################################
+# [SECTION: gear_armours_belts]
+# 장신구 - 벨트 | ACCESSORY - Belts
+# [GROUP: gear] [CLASS: Belts] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+########################################################################
+
+# [GROUP: gear] [CLASS: Belts] [TIER: 1] [MIN_ILVL: 75] [CAP_ILVL: 82] [TIERS_AVAILABLE: 1]
+  BaseType == "Golden Obi" "Utility Belt"
+

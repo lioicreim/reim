@@ -1,42 +1,1188 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0b0f14;
+  --panel: #1a1a1a;
+  --panel2: #1f1f1f;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.62);
+
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  /* 게임별 메인 컬러 (기본값: POE2 파란색) */
+  --game-primary: #3E63DD;
+  --game-primary-hover: rgba(62, 99, 221, 0.1);
+  --game-primary-border: #3E63DD;
+
+  /* Tier colors (FilterBlade 느낌) */
+  --t1: #3b1b1b; /* Elite-ish */
+  --t2: #3a2a12;
+  --t3: #24351b;
+  --t4: #1f2b35;
+
+  /* S~E Tier colors - 옵션 1: 클래식 게임 스타일 (고대비, 명확한 구분) */
+  --tier-s: #ffffff; /* S 티어 배경색 - 흰색 */
+  --tier-a: rgb(204, 90, 138); /* A 티어 배경색 */
+  --tier-b: rgb(205, 82, 80); /* B 티어 배경색 */
+  --tier-c: rgb(255, 165, 0); /* 주황색 (Exalted Orb 스타일) */
+  --tier-d: rgb(210, 178, 135); /* D 티어 배경색 - 기본값 */
+  --tier-e: #000000; /* 검은색 - 기본값 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 게임별 메인 컬러 설정 */
+.game-poe2 {
+  --game-primary: #3E63DD; /* 파란색 */
+  --game-primary-hover: rgba(62, 99, 221, 0.1);
+  --game-primary-border: #3E63DD;
+  
+  /* POE2 전용 컬러 변수 */
+  --poe2-primary: #3E63DD;
+  --poe2-secondary: #ffffff;
+  --poe2-primary-rgb: 62, 99, 221;
+  --poe2-primary-hover: rgba(62, 99, 221, 0.1);
+  --poe2-primary-light: rgba(62, 99, 221, 0.05);
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+.game-poe1 {
+  --game-primary: #ff6b35; /* 주황색 */
+  --game-primary-hover: rgba(255, 107, 53, 0.1);
+  --game-primary-border: #ff6b35;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.game-wow {
+  --game-primary: #D6409F; /* 핑크/마젠타 */
+  --game-primary-hover: rgba(214, 64, 159, 0.1);
+  --game-primary-border: #D6409F;
+}
+
+.game-last-epoch {
+  --game-primary: #9d4edd; /* 보라색 */
+  --game-primary-hover: rgba(157, 78, 221, 0.1);
+  --game-primary-border: #9d4edd;
+}
+
+.game-fellowship {
+  --game-primary: #ffd700; /* 금색 */
+  --game-primary-hover: rgba(255, 215, 0, 0.1);
+  --game-primary-border: #ffd700;
+  --game-secondary: #000000; /* 검은색 텍스트 */
+}
+
+.game-once-human {
+  --game-primary: #ff4757; /* 빨간색 */
+  --game-primary-hover: rgba(255, 71, 87, 0.1);
+  --game-primary-border: #ff4757;
 }
 
 * {
-  box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-a {
-  color: inherit;
+body {
+  background: #121212;
+  color: var(--text);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* 레이아웃 */
+.layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 최상단 헤더 */
+.top-header {
+  background: #000000;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 200;
+}
+
+.top-header-container {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   text-decoration: none;
+  color: var(--text);
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.logo-placeholder {
+  width: 32px;
+  height: 32px;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 0;
+}
+
+.site-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.header-btn-settings {
+  font-size: 18px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-btn:hover {
+  opacity: 0.7;
+}
+
+.header-btn-primary {
+  background: transparent;
+  color: var(--text);
+  border: none;
+}
+
+.header-btn-primary:hover {
+  opacity: 0.7;
+}
+
+.lang-select {
+  width: 60px;
+  height: 36px;
+  background: #2a2a2a;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0 8px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 10px;
+  padding-right: 20px;
+  transition: opacity 0.2s;
+}
+
+.lang-select:hover {
+  opacity: 0.8;
+}
+
+.lang-select:focus {
+  outline: 1px solid var(--game-primary);
+  outline-offset: -1px;
+}
+
+/* 게임 네비게이션 */
+.game-nav {
+  background: #1a1a1a;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 150;
+}
+
+.game-nav-container {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 48px;
+}
+
+.game-nav-item {
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.2s, background 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
+  margin-right: -12px;
+}
+
+.game-nav-item:first-child {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+  margin-left: 0;
+}
+
+.game-nav-item:last-child {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%);
+  margin-right: 0;
+  padding-right: 24px;
+}
+
+.game-nav-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.game-nav-item.active {
+  color: var(--game-secondary, #ffffff);
+  background: var(--game-primary);
+  border-bottom: 2px solid var(--game-primary);
+  z-index: 1;
+}
+
+.game-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--game-primary);
+  z-index: 2;
+}
+
+/* 게임 배너 */
+.game-banner {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.game-banner.ad-banner {
+  height: 90px;
+  background: #121212;
+  /* 배경색과 동일하게 설정, 나중에 광고나 이미지 추가 예정 */
+}
+
+.game-banner.game-hero {
+  height: 300px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+}
+
+.game-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.game-hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.game-logo {
+  font-size: 64px;
+  font-weight: 800;
+  color: var(--tier-s);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.game-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* 게임 서브 네비게이션 */
+.game-sub-nav {
+  background: #1a1a1a;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0; /* 브라우저 상단에 고정 */
+  z-index: 150;
+}
+
+.game-sub-nav-container {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 48px;
+}
+
+.game-sub-nav-item {
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.2s, background 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+
+.game-sub-nav-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.game-sub-nav-item.active {
+  color: var(--poe2-secondary, #ffffff);
+  background: var(--poe2-primary, var(--game-primary));
+  border-bottom: 2px solid var(--poe2-primary, var(--game-primary));
+}
+
+/* POE2 서브 네비게이션 */
+.poe2-sub-nav {
+  background: #1a1a1a;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 150;
+}
+
+.poe2-sub-nav-container {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 48px;
+}
+
+.poe2-sub-nav-item {
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.2s, background 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+
+.poe2-sub-nav-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.poe2-sub-nav-item.active {
+  color: var(--poe2-secondary, #ffffff);
+  background: var(--poe2-primary, var(--game-primary));
+  border-bottom: 2px solid var(--poe2-primary, var(--game-primary));
+}
+
+/* 아이템 필터 레이아웃 */
+.item-filter-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* 아이템 필터 네비게이션 */
+.item-filter-nav {
+  background: #0f0f0f;
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  position: sticky;
+  top: 48px; /* game-sub-nav 높이만큼 */
+  z-index: 140;
+}
+
+.item-filter-nav-container {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 44px;
+}
+
+.item-filter-nav-item {
+  padding: 0 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.2s, background 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+
+.item-filter-nav-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.item-filter-nav-item.active {
+  color: var(--poe2-secondary, #ffffff);
+  border-bottom-color: var(--poe2-primary, var(--game-primary));
+}
+
+.item-filter-content {
+  flex: 1;
+}
+
+/* 페이지 컨텐츠 래퍼 */
+.page-content-wrapper {
+  width: 100%;
+}
+
+/* 애드센스 사이드바 */
+.ad-sidebar {
+  width: 300px;
+  padding: 24px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.ad-placeholder {
+  width: 300px;
+  min-height: 600px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 88px;
+}
+
+.ad-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ad-content {
+  font-size: 14px;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+@media (max-width: 1400px) {
+  .ad-sidebar {
+    display: none;
   }
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  background: #1a1a1a;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow);
+}
+
+.cardHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.cardBody {
+  padding: 16px;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.colTitle {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.tile {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  padding: 10px 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  cursor: default;
+  user-select: none;
+}
+
+.tile small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+/* 체크박스와 라디오 버튼 통일 스타일 (프리셋 디자인) */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--poe2-primary, var(--game-primary));
+}
+
+/* 전역 슬라이더 스타일 (드래그로 조절하는 모든 슬라이더에 적용) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input[type="range"]:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Webkit 브라우저 (Chrome, Safari, Edge) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 6px;
+  height: 16px;
+  background: var(--game-primary);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--game-primary-border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 6px;
+  height: 16px;
+  background: var(--game-primary);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  background: var(--game-primary-border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox 트랙 */
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* 액션 버튼 스타일 (전역) */
+.action-button {
+  padding: 10px 20px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.action-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--game-primary);
+}
+
+.action-button-primary {
+  background: var(--poe2-primary, var(--game-primary));
+  color: var(--poe2-secondary, #ffffff);
+  border-color: var(--poe2-primary, var(--game-primary));
+}
+
+.action-button-primary:hover {
+  background: var(--poe2-primary-hover, var(--game-primary-hover));
+  opacity: 0.9;
+}
+
+.action-button-secondary {
+  background: var(--panel2);
+  color: var(--text);
+}
+
+.action-button-admin {
+  background: var(--panel2);
+  color: var(--text);
+  border-color: var(--game-primary);
+}
+
+.action-button-admin:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.action-button .dropdown-icon {
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+/* 스크롤바 스타일 - 깔끔한 직선 형태 */
+/* 웹킷 브라우저 (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--panel);
+  border-radius: 0;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  border: none;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 화살표 버튼 제거 */
+*::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) var(--panel);
+}
+
+/* 드롭다운 스타일 - quick-filters 페이지용 */
+.leveling-dropdown-wrapper {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 120px !important;
+  max-width: 160px !important;
+  z-index: 1 !important;
+  margin: 4px !important;
+}
+
+.leveling-class-dropdown-wrapper {
+  min-width: 120px !important;
+  max-width: 160px !important;
+  margin: 4px !important;
+}
+
+.leveling-dropdown-row-item .leveling-dropdown-wrapper {
+  min-width: 120px !important;
+  max-width: 160px !important;
+  margin: 4px !important;
+}
+
+.leveling-dropdowns-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 4px !important;
+  flex-wrap: nowrap !important;
+}
+
+.leveling-dropdown-row-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0 !important;
+  margin: 0 !important;
+}
+
+/* section-content 내부의 leveling-dropdowns-row 강제 가로 배치 */
+.section-content .leveling-dropdowns-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 4px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+/* 초기화 버튼 스타일 - quick-filters 페이지용 */
+.leveling-reset-button {
+  padding: 8px 16px !important;
+  background: transparent !important;
+  border: 1px solid #3E63DD !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  border-radius: 4px !important;
+  margin-left: 8px !important;
+}
+
+.leveling-reset-button:hover {
+  background: rgba(62, 99, 221, 0.1) !important;
+  border-color: #3E63DD !important;
+  color: #ffffff !important;
+}
+
+/* 아이템 희귀도 섹션 스타일 - quick-filters 페이지용 */
+.leveling-rarity-section {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.section-content .leveling-rarity-section {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.leveling-rarity-title {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: var(--text) !important;
+}
+
+.leveling-rarity-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+.leveling-rarity-item span {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: var(--text) !important;
+}
+
+.leveling-dropdown-label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--muted) !important;
+  margin-bottom: 6px !important;
+  display: block !important;
+  text-align: center !important;
+}
+
+.leveling-dropdown-button {
+  width: 100% !important;
+  padding: 6px 10px !important;
+  background: var(--panel2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+.leveling-dropdown-button .dropdown-icon {
+  display: block !important;
+  font-size: 12px !important;
+  color: var(--muted) !important;
+  margin-left: 8px !important;
+}
+
+.leveling-dropdown-button:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--border) !important;
+}
+
+.leveling-dropdown-button.selected {
+  background: var(--panel2) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.leveling-dropdown-button.selected:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.leveling-dropdown-menu {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-top: 4px !important;
+  background: var(--panel2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+.leveling-dropdown-item {
+  padding: 8px 12px !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: background 0.2s !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.leveling-dropdown-item:last-child {
+  border-bottom: none !important;
+}
+
+.leveling-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 선택된 드롭다운 항목 - 더 구체적인 선택자로 우선순위 높임 */
+.leveling-dropdown-item.selected,
+.leveling-dropdown-item-multi.selected,
+div.leveling-dropdown-item.selected,
+div.leveling-dropdown-item-multi.selected,
+.leveling-dropdown-menu .leveling-dropdown-item.selected,
+.leveling-dropdown-menu .leveling-dropdown-item-multi.selected,
+.leveling-dropdown-menu div.leveling-dropdown-item.selected,
+.leveling-dropdown-menu div.leveling-dropdown-item-multi.selected {
+  background: #3E63DD !important;
+  background-color: #3E63DD !important;
+  color: #ffffff !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+.leveling-dropdown-item-multi {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  padding: 8px 12px !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  width: 100% !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+.leveling-dropdown-item-multi:last-child {
+  border-bottom: none !important;
+}
+
+.leveling-dropdown-item-multi:hover:not(.selected) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 선택된 다중 선택 드롭다운 항목 - 더 구체적인 선택자 */
+.leveling-dropdown-item-multi.selected,
+div.leveling-dropdown-item-multi.selected,
+.leveling-dropdown-menu .leveling-dropdown-item-multi.selected,
+.leveling-dropdown-menu div.leveling-dropdown-item-multi.selected {
+  background: #3E63DD !important;
+  background-color: #3E63DD !important;
+  color: #ffffff !important;
+  color: rgb(255, 255, 255) !important;
+  font-weight: 400 !important;
+}
+
+.leveling-dropdown-item-multi span {
+  flex: 1 !important;
+  text-align: left !important;
+}
+
+/* 선택된 항목 팝업 - 드롭다운 버튼과 동일한 너비 */
+.selected-items-popup {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-top: 4px !important;
+  padding: 6px 10px !important;
+  background: #3E63DD !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  z-index: 1001 !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  pointer-events: none !important;
+}
+
+.selected-items-popup .selected-item-text {
+  font-size: 12px !important;
+  color: #ffffff !important;
+  line-height: 1.5 !important;
+  text-align: left !important;
+  padding: 3px 0 !important;
+}
+
+/* 섹션 헤더 스타일 - quick-filters 페이지용 */
+.section-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 0 !important;
+  padding: 8px 12px !important;
+  background: var(--panel2) !important;
+  border: 1px solid var(--border) !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.section-header .section-title {
+  flex: 1 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  color: var(--text) !important;
+}
+
+.section-header .active-rules-count {
+  margin-left: auto !important;
+  font-size: 12px !important;
+  color: var(--muted) !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+.section-toggle-icon {
+  font-size: 12px !important;
+  color: var(--muted) !important;
+  margin-left: 8px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.section-checkbox {
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+.section-checkbox input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  cursor: pointer !important;
+  accent-color: var(--poe2-primary, var(--game-primary)) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 골드 규칙 리스트 스타일 - quick-filters 페이지용 */
+.filter-rule-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 2px 16px 2px 32px !important;
+  min-height: auto !important;
+  border-bottom: none !important;
+  position: relative !important;
+}
+
+.filter-rule-item::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 32px !important;
+  right: 0 !important;
+  height: 1px !important;
+  background: #000000 !important;
+}
+
+.filter-rule-item:last-child::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 32px !important;
+  right: 0 !important;
+  height: 1px !important;
+  background: #000000 !important;
+}
+
+.filter-rule-item:last-child {
+  border-bottom: 1px solid #000000 !important;
+}
+
+.rule-checkbox {
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  width: 20px !important;
+}
+
+.rule-checkbox input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  cursor: pointer !important;
+  accent-color: var(--poe2-primary, var(--game-primary)) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rule-title {
+  flex: 1 !important;
+  font-size: 14px !important;
+  color: var(--text) !important;
+  min-width: 0 !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+}
+
+.rule-edit-button {
+  padding: 6px 16px !important;
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  border-radius: 0 !important;
+}
+
+.rule-edit-button:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: var(--text) !important;
 }

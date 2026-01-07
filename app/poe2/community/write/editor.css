@@ -1,0 +1,393 @@
+/* 에디터 컨테이너 */
+.write-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 20px;
+}
+
+.write-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.write-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.write-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.write-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel,
+.btn-submit {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: var(--text);
+}
+
+.btn-cancel:hover {
+  background: var(--panel2);
+}
+
+.btn-submit {
+  background: var(--game-primary);
+  color: var(--poe2-secondary, #ffffff);
+  border-color: var(--game-primary);
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--game-primary-hover);
+  color: var(--text);
+}
+
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 폼 그룹 */
+.write-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.category-select,
+.title-input {
+  padding: 12px 16px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.category-select {
+  width: 200px;
+  cursor: pointer;
+}
+
+.title-input {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.title-input::placeholder {
+  color: var(--muted);
+}
+
+/* 툴바 */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.editor-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.editor-toolbar button:hover {
+  background: var(--panel);
+  border-color: var(--border);
+}
+
+.editor-toolbar button.is-active {
+  background: var(--game-primary);
+  color: var(--poe2-secondary, #ffffff);
+  border-color: var(--game-primary);
+}
+
+.editor-toolbar select {
+  padding: 6px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.editor-toolbar select:focus {
+  outline: none;
+  border-color: var(--game-primary);
+}
+
+.color-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--game-primary);
+  border-radius: 50%;
+  margin-left: 2px;
+}
+
+/* 에디터 콘텐츠 */
+.editor-content {
+  min-height: 500px;
+  padding: 20px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+/* Tiptap 에디터 스타일 */
+.ProseMirror {
+  outline: none;
+  min-height: 500px;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.ProseMirror p {
+  margin: 0.75em 0;
+}
+
+.ProseMirror p:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3 {
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  line-height: 1.3;
+}
+
+.ProseMirror h1 {
+  font-size: 2em;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25em;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+}
+
+.ProseMirror li {
+  margin: 0.25em 0;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid var(--game-primary);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.ProseMirror code {
+  background: var(--panel);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  color: var(--game-primary);
+}
+
+.ProseMirror pre {
+  background: var(--panel);
+  padding: 1em;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.ProseMirror pre code {
+  background: transparent;
+  padding: 0;
+  color: var(--text);
+}
+
+.ProseMirror a {
+  color: var(--game-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ProseMirror a:hover {
+  color: var(--game-primary-hover);
+}
+
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid var(--border);
+  margin: 2em 0;
+}
+
+/* 이미지 스타일 */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 1em 0;
+  cursor: move;
+  transition: opacity 0.2s;
+}
+
+.ProseMirror img:hover {
+  opacity: 0.8;
+}
+
+/* 이미지 그룹 스타일 (가로 배치) */
+.ProseMirror .image-group-1 {
+  width: 100%;
+  display: block;
+  margin: 1em auto;
+}
+
+.ProseMirror .image-group-2 {
+  width: calc(50% - 8px);
+  display: inline-block;
+  margin: 1em 4px;
+  vertical-align: top;
+}
+
+.ProseMirror .image-group-3 {
+  width: calc(33.333% - 8px);
+  display: inline-block;
+  margin: 1em 4px;
+  vertical-align: top;
+}
+
+/* 이미지 그룹 컨테이너 */
+.ProseMirror .image-group-container {
+  display: flex;
+  gap: 8px;
+  margin: 1em 0;
+  width: 100%;
+}
+
+.ProseMirror .image-group-container img {
+  flex: 1;
+  margin: 0;
+  min-width: 0;
+}
+
+/* Placeholder 스타일 */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted);
+  pointer-events: none;
+  height: 0;
+}
+
+/* 텍스트 정렬 */
+.ProseMirror [style*="text-align: left"] {
+  text-align: left;
+}
+
+.ProseMirror [style*="text-align: center"] {
+  text-align: center;
+}
+
+.ProseMirror [style*="text-align: right"] {
+  text-align: right;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .write-container {
+    padding: 16px;
+  }
+
+  .editor-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar-group {
+    flex-wrap: wrap;
+  }
+
+  .ProseMirror .image-group-2,
+  .ProseMirror .image-group-3 {
+    width: 100%;
+    display: block;
+    margin: 1em 0;
+  }
+}

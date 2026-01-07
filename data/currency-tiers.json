@@ -1,0 +1,292 @@
+{
+  "early": {
+    "S": [
+      "Albino Rhoa Feather",
+      "Ancient Infuser",
+      "Crystallised Corruption",
+      "Divine Orb",
+      "Fracturing Orb",
+      "Greater Chaos Orb",
+      "Hinekora's Lock",
+      "Mirror of Kalandra",
+      "Orb of Annulment",
+      "Perfect Chaos Orb",
+      "Perfect Exalted Orb",
+      "Perfect Jeweller's Orb",
+      "Vaal Infuser"
+    ],
+    "A": [
+      "Architect's Orb",
+      "Core Destabiliser",
+      "Gemcutter's Prism",
+      "Greater Exalted Orb",
+      "Orb of Extraction",
+      "Perfect Orb of Augmentation",
+      "Perfect Regal Orb",
+      "Vaal Cultivation Orb"
+    ],
+    "B": [
+      "Arcanist's Etcher",
+      "Chaos Orb",
+      "Greater Jeweller's Orb",
+      "Orb of Chance"
+    ],
+    "C": [
+      "Armourer's Scrap",
+      "Artificer's Orb",
+      "Chance Shard",
+      "Exalted Orb",
+      "Glassblower's Bauble",
+      "Greater Regal Orb",
+      "Lesser Jeweller's Orb",
+      "Orb of Alchemy",
+      "Perfect Orb of Transmutation",
+      "Regal Orb",
+      "Vaal Orb"
+    ],
+    "D": [
+      "Blacksmith's Whetstone",
+      "Greater Orb of Augmentation",
+      "Greater Orb of Transmutation",
+      "Orb of Augmentation",
+      "Orb of Transmutation"
+    ],
+    "E": [
+      "Artificer's Shard",
+      "Regal Shard",
+      "Transmutation Shard"
+    ]
+  },
+  "normal": {
+    "S": [
+      "Albino Rhoa Feather",
+      "Divine Orb",
+      "Fracturing Orb",
+      "Hinekora's Lock",
+      "Mirror of Kalandra"
+    ],
+    "A": [
+      "Architect's Orb",
+      "Perfect Chaos Orb",
+      "Vaal Cultivation Orb",
+      "Vaal Infuser"
+    ],
+    "B": [
+      "Ancient Infuser",
+      "Core Destabiliser",
+      "Crystallised Corruption",
+      "Greater Chaos Orb",
+      "Orb of Annulment",
+      "Orb of Extraction",
+      "Perfect Exalted Orb",
+      "Perfect Jeweller's Orb"
+    ],
+    "C": [
+      "Arcanist's Etcher",
+      "Armourer's Scrap",
+      "Artificer's Orb",
+      "Chance Shard",
+      "Chaos Orb",
+      "Exalted Orb",
+      "Gemcutter's Prism",
+      "Glassblower's Bauble",
+      "Greater Exalted Orb",
+      "Greater Jeweller's Orb",
+      "Greater Regal Orb",
+      "Orb of Alchemy",
+      "Orb of Chance",
+      "Perfect Orb of Augmentation",
+      "Perfect Orb of Transmutation",
+      "Perfect Regal Orb",
+      "Vaal Orb"
+    ],
+    "D": [
+      "Blacksmith's Whetstone",
+      "Greater Orb of Augmentation",
+      "Greater Orb of Transmutation",
+      "Lesser Jeweller's Orb",
+      "Orb of Augmentation",
+      "Orb of Transmutation",
+      "Regal Orb"
+    ],
+    "E": [
+      "Artificer's Shard",
+      "Regal Shard",
+      "Transmutation Shard"
+    ]
+  },
+  "late": {
+    "S": [
+      "Albino Rhoa Feather",
+      "Divine Orb",
+      "Fracturing Orb",
+      "Hinekora's Lock",
+      "Mirror of Kalandra"
+    ],
+    "A": [
+      "Architect's Orb",
+      "Perfect Chaos Orb",
+      "Perfect Exalted Orb",
+      "Vaal Cultivation Orb",
+      "Vaal Infuser"
+    ],
+    "B": [
+      "Ancient Infuser",
+      "Chaos Orb",
+      "Core Destabiliser",
+      "Crystallised Corruption",
+      "Greater Chaos Orb",
+      "Greater Jeweller's Orb",
+      "Orb of Annulment",
+      "Orb of Chance",
+      "Orb of Extraction",
+      "Perfect Jeweller's Orb"
+    ],
+    "C": [
+      "Armourer's Scrap",
+      "Artificer's Orb",
+      "Chance Shard",
+      "Exalted Orb",
+      "Gemcutter's Prism",
+      "Glassblower's Bauble",
+      "Greater Exalted Orb",
+      "Greater Regal Orb",
+      "Lesser Jeweller's Orb",
+      "Orb of Alchemy",
+      "Perfect Orb of Augmentation",
+      "Perfect Orb of Transmutation",
+      "Perfect Regal Orb",
+      "Regal Orb",
+      "Vaal Orb"
+    ],
+    "D": [
+      "Arcanist's Etcher",
+      "Blacksmith's Whetstone",
+      "Greater Orb of Augmentation",
+      "Greater Orb of Transmutation",
+      "Orb of Augmentation",
+      "Orb of Transmutation"
+    ],
+    "E": [
+      "Artificer's Shard",
+      "Regal Shard",
+      "Transmutation Shard"
+    ]
+  },
+  "ssf": {
+    "S": [
+      "Albino Rhoa Feather",
+      "Divine Orb",
+      "Hinekora's Lock",
+      "Mirror of Kalandra",
+      "Perfect Chaos Orb",
+      "Perfect Jeweller's Orb"
+    ],
+    "A": [
+      "Ancient Infuser",
+      "Architect's Orb",
+      "Core Destabiliser",
+      "Crystallised Corruption",
+      "Greater Chaos Orb",
+      "Orb of Annulment",
+      "Orb of Extraction",
+      "Perfect Exalted Orb",
+      "Vaal Cultivation Orb",
+      "Vaal Infuser"
+    ],
+    "B": [
+      "Chaos Orb",
+      "Fracturing Orb",
+      "Greater Exalted Orb",
+      "Greater Jeweller's Orb",
+      "Orb of Chance",
+      "Perfect Regal Orb"
+    ],
+    "C": [
+      "Arcanist's Etcher",
+      "Armourer's Scrap",
+      "Artificer's Orb",
+      "Chance Shard",
+      "Exalted Orb",
+      "Gemcutter's Prism",
+      "Glassblower's Bauble",
+      "Greater Regal Orb",
+      "Lesser Jeweller's Orb",
+      "Orb of Alchemy",
+      "Perfect Orb of Augmentation",
+      "Perfect Orb of Transmutation",
+      "Regal Orb",
+      "Vaal Orb"
+    ],
+    "D": [
+      "Blacksmith's Whetstone",
+      "Greater Orb of Augmentation",
+      "Greater Orb of Transmutation",
+      "Orb of Augmentation",
+      "Orb of Transmutation"
+    ],
+    "E": [
+      "Artificer's Shard",
+      "Regal Shard",
+      "Transmutation Shard"
+    ]
+  },
+  "default": {
+    "S": [
+      "Albino Rhoa Feather",
+      "Divine Orb",
+      "Fracturing Orb",
+      "Hinekora's Lock",
+      "Mirror of Kalandra"
+    ],
+    "A": [
+      "Architect's Orb",
+      "Perfect Chaos Orb",
+      "Vaal Cultivation Orb",
+      "Vaal Infuser"
+    ],
+    "B": [
+      "Ancient Infuser",
+      "Core Destabiliser",
+      "Crystallised Corruption",
+      "Greater Chaos Orb",
+      "Orb of Annulment",
+      "Orb of Extraction",
+      "Perfect Exalted Orb",
+      "Perfect Jeweller's Orb"
+    ],
+    "C": [
+      "Arcanist's Etcher",
+      "Armourer's Scrap",
+      "Artificer's Orb",
+      "Chance Shard",
+      "Chaos Orb",
+      "Exalted Orb",
+      "Gemcutter's Prism",
+      "Glassblower's Bauble",
+      "Greater Exalted Orb",
+      "Greater Jeweller's Orb",
+      "Greater Regal Orb",
+      "Orb of Alchemy",
+      "Orb of Chance",
+      "Perfect Orb of Augmentation",
+      "Perfect Orb of Transmutation",
+      "Perfect Regal Orb",
+      "Vaal Orb"
+    ],
+    "D": [
+      "Blacksmith's Whetstone",
+      "Greater Orb of Augmentation",
+      "Greater Orb of Transmutation",
+      "Lesser Jeweller's Orb",
+      "Orb of Augmentation",
+      "Orb of Transmutation",
+      "Regal Orb"
+    ],
+    "E": [
+      "Artificer's Shard",
+      "Regal Shard",
+      "Transmutation Shard"
+    ]
+  }
+}

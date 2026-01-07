@@ -1,0 +1,802 @@
+{
+  "Abyssal Signet": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Adherent Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 3
+  },
+  "Adherent Cuffs": {
+    "armourType": "AR/ES",
+    "class": "Gloves",
+    "tier": 1
+  },
+  "Aegis Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 1
+  },
+  "Akoyan Club": {
+    "armourType": null,
+    "class": "One Hand Maces",
+    "tier": 1
+  },
+  "Akoyan Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 1
+  },
+  "Alpha Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Amethyst Ring": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Ancestral Tiara": {
+    "armourType": "ES",
+    "class": "Helmets",
+    "tier": 1
+  },
+  "Ancient Buckler": {
+    "armourType": "NONE",
+    "class": "Bucklers",
+    "tier": 2
+  },
+  "Anvil Maul": {
+    "armourType": null,
+    "class": "Two Hand Maces",
+    "tier": 2
+  },
+  "Arrayed Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 3
+  },
+  "Artillery Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 3
+  },
+  "Ashbark Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Ashen Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 2
+  },
+  "Attuned Wand": {
+    "armourType": null,
+    "class": "Wands",
+    "tier": 1
+  },
+  "Austere Garb": {
+    "armourType": "EV/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Blacksteel Crest Shield": {
+    "armourType": "AR/ES",
+    "class": "Shields",
+    "tier": 1
+  },
+  "Blacksteel Gauntlets": {
+    "armourType": "AR/EV",
+    "class": "Gloves",
+    "tier": 1
+  },
+  "Blacksteel Sabatons": {
+    "armourType": "AR/EV",
+    "class": "Boots",
+    "tier": 1
+  },
+  "Bolting Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 2
+  },
+  "Bone Wand": {
+    "armourType": null,
+    "class": "Wands",
+    "tier": 2
+  },
+  "Cavalry Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 2
+  },
+  "Chiming Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 1
+  },
+  "Conjurer Mantle": {
+    "armourType": "AR/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Corsair Coat": {
+    "armourType": "EV",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Crown Mace": {
+    "armourType": null,
+    "class": "One Hand Maces",
+    "tier": 2
+  },
+  "Cryptic Crown": {
+    "armourType": "AR/ES",
+    "class": "Helmets",
+    "tier": 1
+  },
+  "Cryptic Leggings": {
+    "armourType": "AR/ES",
+    "class": "Boots",
+    "tier": 1
+  },
+  "Cultist Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 3
+  },
+  "Daggerfoot Shoes": {
+    "armourType": "EV/ES",
+    "class": "Boots",
+    "tier": 1
+  },
+  "Dastard Armour": {
+    "armourType": "AR/EV",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Death Mail": {
+    "armourType": "AR/EV",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Death Mantle": {
+    "armourType": "AR/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Desert Buckler": {
+    "armourType": "NONE",
+    "class": "Bucklers",
+    "tier": 1
+  },
+  "Desolate Crossbow": {
+    "armourType": null,
+    "class": "Crossbows",
+    "tier": 1
+  },
+  "Drakeskin Boots": {
+    "armourType": "EV",
+    "class": "Boots",
+    "tier": 1
+  },
+  "Dreaming Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 1
+  },
+  "Druidic Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 2
+  },
+  "Dueling Wand": {
+    "armourType": null,
+    "class": "Wands",
+    "tier": 1
+  },
+  "Dusk Amulet": {
+    "armourType": null,
+    "class": "Amulets",
+    "tier": 1
+  },
+  "Dusk Ring": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Elegant Crossbow": {
+    "armourType": null,
+    "class": "Crossbows",
+    "tier": 1
+  },
+  "Engraved Crossbow": {
+    "armourType": null,
+    "class": "Crossbows",
+    "tier": 2
+  },
+  "Falconer's Jacket": {
+    "armourType": "EV/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Fanatic Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 2
+  },
+  "Fanatic Greathammer": {
+    "armourType": null,
+    "class": "Two Hand Maces",
+    "tier": 1
+  },
+  "Fang Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Feathered Raiment": {
+    "armourType": "ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Flanged Mace": {
+    "armourType": null,
+    "class": "One Hand Maces",
+    "tier": 2
+  },
+  "Flexed Crossbow": {
+    "armourType": null,
+    "class": "Crossbows",
+    "tier": 1
+  },
+  "Flowing Raiment": {
+    "armourType": "ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Flying Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 2
+  },
+  "Fortified Hammer": {
+    "armourType": null,
+    "class": "One Hand Maces",
+    "tier": 1
+  },
+  "Freebooter Cap": {
+    "armourType": "EV",
+    "class": "Helmets",
+    "tier": 1
+  },
+  "Fungal Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Galvanic Wand": {
+    "armourType": null,
+    "class": "Wands",
+    "tier": 1
+  },
+  "Gelid Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 2
+  },
+  "Gemini Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 1
+  },
+  "Gemini Crossbow": {
+    "armourType": null,
+    "class": "Crossbows",
+    "tier": 1
+  },
+  "Gladiatorial Helm": {
+    "armourType": "AR/EV",
+    "class": "Helmets",
+    "tier": 1
+  },
+  "Gloam Amulet": {
+    "armourType": null,
+    "class": "Amulets",
+    "tier": 1
+  },
+  "Gloam Ring": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Gold Amulet": {
+    "armourType": null,
+    "class": "Amulets",
+    "tier": 1
+  },
+  "Gold Ring": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Golden Obi": {
+    "armourType": null,
+    "class": "Belts",
+    "tier": 1
+  },
+  "Golden Targe": {
+    "armourType": "AR/EV",
+    "class": "Shields",
+    "tier": 1
+  },
+  "Grand Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 2
+  },
+  "Grinning Mask": {
+    "armourType": "EV/ES",
+    "class": "Helmets",
+    "tier": 1
+  },
+  "Guardian Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 1
+  },
+  "Guardian Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 1
+  },
+  "Gutspike Buckler": {
+    "armourType": "NONE",
+    "class": "Bucklers",
+    "tier": 2
+  },
+  "Hallowed Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 3
+  },
+  "Imperial Greathelm": {
+    "armourType": "AR",
+    "class": "Helmets",
+    "tier": 1
+  },
+  "Ironwood Greathammer": {
+    "armourType": null,
+    "class": "Two Hand Maces",
+    "tier": 1
+  },
+  "Ironwood Shortbow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 2
+  },
+  "Jade Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Leyline Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 2
+  },
+  "Lunar Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 2
+  },
+  "Maji Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Marauding Mace": {
+    "armourType": null,
+    "class": "One Hand Maces",
+    "tier": 1
+  },
+  "Massive Greathammer": {
+    "armourType": null,
+    "class": "Two Hand Maces",
+    "tier": 1
+  },
+  "Massive Mitts": {
+    "armourType": "AR",
+    "class": "Gloves",
+    "tier": 1
+  },
+  "Militant Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 3
+  },
+  "Molten Hammer": {
+    "armourType": null,
+    "class": "One Hand Maces",
+    "tier": 2
+  },
+  "Obliterator Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 1
+  },
+  "Omen Sceptre": {
+    "armourType": null,
+    "class": "Sceptres",
+    "tier": 1
+  },
+  "Orichalcum Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 2
+  },
+  "Ornate Buckler": {
+    "armourType": "NONE",
+    "class": "Bucklers",
+    "tier": 2
+  },
+  "Ornate Plate": {
+    "armourType": "AR",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Paralysing Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 1
+  },
+  "Pearlescent Amulet": {
+    "armourType": null,
+    "class": "Amulets",
+    "tier": 1
+  },
+  "Penetrating Quiver": {
+    "armourType": null,
+    "class": "Quivers",
+    "tier": 2
+  },
+  "Penumbra Amulet": {
+    "armourType": null,
+    "class": "Amulets",
+    "tier": 1
+  },
+  "Penumbra Ring": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Polished Bracers": {
+    "armourType": "EV",
+    "class": "Gloves",
+    "tier": 1
+  },
+  "Primed Quiver": {
+    "armourType": null,
+    "class": "Quivers",
+    "tier": 1
+  },
+  "Prismatic Ring": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Pronged Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 2
+  },
+  "Pyrophyte Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 2
+  },
+  "Rambler Jacket": {
+    "armourType": "EV/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Rattling Sceptre": {
+    "armourType": null,
+    "class": "Sceptres",
+    "tier": 1
+  },
+  "Razor Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 2
+  },
+  "Reaping Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 2
+  },
+  "Roaring Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 2
+  },
+  "Ruination Maul": {
+    "armourType": null,
+    "class": "Two Hand Maces",
+    "tier": 2
+  },
+  "Runed Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 3
+  },
+  "Sacramental Robe": {
+    "armourType": "ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Sacred Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 1
+  },
+  "Sacred Maul": {
+    "armourType": null,
+    "class": "Two Hand Maces",
+    "tier": 2
+  },
+  "Sacrificial Regalia": {
+    "armourType": "AR/EV/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Sanctified Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 1
+  },
+  "Seastorm Mantle": {
+    "armourType": "AR/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Secured Wraps": {
+    "armourType": "EV/ES",
+    "class": "Gloves",
+    "tier": 1
+  },
+  "Sekhema Sandals": {
+    "armourType": "ES",
+    "class": "Boots",
+    "tier": 1
+  },
+  "Shrine Sceptre": {
+    "armourType": null,
+    "class": "Sceptres",
+    "tier": 2
+  },
+  "Shrouded Mail": {
+    "armourType": "AR/EV",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Siege Crossbow": {
+    "armourType": null,
+    "class": "Crossbows",
+    "tier": 1
+  },
+  "Sinister Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 2
+  },
+  "Siphoning Wand": {
+    "armourType": null,
+    "class": "Wands",
+    "tier": 1
+  },
+  "Sirenscale Gloves": {
+    "armourType": "ES",
+    "class": "Gloves",
+    "tier": 1
+  },
+  "Skullcrusher Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 1
+  },
+  "Sleek Jacket": {
+    "armourType": "EV/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Slipstrike Vest": {
+    "armourType": "EV",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Soaring Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 1
+  },
+  "Solar Amulet": {
+    "armourType": null,
+    "class": "Amulets",
+    "tier": 1
+  },
+  "Soldier Cuirass": {
+    "armourType": "AR",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Spiked Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 1
+  },
+  "Spiny Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Stalking Spear": {
+    "armourType": null,
+    "class": "Spears",
+    "tier": 2
+  },
+  "Stoic Sceptre": {
+    "armourType": null,
+    "class": "Sceptres",
+    "tier": 2
+  },
+  "Stout Crossbow": {
+    "armourType": null,
+    "class": "Crossbows",
+    "tier": 2
+  },
+  "Strife Pick": {
+    "armourType": null,
+    "class": "One Hand Maces",
+    "tier": 1
+  },
+  "Striking Quarterstaff": {
+    "armourType": null,
+    "class": "Quarterstaves",
+    "tier": 1
+  },
+  "Swiftstalker Coat": {
+    "armourType": "EV",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Tasalian Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 1
+  },
+  "Tasalian Greaves": {
+    "armourType": "AR",
+    "class": "Boots",
+    "tier": 1
+  },
+  "Tawhoan Greatclub": {
+    "armourType": null,
+    "class": "Two Hand Maces",
+    "tier": 1
+  },
+  "Tawhoan Tower Shield": {
+    "armourType": "AR",
+    "class": "Shields",
+    "tier": 1
+  },
+  "Tenebrous Amulet": {
+    "armourType": null,
+    "class": "Amulets",
+    "tier": 1
+  },
+  "Tenebrous Ring": {
+    "armourType": null,
+    "class": "Rings",
+    "tier": 1
+  },
+  "Thane Mail": {
+    "armourType": "AR/EV",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Thunder Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Tribal Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 3
+  },
+  "Twin Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 2
+  },
+  "Utility Belt": {
+    "armourType": null,
+    "class": "Belts",
+    "tier": 1
+  },
+  "Utzaal Cuirass": {
+    "armourType": "AR",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Vile Robe": {
+    "armourType": "ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Visceral Quiver": {
+    "armourType": null,
+    "class": "Quivers",
+    "tier": 1
+  },
+  "Volant Quiver": {
+    "armourType": null,
+    "class": "Quivers",
+    "tier": 2
+  },
+  "Volatile Wand": {
+    "armourType": null,
+    "class": "Wands",
+    "tier": 2
+  },
+  "Voltaic Staff": {
+    "armourType": null,
+    "class": "Staves",
+    "tier": 1
+  },
+  "Warlord Cuirass": {
+    "armourType": "AR",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Warmonger Bow": {
+    "armourType": null,
+    "class": "Bows",
+    "tier": 1
+  },
+  "Whorl Focus": {
+    "armourType": null,
+    "class": "Foci",
+    "tier": 3
+  },
+  "Wildwood Talisman": {
+    "armourType": null,
+    "class": "Talismans",
+    "tier": 1
+  },
+  "Withered Wand": {
+    "armourType": null,
+    "class": "Wands",
+    "tier": 1
+  },
+  "Wolfskin Mantle": {
+    "armourType": "AR/ES",
+    "class": "Armours",
+    "tier": 1
+  },
+  "Wrath Sceptre": {
+    "armourType": null,
+    "class": "Sceptres",
+    "tier": 1
+  },
+  "Wyrmscale Coat": {
+    "armourType": "EV",
+    "class": "Armours",
+    "tier": 1
+  }
+}

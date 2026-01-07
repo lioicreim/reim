@@ -1,0 +1,62 @@
+
+########################################################################
+### 화폐 Currency 프리셋
+# [SECTION: currency]
+# 화폐 | Currency
+########################################################################
+
+# 새로운 리그 초반 프리셋 (Early-Games Presets)
+# [RID: currency_preset_early_game_s][RID: currency_s]
+  BaseType == "Greater Chaos Orb" "Perfect Chaos Orb" "Mirror of Kalandra" "Hinekora's Lock" "Perfect Exalted Orb" "Perfect Jeweller's Orb" "Divine Orb" "Orb of Annulment" "Fracturing Orb" "Albino Rhoa Feather" "Vaal Infuser" "Ancient Infuser" "Crystallised Corruption"
+# [RID: currency_preset_early_game_a][RID: currency_a]
+	BaseType == "Greater Exalted Orb" "Perfect Regal Orb" "Perfect Orb of Augmentation" "Gemcutter's Prism" "Core Destabiliser" "Architect's Orb" "Orb of Extraction" "Vaal Cultivation Orb"
+# [RID: currency_preset_early_game_b][RID: currency_b]
+  BaseType == "Arcanist's Etcher" "Chaos Orb" "Orb of Chance" "Greater Jeweller's Orb"
+# [RID: currency_preset_early_game_c][RID: currency_c]
+	BaseType == "Armourer's Scrap" "Orb of Alchemy" "Perfect Orb of Transmutation" "Exalted Orb" "Regal Orb" "Greater Regal Orb" "Glassblower's Bauble" "Lesser Jeweller's Orb" "Artificer's Orb" "Chance Shard" "Vaal Orb"
+# [RID: currency_preset_early_game_d][RID: currency_d]
+  BaseType == "Blacksmith's Whetstone" "Orb of Transmutation" "Greater Orb of Transmutation" "Orb of Augmentation" "Greater Orb of Augmentation"
+# [RID: currency_preset_early_game_e][RID: currency_e]
+  BaseType == "Transmutation Shard" "Regal Shard" "Artificer's Shard"
+
+# 리그 중반 화폐 프리셋 (Normal Presets)
+# [RID: currency_preset_normal_s][RID: currency_s]
+	BaseType == "Mirror of Kalandra" "Hinekora's Lock" "Divine Orb" "Fracturing Orb" "Albino Rhoa Feather"
+# [RID: currency_preset__normal_a][RID: currency_a]
+  BaseType == "Perfect Chaos Orb" "Vaal Infuser" "Architect's Orb" "Vaal Cultivation Orb"
+# [RID: currency_preset_normal_b][RID: currency_b]
+  BaseType == "Greater Chaos Orb" "Perfect Exalted Orb" "Perfect Jeweller's Orb" "Orb of Annulment" "Core Destabiliser" "Ancient Infuser" "Orb of Extraction" "Crystallised Corruption"
+# [RID: currency_preset_normal_c][RID: currency_c]
+  BaseType == "Arcanist's Etcher" "Chaos Orb" "Armourer's Scrap" "Orb of Alchemy" "Orb of Chance" "Perfect Orb of Transmutation" "Exalted Orb" "Greater Exalted Orb" "Greater Regal Orb" "Perfect Regal Orb" "Perfect Orb of Augmentation" "Glassblower's Bauble" "Gemcutter's Prism" "Greater Jeweller's Orb" "Artificer's Orb" "Chance Shard" "Vaal Orb"
+# [RID: currency_preset_normal_d][RID: currency_d]
+  BaseType == "Lesser Jeweller's Orb" "Blacksmith's Whetstone" "Orb of Transmutation" "Greater Orb of Transmutation" "Regal Orb" "Orb of Augmentation" "Greater Orb of Augmentation"
+# [RID: currency_preset_normal_e][RID: currency_e]
+  BaseType == "Transmutation Shard" "Regal Shard" "Artificer's Shard"
+
+# 리그 후반 화폐 프리셋 (Late-Game Presets)
+# [RID: currency_preset_late_game_s][RID: currency_s]
+  BaseType == "Mirror of Kalandra" "Hinekora's Lock" "Divine Orb" "Fracturing Orb" "Albino Rhoa Feather"
+# [RID: currency_preset_late_game_a][RID: currency_a]
+  BaseType == "Perfect Chaos Orb" "Perfect Exalted Orb" "Vaal Infuser" "Architect's Orb" "Vaal Cultivation Orb"
+# [RID: currency_preset_late_game_b][RID: currency_b]
+  BaseType == "Chaos Orb" "Greater Chaos Orb" "Orb of Chance" "Greater Jeweller's Orb" "Perfect Jeweller's Orb" "Orb of Annulment" "Core Destabiliser" "Ancient Infuser" "Orb of Extraction" "Crystallised Corruption"
+# [RID: currency_preset_late_game_c][RID: currency_c]
+  BaseType == "Armourer's Scrap" "Orb of Alchemy" "Perfect Orb of Transmutation" "Exalted Orb" "Greater Exalted Orb" "Regal Orb" "Greater Regal Orb" "Perfect Regal Orb" "Perfect Orb of Augmentation" "Glassblower's Bauble" "Gemcutter's Prism" "Lesser Jeweller's Orb" "Artificer's Orb" "Chance Shard" "Vaal Orb"
+# [RID: currency_preset_late_game_d][RID: currency_d]
+  BaseType == "Blacksmith's Whetstone" "Arcanist's Etcher" "Orb of Transmutation" "Greater Orb of Transmutation" "Orb of Augmentation" "Greater Orb of Augmentation"
+# [RID: currency_preset_late_game_e][RID: currency_e]
+  BaseType == "Transmutation Shard" "Regal Shard" "Artificer's Shard"
+
+# SSF 리그 프리셋 (SSF)
+# [RID: currency_preset_ssf_s][RID: currency_s]
+	BaseType == "Perfect Chaos Orb" "Mirror of Kalandra" "Hinekora's Lock" "Perfect Jeweller's Orb" "Divine Orb" "Albino Rhoa Feather"
+# [RID: currency_preset_ssf_a][RID: currency_a]
+  BaseType == "Greater Chaos Orb" "Perfect Exalted Orb" "Orb of Annulment" "Core Destabiliser" "Vaal Infuser" "Architect's Orb" "Ancient Infuser" "Orb of Extraction" "Crystallised Corruption" "Vaal Cultivation Orb"
+# [RID: currency_preset_ssf_b][RID: currency_b]
+  BaseType == "Chaos Orb" "Orb of Chance" "Greater Exalted Orb" "Perfect Regal Orb" "Greater Jeweller's Orb" "Fracturing Orb"
+# [RID: currency_preset_ssf_c][RID: currency_c]
+  BaseType == "Arcanist's Etcher" "Armourer's Scrap" "Orb of Alchemy" "Perfect Orb of Transmutation" "Exalted Orb" "Regal Orb" "Greater Regal Orb" "Perfect Orb of Augmentation" "Glassblower's Bauble" "Gemcutter's Prism" "Lesser Jeweller's Orb" "Artificer's Orb" "Chance Shard" "Vaal Orb"
+# [RID: currency_preset_ssf_d][RID: currency_d]
+  BaseType == "Blacksmith's Whetstone" "Orb of Transmutation" "Greater Orb of Transmutation" "Orb of Augmentation" "Greater Orb of Augmentation"
+# [RID: currency_preset_ssf_e][RID: currency_e]
+  BaseType == "Transmutation Shard" "Regal Shard" "Artificer's Shard"

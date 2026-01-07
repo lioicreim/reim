@@ -1,0 +1,107 @@
+{
+  "gold": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "gold_3000",
+        "enabled": true,
+        "name": "골드 3000 이상",
+        "nameKo": "골드 3000 이상",
+        "type": "show",
+        "conditions": {
+          "stackSize": {
+            "operator": ">=",
+            "value": 3000
+          }
+        },
+        "styles": {
+          "fontSize": 40,
+          "textColor": { "r": 213, "g": 181, "b": 110, "a": 215 },
+          "borderColor": { "r": 235, "g": 200, "b": 110, "a": 255 },
+          "playEffect": "Yellow"
+        }
+      },
+      {
+        "id": "gold_1000",
+        "enabled": true,
+        "name": "골드 1000 이상",
+        "nameKo": "골드 1000 이상",
+        "type": "show",
+        "conditions": {
+          "stackSize": {
+            "operator": ">=",
+            "value": 1000
+          }
+        },
+        "styles": {
+          "fontSize": 32,
+          "textColor": { "r": 213, "g": 181, "b": 110, "a": 215 },
+          "playEffect": "White"
+        }
+      },
+      {
+        "id": "gold_500_hide",
+        "enabled": true,
+        "name": "골드 500 미만 숨김",
+        "nameKo": "골드 500 미만 숨김",
+        "type": "hide",
+        "conditions": {
+          "areaLevel": {
+            "operator": ">=",
+            "value": 75
+          },
+          "stackSize": {
+            "operator": "<",
+            "value": 500
+          }
+        }
+      },
+      {
+        "id": "gold_500",
+        "enabled": true,
+        "name": "골드 500 이상",
+        "nameKo": "골드 500 이상",
+        "type": "show",
+        "conditions": {
+          "stackSize": {
+            "operator": ">=",
+            "value": 500
+          }
+        },
+        "styles": {
+          "fontSize": 30,
+          "textColor": { "r": 213, "g": 181, "b": 110, "a": 215 }
+        }
+      },
+      {
+        "id": "gold_hide_endgame",
+        "enabled": true,
+        "name": "엔드게임 | 골드 100 미만 숨김",
+        "nameKo": "엔드게임 | 골드 100 미만 숨김",
+        "type": "hide",
+        "conditions": {
+          "areaLevel": {
+            "operator": ">=",
+            "value": 65
+          },
+          "stackSize": {
+            "operator": "<",
+            "value": 100
+          }
+        }
+      },
+      {
+        "id": "gold_default",
+        "enabled": true,
+        "name": "골드 기본값",
+        "nameKo": "골드 기본값",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "fontSize": 30,
+          "textColor": { "r": 213, "g": 181, "b": 110, "a": 215 }
+        }
+      }
+    ]
+  }
+}

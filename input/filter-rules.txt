@@ -1,0 +1,79 @@
+########################################################################
+# 베이스 아이템 필터 규칙들
+########################################################################
+
+# 1. 레벨 필터링 규칙
+# 최소 레벨 / 최대 레벨 기준으로 필터링
+# 티어에 따라 SetBorderColor 의 값은 관리자가 지정한 기본값으로 변경되며 유저가 커스텀 가능하다
+  ItemLevel >= {MIN_ILVL}
+  Class {CLASS}
+  BaseType == {Tier 1}
+  Rarity == {Rarity}
+	SetFontSize 45
+	SetBorderColor 255 0 130 # Pink
+  PlayEffect {Unid_Color}
+  MinimapIcon {MapIcon_Size} {MapIcon_Color} {MapIcon_Type}
+
+# 1-1. 예를 들면 실제 아이템 필터에 보이는 코드는 아래와 같다 
+Show
+  ItemLevel >= 82
+  Class "All"
+  BaseType == "Twin Bow" "Ironwood Shortbow" "Cavalry Bow" "Fanatic Bow" "Stout Crossbow" "Engraved Crossbow" "Druidic Focus" "Leyline Focus" "Flanged Mace" "Crown Mace" "Molten Hammer" "Sinister Quarterstaff" "Lunar Quarterstaff" "Bolting Quarterstaff" "Razor Quarterstaff" "Penetrating Quiver" "Volant Quiver" "Stoic Sceptre" "Shrine Sceptre" "Orichalcum Spear" "Pronged Spear" "Stalking Spear" "Flying Spear" "Grand Spear" "Ashen Staff" "Gelid Staff" "Pyrophyte Staff" "Reaping Staff" "Roaring Staff" "Anvil Maul" "Sacred Maul" "Ruination Maul" "Bone Wand" "Volatile Wand" "Guardian Bow" "Gemini Bow" "Warmonger Bow" "Obliterator Bow" "Flexed Crossbow" "Gemini Crossbow" "Siege Crossbow" "Desolate Crossbow" "Elegant Crossbow" "Sacred Focus" "Tasalian Focus" "Strife Pick" "Fortified Hammer" "Marauding Mace" "Akoyan Club" "Striking Quarterstaff" "Aegis Quarterstaff" "Dreaming Quarterstaff" "Skullcrusher Quarterstaff" "Primed Quiver" "Visceral Quiver" "Rattling Sceptre" "Omen Sceptre" "Wrath Sceptre" "Spiked Spear" "Akoyan Spear" "Soaring Spear" "Guardian Spear" "Voltaic Staff" "Chiming Staff" "Paralysing Staff" "Sanctified Staff" "Spiny Talisman" "Wildwood Talisman" "Ashbark Talisman" "Alpha Talisman" "Thunder Talisman" "Fang Talisman" "Jade Talisman" "Fungal Talisman" "Maji Talisman" "Ironwood Greathammer" "Fanatic Greathammer" "Massive Greathammer" "Tawhoan Greatclub" "Withered Wand" "Attuned Wand" "Siphoning Wand" "Galvanic Wand" "Dueling Wand"
+  Rarity == Rare
+	SetFontSize 45
+	SetBorderColor 255 0 130 # Pink
+  MinimapIcon 2 Red Kite
+
+# 2. 레벨 + 미감정 등급 필터링 규칙
+# 레벨과 미감정 등급 기준으로 필터링 되며 미감정 등급에 따라 빛기둥 컬러가 달라진다
+# 예시 코드
+
+Show
+  ItemLevel >= 82
+  UnidentifiedItemTier >= 5
+  Class "Body Armours" "Helmets" "Gloves" "Boots"
+  BaseType == "Bulwark Greaves" "Ornate Greaves" "Vaal Greaves" "Cinched Boots" "Cavalry Boots" "Dragonscale Boots" "Bound Sandals" "Luxurious Slippers" "Sandsworn Sandals" "Veteran Sabatons" "Noble Sabatons" "Fortress Sabatons" "Faithful Leggings" "Apostle Leggings" "Warlock Leggings" "Wanderer Shoes" "Charmed Shoes" "Quickslip Shoes" "Knightly Mitts" "Ornate Mitts" "Vaal Mitts" "Stalking Bracers" "Grand Bracers" "Barbed Bracers" "Grim Gloves" "Opulent Gloves" "Vaal Gloves" "Steelmail Gauntlets" "Commander Gauntlets" "Cultist Gauntlets" "Bound Cuffs" "Ancient Cuffs" "Gleaming Cuffs" "War Wraps" "Elegant Wraps" "Vaal Wraps" "Warmonger Greathelm" "Masked Greathelm" "Paragon Greathelm" "Woven Cap" "Desert Cap" "Trapper Hood" "Skycrown Tiara" "Sorcerous Tiara" "Kamasan Tiara" "Warded Helm" "Cryptic Helm" "Champion Helm" "Druidic Crown" "Saintly Crown" "Divine Crown" "Brigand Mask" "Faridun Mask" "Soaring Mask" "Soldier Cuirass" "Ornate Plate" "Utzaal Cuirass" "Warlord Cuirass" "Swiftstalker Coat" "Slipstrike Vest" "Wyrmscale Coat" "Corsair Coat" "Vile Robe" "Flowing Raiment" "Sacramental Robe" "Feathered Raiment" "Dastard Armour" "Shrouded Mail" "Death Mail" "Thane Mail" "Wolfskin Mantle" "Conjurer Mantle" "Death Mantle" "Seastorm Mantle" "Sleek Jacket" "Rambler Jacket" "Falconer's Jacket" "Austere Garb" "Sacrificial Regalia" "Tasalian Greaves" "Drakeskin Boots" "Sekhema Sandals" "Blacksteel Sabatons" "Cryptic Leggings" "Daggerfoot Shoes" "Massive Mitts" "Polished Bracers" "Sirenscale Gloves" "Blacksteel Gauntlets" "Adherent Cuffs" "Secured Wraps" "Imperial Greathelm" "Freebooter Cap" "Ancestral Tiara" "Gladiatorial Helm" "Cryptic Crown" "Grinning Mask"
+  Rarity == Rare
+	SetFontSize 45
+	SetBorderColor 255 0 130 # Pink
+  PlayEffect Red
+  MinimapIcon 2 Red Kite
+
+# 3. 특출난 아이템
+# 특출난 아이템은 1 소켓 아이템이 2 소켓으로 드롭되거나 2 소켓 아이템이 3 소켓 아이템으로 드롭되는 일반 등급 아이템이다
+# 아래는 예시 코드
+
+# 무기 1-2 티어 | 1 소켓 아이템이 2 소켓으로 드롭되는 경우
+# [RID: gear_weapons_total_t1_1socketed2_normal]
+Show
+  ItemLevel >= 82
+	Sockets >= 2
+  Class "Bows" "Crossbows" "Foci" "One Hand Maces" "Quivers" "Quarterstaves" "Sceptres" "Spears" "Talismans" "Staves" "Two Hand Maces" "Wands"
+  BaseType == "Twin Bow" "Ironwood Shortbow" "Cavalry Bow" "Fanatic Bow" "Stout Crossbow" "Engraved Crossbow" "Druidic Focus" "Leyline Focus" "Flanged Mace" "Crown Mace" "Molten Hammer" "Sinister Quarterstaff" "Lunar Quarterstaff" "Bolting Quarterstaff" "Razor Quarterstaff" "Penetrating Quiver" "Volant Quiver" "Stoic Sceptre" "Shrine Sceptre" "Orichalcum Spear" "Pronged Spear" "Stalking Spear" "Flying Spear" "Grand Spear" "Ashen Staff" "Gelid Staff" "Pyrophyte Staff" "Reaping Staff" "Roaring Staff" "Anvil Maul" "Sacred Maul" "Ruination Maul" "Bone Wand" "Volatile Wand" "Guardian Bow" "Gemini Bow" "Warmonger Bow" "Obliterator Bow" "Flexed Crossbow" "Gemini Crossbow" "Siege Crossbow" "Desolate Crossbow" "Elegant Crossbow" "Sacred Focus" "Tasalian Focus" "Strife Pick" "Fortified Hammer" "Marauding Mace" "Akoyan Club" "Striking Quarterstaff" "Aegis Quarterstaff" "Dreaming Quarterstaff" "Skullcrusher Quarterstaff" "Primed Quiver" "Visceral Quiver" "Rattling Sceptre" "Omen Sceptre" "Wrath Sceptre" "Spiked Spear" "Akoyan Spear" "Soaring Spear" "Guardian Spear" "Voltaic Staff" "Chiming Staff" "Paralysing Staff" "Sanctified Staff" "Spiny Talisman" "Wildwood Talisman" "Ashbark Talisman" "Alpha Talisman" "Thunder Talisman" "Fang Talisman" "Jade Talisman" "Fungal Talisman" "Maji Talisman" "Ironwood Greathammer" "Fanatic Greathammer" "Massive Greathammer" "Tawhoan Greatclub" "Withered Wand" "Attuned Wand" "Siphoning Wand" "Galvanic Wand" "Dueling Wand"
+  Rarity == Normal
+  PlayEffect Purple
+  MinimapIcon 1 Purple Kite
+  PlayAlertSound 6 300
+
+# 4. 감정된 아이템 옵션 필터링
+# 주문 감정서로 미감정 아이템을 확인한 후 땅에 떨어드리면 필터링이 적용되기 때문에 좋은 옵션(모드)일 경우 표시할 수 있다
+# 아래는 예시 코드
+
+Show
+  Identified True
+  Class == "Bows" "Crossbows" "Spears" "Talismans" "One Hand Maces" "Quarterstaves" "Two Hand Maces"
+  BaseType == "Artillery Bow" "Tribal Bow" "Adherent Bow" "Militant Bow" "Blackfire Crossbow" "Piercing Crossbow" "Twin Crossbow" "Cannonade Crossbow" "Bleak Crossbow" "Morning Star" "Jade Club" "Kalguuran Forgehammer" "Marching Mace" "Bandit Mace" "Structured Hammer" "Hefty Quarterstaff" "Smooth Quarterstaff" "Waxing Quarterstaff" "Bladed Quarterstaff" "Guardian Quarterstaff" "Branched Spear" "Jagged Spear" "Massive Spear" "Voltfang Talisman" "Lumbering Talisman" "Howling Talisman" "Roaring Talisman" "Fury Talisman" "Cruel Talisman" "Condemned Talisman" "Wingbeat Talisman" "Pointed Maul" "Totemic Greatclub" "Solemn Maul" "Heavy Greathammer" "Disintegrating Maul" "Twin Bow" "Ironwood Shortbow" "Cavalry Bow" "Fanatic Bow" "Stout Crossbow" "Engraved Crossbow" "Flanged Mace" "Crown Mace" "Molten Hammer" "Sinister Quarterstaff" "Lunar Quarterstaff" "Bolting Quarterstaff" "Razor Quarterstaff" "Orichalcum Spear" "Pronged Spear" "Stalking Spear" "Flying Spear" "Grand Spear" "Anvil Maul" "Sacred Maul" "Ruination Maul" "Guardian Bow" "Gemini Bow" "Warmonger Bow" "Obliterator Bow" "Flexed Crossbow" "Gemini Crossbow" "Siege Crossbow" "Desolate Crossbow" "Elegant Crossbow" "Strife Pick" "Fortified Hammer" "Marauding Mace" "Akoyan Club" "Striking Quarterstaff" "Aegis Quarterstaff" "Dreaming Quarterstaff" "Skullcrusher Quarterstaff" "Spiked Spear" "Akoyan Spear" "Soaring Spear" "Guardian Spear" "Spiny Talisman" "Wildwood Talisman" "Ashbark Talisman" "Alpha Talisman" "Thunder Talisman" "Fang Talisman" "Jade Talisman" "Fungal Talisman" "Maji Talisman" "Ironwood Greathammer" "Fanatic Greathammer" "Massive Greathammer" "Tawhoan Greatclub"
+  HasExplicitMod >=1 "Dictator's" "Emperor's" "Flaring" "Merciless" "Tempered" "Tyrannical"
+  HasExplicitMod >=1 "of Celebration" "of Destruction" "of Infamy" "of Unmaking" "of the Desperate" "of the Vampire"
+  HasExplicitMod >=4 "Dictator's" "Emperor's" "Flaring" "Merciless" "Tempered" "Tyrannical" "of Celebration" "of Destruction" "of Infamy" "of Unmaking" "of the Desperate" "of the Vampire" "Conqueror's" "Cruel" "Razor-sharp" "of Calamity" "of Fame" "of Ferocity" "of Fury" "of Ruin" "of the Drought" "of the Lamprey"
+  HasExplicitMod =0 "Arcing" "Blasting" "Burning" "Burnished" "Buzzing" "Catalysing" "Chilled" "Crackling" "Discharging" "Empowering" "Flaming" "Freezing" "Frigid" "Frosted" "Frozen" "Glaciated" "Glinting" "Heated" "Heavy" "Humming" "Icy" "Incinerating" "Infusing" "Journeyman's" "Overpowering" "Polar" "Polished" "Reaver's" "Scorching" "Serrated" "Shocking" "Smoking" "Smouldering" "Snapping" "Sparking" "Squire's" "Unleashed" "Wicked" "of Absorption" "of Conquest" "of Consumption" "of Dazing" "of Ease" "of Enveloping" "of Impact" "of Infusion" "of Ire" "of Mastery" "of Menace" "of Osmosis" "of Regrowth" "of Rejuvenation" "of Restoration" "of Siphoning" "of Skill" "of Slamming" "of Staggering" "of Stunning" "of Success" "of Triumph" "of Valour" "of Vanquishing" "of Victory" "of the Apt" "of the Concussion" "of the Skilled" "of the Talented" "of the Worthy"
+  PlayEffect Purple
+  MinimapIcon 1 Purple Kite
+  PlayAlertSound 6 300
+
+########################################################################
+# 기타 규칙에 대한 문서 (Other Rules Doc)
+########################################################################
+# 제작 베이스로 사용되는 MIN_ILVL, MAX_ILVL 일반 등급은 코드에서 제외
+# 퀄리티 조건으로 필터링 하는 코드 제외
+# 분해용 아이템 코드는 Starter 에만 추가 (리그 첫 주에만 주로 사용)

@@ -1,0 +1,491 @@
+{
+  "Wands": {
+    "1": [
+      "Attuned Wand",
+      "Dueling Wand",
+      "Galvanic Wand",
+      "Siphoning Wand",
+      "Withered Wand"
+    ],
+    "2": [
+      "Bone Wand",
+      "Volatile Wand"
+    ]
+  },
+  "Staves": {
+    "1": [
+      "Chiming Staff",
+      "Paralysing Staff",
+      "Sanctified Staff",
+      "Voltaic Staff"
+    ],
+    "2": [
+      "Ashen Staff",
+      "Gelid Staff",
+      "Pyrophyte Staff",
+      "Reaping Staff",
+      "Roaring Staff"
+    ]
+  },
+  "Foci": {
+    "1": [
+      "Sacred Focus",
+      "Tasalian Focus"
+    ],
+    "2": [
+      "Druidic Focus",
+      "Leyline Focus"
+    ],
+    "3": [
+      "Arrayed Focus",
+      "Cultist Focus",
+      "Hallowed Focus",
+      "Runed Focus",
+      "Whorl Focus"
+    ]
+  },
+  "Sceptres": {
+    "1": [
+      "Omen Sceptre",
+      "Rattling Sceptre",
+      "Wrath Sceptre"
+    ],
+    "2": [
+      "Shrine Sceptre",
+      "Stoic Sceptre"
+    ]
+  },
+  "Bows": {
+    "1": [
+      "Gemini Bow",
+      "Guardian Bow",
+      "Obliterator Bow",
+      "Warmonger Bow"
+    ],
+    "2": [
+      "Cavalry Bow",
+      "Fanatic Bow",
+      "Ironwood Shortbow",
+      "Twin Bow"
+    ],
+    "3": [
+      "Adherent Bow",
+      "Artillery Bow",
+      "Militant Bow",
+      "Tribal Bow"
+    ]
+  },
+  "Quivers": {
+    "1": [
+      "Primed Quiver",
+      "Visceral Quiver"
+    ],
+    "2": [
+      "Penetrating Quiver",
+      "Volant Quiver"
+    ]
+  },
+  "Crossbows": {
+    "1": [
+      "Desolate Crossbow",
+      "Elegant Crossbow",
+      "Flexed Crossbow",
+      "Gemini Crossbow",
+      "Siege Crossbow"
+    ],
+    "2": [
+      "Engraved Crossbow",
+      "Stout Crossbow"
+    ]
+  },
+  "Quarterstaves": {
+    "1": [
+      "Aegis Quarterstaff",
+      "Dreaming Quarterstaff",
+      "Skullcrusher Quarterstaff",
+      "Striking Quarterstaff"
+    ],
+    "2": [
+      "Bolting Quarterstaff",
+      "Lunar Quarterstaff",
+      "Razor Quarterstaff",
+      "Sinister Quarterstaff"
+    ]
+  },
+  "Spears": {
+    "1": [
+      "Akoyan Spear",
+      "Guardian Spear",
+      "Soaring Spear",
+      "Spiked Spear"
+    ],
+    "2": [
+      "Flying Spear",
+      "Grand Spear",
+      "Orichalcum Spear",
+      "Pronged Spear",
+      "Stalking Spear"
+    ]
+  },
+  "Talismans": {
+    "1": [
+      "Alpha Talisman",
+      "Ashbark Talisman",
+      "Fang Talisman",
+      "Fungal Talisman",
+      "Jade Talisman",
+      "Maji Talisman",
+      "Spiny Talisman",
+      "Thunder Talisman",
+      "Wildwood Talisman"
+    ]
+  },
+  "One Hand Maces": {
+    "1": [
+      "Akoyan Club",
+      "Fortified Hammer",
+      "Marauding Mace",
+      "Strife Pick"
+    ],
+    "2": [
+      "Crown Mace",
+      "Flanged Mace",
+      "Molten Hammer"
+    ]
+  },
+  "Two Hand Maces": {
+    "1": [
+      "Fanatic Greathammer",
+      "Ironwood Greathammer",
+      "Massive Greathammer",
+      "Tawhoan Greatclub"
+    ],
+    "2": [
+      "Anvil Maul",
+      "Ruination Maul",
+      "Sacred Maul"
+    ]
+  },
+  "Armours": {
+    "1": [
+      "Austere Garb",
+      "Conjurer Mantle",
+      "Corsair Coat",
+      "Dastard Armour",
+      "Death Mail",
+      "Death Mantle",
+      "Falconer's Jacket",
+      "Feathered Raiment",
+      "Flowing Raiment",
+      "Ornate Plate",
+      "Rambler Jacket",
+      "Sacramental Robe",
+      "Sacrificial Regalia",
+      "Seastorm Mantle",
+      "Shrouded Mail",
+      "Sleek Jacket",
+      "Slipstrike Vest",
+      "Soldier Cuirass",
+      "Swiftstalker Coat",
+      "Thane Mail",
+      "Utzaal Cuirass",
+      "Vile Robe",
+      "Warlord Cuirass",
+      "Wolfskin Mantle",
+      "Wyrmscale Coat"
+    ]
+  },
+  "Helmets": {
+    "1": [
+      "Ancestral Tiara",
+      "Cryptic Crown",
+      "Freebooter Cap",
+      "Gladiatorial Helm",
+      "Grinning Mask",
+      "Imperial Greathelm"
+    ]
+  },
+  "Gloves": {
+    "1": [
+      "Adherent Cuffs",
+      "Blacksteel Gauntlets",
+      "Massive Mitts",
+      "Polished Bracers",
+      "Secured Wraps",
+      "Sirenscale Gloves"
+    ]
+  },
+  "Boots": {
+    "1": [
+      "Blacksteel Sabatons",
+      "Cryptic Leggings",
+      "Daggerfoot Shoes",
+      "Drakeskin Boots",
+      "Sekhema Sandals",
+      "Tasalian Greaves"
+    ]
+  },
+  "Shields": {
+    "1": [
+      "Blacksteel Crest Shield",
+      "Golden Targe",
+      "Tawhoan Tower Shield"
+    ]
+  },
+  "Bucklers": {
+    "1": [
+      "Desert Buckler"
+    ],
+    "2": [
+      "Ancient Buckler",
+      "Gutspike Buckler",
+      "Ornate Buckler"
+    ]
+  },
+  "Amulets": {
+    "1": [
+      "Dusk Amulet",
+      "Gloam Amulet",
+      "Gold Amulet",
+      "Pearlescent Amulet",
+      "Penumbra Amulet",
+      "Solar Amulet",
+      "Tenebrous Amulet"
+    ]
+  },
+  "Rings": {
+    "1": [
+      "Abyssal Signet",
+      "Amethyst Ring",
+      "Dusk Ring",
+      "Gloam Ring",
+      "Gold Ring",
+      "Penumbra Ring",
+      "Prismatic Ring",
+      "Tenebrous Ring"
+    ]
+  },
+  "Belts": {
+    "1": [
+      "Adherent Bow",
+      "Adherent Cuffs",
+      "Aegis Quarterstaff",
+      "Akoyan Club",
+      "Akoyan Spear",
+      "Alpha Talisman",
+      "Ancestral Tiara",
+      "Ancient Cuffs",
+      "Anvil Maul",
+      "Apostle Leggings",
+      "Artillery Bow",
+      "Ashbark Talisman",
+      "Ashen Staff",
+      "Attuned Wand",
+      "Austere Garb",
+      "Bandit Mace",
+      "Barbed Bracers",
+      "Blackfire Crossbow",
+      "Blacksteel Gauntlets",
+      "Blacksteel Sabatons",
+      "Bladed Quarterstaff",
+      "Bleak Crossbow",
+      "Bolting Quarterstaff",
+      "Bone Wand",
+      "Bound Cuffs",
+      "Bound Sandals",
+      "Branched Spear",
+      "Brigand Mask",
+      "Bulwark Greaves",
+      "Cannonade Crossbow",
+      "Cavalry Boots",
+      "Cavalry Bow",
+      "Champion Helm",
+      "Charmed Shoes",
+      "Chiming Staff",
+      "Cinched Boots",
+      "Commander Gauntlets",
+      "Condemned Talisman",
+      "Conjurer Mantle",
+      "Corsair Coat",
+      "Crown Mace",
+      "Cruel Talisman",
+      "Cryptic Crown",
+      "Cryptic Helm",
+      "Cryptic Leggings",
+      "Cultist Gauntlets",
+      "Daggerfoot Shoes",
+      "Dastard Armour",
+      "Death Mail",
+      "Death Mantle",
+      "Desert Cap",
+      "Desolate Crossbow",
+      "Disintegrating Maul",
+      "Divine Crown",
+      "Dragonscale Boots",
+      "Drakeskin Boots",
+      "Dreaming Quarterstaff",
+      "Druidic Crown",
+      "Druidic Focus",
+      "Dueling Wand",
+      "Elegant Crossbow",
+      "Elegant Wraps",
+      "Engraved Crossbow",
+      "Faithful Leggings",
+      "Falconer's Jacket",
+      "Fanatic Bow",
+      "Fanatic Greathammer",
+      "Fang Talisman",
+      "Faridun Mask",
+      "Feathered Raiment",
+      "Flanged Mace",
+      "Flexed Crossbow",
+      "Flowing Raiment",
+      "Flying Spear",
+      "Fortified Hammer",
+      "Fortress Sabatons",
+      "Freebooter Cap",
+      "Fungal Talisman",
+      "Fury Talisman",
+      "Galvanic Wand",
+      "Gelid Staff",
+      "Gemini Bow",
+      "Gemini Crossbow",
+      "Gladiatorial Helm",
+      "Gleaming Cuffs",
+      "Golden Obi",
+      "Grand Bracers",
+      "Grand Spear",
+      "Grim Gloves",
+      "Grinning Mask",
+      "Guardian Bow",
+      "Guardian Quarterstaff",
+      "Guardian Spear",
+      "Heavy Greathammer",
+      "Hefty Quarterstaff",
+      "Howling Talisman",
+      "Imperial Greathelm",
+      "Ironwood Greathammer",
+      "Ironwood Shortbow",
+      "Jade Club",
+      "Jade Talisman",
+      "Jagged Spear",
+      "Kalguuran Forgehammer",
+      "Kamasan Tiara",
+      "Knightly Mitts",
+      "Leyline Focus",
+      "Lumbering Talisman",
+      "Lunar Quarterstaff",
+      "Luxurious Slippers",
+      "Maji Talisman",
+      "Marauding Mace",
+      "Marching Mace",
+      "Masked Greathelm",
+      "Massive Greathammer",
+      "Massive Mitts",
+      "Massive Spear",
+      "Militant Bow",
+      "Molten Hammer",
+      "Morning Star",
+      "Noble Sabatons",
+      "Obliterator Bow",
+      "Omen Sceptre",
+      "Opulent Gloves",
+      "Orichalcum Spear",
+      "Ornate Greaves",
+      "Ornate Mitts",
+      "Ornate Plate",
+      "Paragon Greathelm",
+      "Paralysing Staff",
+      "Penetrating Quiver",
+      "Piercing Crossbow",
+      "Pointed Maul",
+      "Polished Bracers",
+      "Primed Quiver",
+      "Pronged Spear",
+      "Pyrophyte Staff",
+      "Quickslip Shoes",
+      "Rambler Jacket",
+      "Rattling Sceptre",
+      "Razor Quarterstaff",
+      "Reaping Staff",
+      "Roaring Staff",
+      "Roaring Talisman",
+      "Ruination Maul",
+      "Sacramental Robe",
+      "Sacred Focus",
+      "Sacred Maul",
+      "Sacrificial Regalia",
+      "Saintly Crown",
+      "Sanctified Staff",
+      "Sandsworn Sandals",
+      "Seastorm Mantle",
+      "Secured Wraps",
+      "Sekhema Sandals",
+      "Shrine Sceptre",
+      "Shrouded Mail",
+      "Siege Crossbow",
+      "Sinister Quarterstaff",
+      "Siphoning Wand",
+      "Sirenscale Gloves",
+      "Skullcrusher Quarterstaff",
+      "Skycrown Tiara",
+      "Sleek Jacket",
+      "Slipstrike Vest",
+      "Smooth Quarterstaff",
+      "Soaring Mask",
+      "Soaring Spear",
+      "Soldier Cuirass",
+      "Solemn Maul",
+      "Sorcerous Tiara",
+      "Spiked Spear",
+      "Spiny Talisman",
+      "Stalking Bracers",
+      "Stalking Spear",
+      "Steelmail Gauntlets",
+      "Stoic Sceptre",
+      "Stout Crossbow",
+      "Strife Pick",
+      "Striking Quarterstaff",
+      "Structured Hammer",
+      "Swiftstalker Coat",
+      "Tasalian Focus",
+      "Tasalian Greaves",
+      "Tawhoan Greatclub",
+      "Thane Mail",
+      "Thunder Talisman",
+      "Totemic Greatclub",
+      "Trapper Hood",
+      "Tribal Bow",
+      "Twin Bow",
+      "Twin Crossbow",
+      "Utility Belt",
+      "Utzaal Cuirass",
+      "Vaal Gloves",
+      "Vaal Greaves",
+      "Vaal Mitts",
+      "Vaal Wraps",
+      "Veteran Sabatons",
+      "Vile Robe",
+      "Visceral Quiver",
+      "Volant Quiver",
+      "Volatile Wand",
+      "Voltaic Staff",
+      "Voltfang Talisman",
+      "Wanderer Shoes",
+      "War Wraps",
+      "Warded Helm",
+      "Warlock Leggings",
+      "Warlord Cuirass",
+      "Warmonger Bow",
+      "Warmonger Greathelm",
+      "Waxing Quarterstaff",
+      "Wildwood Talisman",
+      "Wingbeat Talisman",
+      "Withered Wand",
+      "Wolfskin Mantle",
+      "Woven Cap",
+      "Wrath Sceptre",
+      "Wyrmscale Coat"
+    ]
+  }
+}
