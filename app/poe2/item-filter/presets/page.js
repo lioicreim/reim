@@ -29,8 +29,11 @@ export default function PresetsPage() {
   const allPresets = presetsData.presets.filter(p => !p.id.startsWith("ps5-"));
   const currentPreset = presetsData.presets.find(p => p.id === selectedPreset);
 
-  // PS5 체크박스 상태
-  const [isPS5, setIsPS5] = useState(false);
+  // 사운드 선택 상태 (default, ps5, none)
+  const [soundOption, setSoundOption] = useState("default");
+  
+  // isPS5는 기존 로직 호환성을 위해 유지
+  const isPS5 = soundOption === "ps5";
 
   // 제외 옵션 체크박스 상태
   const [excludedOptions, setExcludedOptions] = useState({
@@ -125,26 +128,57 @@ export default function PresetsPage() {
                 );
               })}
             </div>
-            <div className="ps5-checkbox-section">
-              <label className="ps5-checkbox" title={lang === "ko" ? "기본 사운드로 변경됩니다" : "Will change to default sound"}>
-                <input
-                  type="checkbox"
-                  checked={isPS5}
-                  onChange={(e) => setIsPS5(e.target.checked)}
-                />
-                <span>{lang === "ko" ? "PS5" : "PS5"}</span>
-              </label>
-            </div>
-          </div>
-
-          {/* 선택된 프리셋 설명 및 제외 옵션 */}
-          {currentPreset && (
-            <div className="preset-details-section">
+            {/* 선택된 프리셋 설명 */}
+            {currentPreset && (
               <p className="preset-description-text">
                 {lang === "ko" ? currentPreset.descriptionKo : currentPreset.description}
               </p>
+            )}
+          </div>
 
-              <div className="preset-description-divider"></div>
+          {/* 사운드 선택 및 제외 옵션 */}
+          {currentPreset && (
+            <div className="preset-details-section">
+              {/* 사운드 선택 영역 */}
+              <div className="sound-selection-section">
+                <p className="sound-selection-label">
+                  {lang === "ko" ? "사운드를 설정하세요" : "SELECT SOUND SETTING"}
+                </p>
+                <div className="sound-radio-group">
+                  <label className="sound-radio-option">
+                    <input
+                      type="radio"
+                      name="sound"
+                      value="default"
+                      checked={soundOption === "default"}
+                      onChange={(e) => setSoundOption(e.target.value)}
+                    />
+                    <span className="sound-radio-label">{lang === "ko" ? "기본값" : "Default"}</span>
+                  </label>
+                  <label className="sound-radio-option">
+                    <input
+                      type="radio"
+                      name="sound"
+                      value="ps5"
+                      checked={soundOption === "ps5"}
+                      onChange={(e) => setSoundOption(e.target.value)}
+                    />
+                    <span className="sound-radio-label">{lang === "ko" ? "PS5" : "PS5"}</span>
+                  </label>
+                  <label className="sound-radio-option">
+                    <input
+                      type="radio"
+                      name="sound"
+                      value="none"
+                      checked={soundOption === "none"}
+                      onChange={(e) => setSoundOption(e.target.value)}
+                    />
+                    <span className="sound-radio-label">{lang === "ko" ? "모든 사운드 제거" : "Remove All Sounds"}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="sound-section-divider"></div>
 
               <div className="exclude-options-section">
                 <p className="exclude-options-label">
@@ -214,8 +248,42 @@ export default function PresetsPage() {
       </div>
 
       <style jsx>{`
+        .container {
+          background: #0a0a0a;
+        }
+
+        .card {
+          background: transparent;
+          border: none;
+          box-shadow: none;
+        }
+
+        .cardBody {
+          padding: 0;
+        }
+
         .preset-selection-section {
-          margin-bottom: 32px;
+          margin-bottom: 16px;
+        }
+
+        .preset-description-text {
+          font-size: 14px;
+          color: var(--text);
+          line-height: 1.6;
+          margin-top: 24px;
+          margin-bottom: 0;
+          text-align: center;
+          min-height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          white-space: pre-line;
+          background: #1a1a1a;
+          border-radius: 0;
+          max-width: 800px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         .preset-selection-label {
@@ -266,13 +334,34 @@ export default function PresetsPage() {
           color: var(--text);
         }
 
-        .ps5-checkbox-section {
-          display: flex;
-          justify-content: center;
-          margin-top: 16px;
+        .sound-selection-section {
+          margin-bottom: 32px;
         }
 
-        .ps5-checkbox {
+        .sound-selection-label {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--text);
+          margin-bottom: 16px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          text-align: center;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .sound-radio-group {
+          display: flex;
+          flex-direction: row;
+          gap: 24px;
+          margin-bottom: 16px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .sound-radio-option {
           display: flex;
           align-items: center;
           gap: 10px;
@@ -282,42 +371,33 @@ export default function PresetsPage() {
           user-select: none;
         }
 
-        .ps5-checkbox input[type="checkbox"] {
+        .sound-radio-option input[type="radio"] {
           width: 18px;
           height: 18px;
           cursor: pointer;
           accent-color: var(--poe2-primary, var(--game-primary));
         }
 
-        .ps5-checkbox:hover {
+        .sound-radio-label {
+          flex: 1;
+        }
+
+        .sound-radio-option:hover {
           color: var(--text);
+        }
+
+        .sound-section-divider {
+          width: 400px;
+          height: 1px;
+          background: var(--border);
+          margin: 32px auto;
         }
 
         .preset-details-section {
           padding-top: 24px;
-          border-top: 1px solid var(--border);
+          border-top: none;
           min-height: 400px;
-        }
-
-        .preset-description-text {
-          font-size: 14px;
-          color: var(--text);
-          line-height: 1.6;
-          margin-bottom: 24px;
-          text-align: center;
-          min-height: 80px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0 20px;
-          white-space: pre-line;
-        }
-
-        .preset-description-divider {
-          width: 100%;
-          height: 1px;
-          background: var(--border);
-          margin: 24px 0;
+          background: transparent;
         }
 
         .exclude-options-section {
@@ -325,14 +405,14 @@ export default function PresetsPage() {
         }
 
         .exclude-options-label {
-          font-size: 12px;
+          font-size: 16px;
           font-weight: 600;
-          color: var(--muted);
+          color: var(--text);
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          margin-bottom: 12px;
+          margin-bottom: 16px;
           text-align: center;
-          height: 20px;
+          height: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -372,8 +452,8 @@ export default function PresetsPage() {
           gap: 12px;
           padding-top: 24px;
           padding-bottom: 24px;
-          border-top: 1px solid var(--border);
-          justify-content: flex-end;
+          border-top: none;
+          justify-content: center;
           height: 80px;
           align-items: center;
           box-sizing: border-box;
@@ -390,6 +470,7 @@ export default function PresetsPage() {
           transition: opacity 0.2s;
           min-width: 160px;
           white-space: nowrap;
+          border-radius: 0;
         }
 
         .btn-primary:hover {
@@ -398,7 +479,7 @@ export default function PresetsPage() {
 
         .btn-secondary {
           padding: 12px 24px;
-          background: var(--panel2);
+          background: #1a1a1a;
           color: var(--text);
           border: 1px solid var(--border);
           font-size: 14px;
@@ -407,10 +488,11 @@ export default function PresetsPage() {
           transition: background 0.2s;
           min-width: 120px;
           white-space: nowrap;
+          border-radius: 0;
         }
 
         .btn-secondary:hover {
-          background: var(--panel);
+          background: rgba(255, 255, 255, 0.05);
         }
 
         @media (max-width: 768px) {

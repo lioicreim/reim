@@ -1686,6 +1686,17 @@ export default function QuickFiltersPage() {
         })()}
 
       <style jsx>{`
+        .card {
+          background: transparent;
+          border: none;
+          box-shadow: none;
+        }
+
+        .cardBody {
+          background: transparent;
+          padding: 0;
+        }
+
         .quick-filters-layout {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -1702,7 +1713,7 @@ export default function QuickFiltersPage() {
         .quick-filters-column {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 8px;
         }
 
         .column-header {
@@ -1741,7 +1752,7 @@ export default function QuickFiltersPage() {
         .league-start-wrapper {
           display: flex;
           flex-direction: column;
-          gap: 0;
+          gap: 8px;
           margin-bottom: 0;
         }
 
@@ -2132,7 +2143,7 @@ export default function QuickFiltersPage() {
         }
 
         .quick-filter-section {
-          margin-bottom: 0;
+          margin-bottom: 8px;
           display: flex;
           flex-direction: column;
         }
@@ -2143,13 +2154,17 @@ export default function QuickFiltersPage() {
           gap: 12px;
           margin-bottom: 0;
           padding: 8px 12px;
-          background: var(--panel2);
+          background: #1a1a1a;
           border: 1px solid var(--border);
           cursor: pointer;
           transition: all 0.2s;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
           width: 100%;
           box-sizing: border-box;
+        }
+
+        .quick-filter-section {
+          margin-bottom: 8px;
         }
 
         .section-header .section-title {
@@ -2192,7 +2207,7 @@ export default function QuickFiltersPage() {
           width: 18px;
           height: 18px;
           cursor: pointer;
-          accent-color: var(--poe2-primary, var(--game-primary));
+          accent-color: #b65951;
           margin: 0;
           padding: 0;
         }
@@ -2217,8 +2232,8 @@ export default function QuickFiltersPage() {
           gap: 0;
           padding: 0;
           margin: 0;
-          background: var(--panel);
-          border: 1px solid var(--border);
+          background: transparent;
+          border: none;
           border-top: none;
         }
 
@@ -2234,33 +2249,23 @@ export default function QuickFiltersPage() {
         }
 
         .filter-rule-item {
-          display: flex;
+          display: flex !important;
           align-items: center;
           gap: 10px;
           padding: 2px 16px 2px 32px;
-          min-height: auto;
-          border-bottom: none;
+          min-height: 46px !important;
+          height: 46px !important;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
           position: relative;
+          background: #141414 !important;
         }
 
         .filter-rule-item::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 32px;
-          right: 0;
-          height: 1px;
-          background: #000000;
+          display: none !important;
         }
 
-        .filter-rule-item:last-child::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 32px;
-          right: 0;
-          height: 1px;
-          background: #000000;
+        .filter-rule-item:last-child {
+          border-bottom: none !important;
         }
 
         .rule-checkbox {
@@ -2275,7 +2280,7 @@ export default function QuickFiltersPage() {
           width: 18px;
           height: 18px;
           cursor: pointer;
-          accent-color: var(--poe2-primary, var(--game-primary));
+          accent-color: #b65951;
           margin: 0;
           padding: 0;
         }
@@ -2290,7 +2295,9 @@ export default function QuickFiltersPage() {
         }
 
         .rule-edit-button {
-          padding: 6px 16px;
+          padding: 0;
+          width: 42px;
+          height: 26px;
           background: transparent;
           border: 1px solid var(--border);
           color: var(--muted);
@@ -2300,6 +2307,9 @@ export default function QuickFiltersPage() {
           white-space: nowrap;
           flex-shrink: 0;
           border-radius: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .rule-edit-button:hover {

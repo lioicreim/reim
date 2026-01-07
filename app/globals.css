@@ -8,10 +8,13 @@
 
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 
+  /* 사이트 기본 블랙 컬러 */
+  --black: #0a0a0a;
+
   /* 게임별 메인 컬러 (기본값: POE2 파란색) */
-  --game-primary: #3E63DD;
-  --game-primary-hover: rgba(62, 99, 221, 0.1);
-  --game-primary-border: #3E63DD;
+  --game-primary: #155dfc;
+  --game-primary-hover: rgba(21, 93, 252, 0.1);
+  --game-primary-border: #155dfc;
 
   /* Tier colors (FilterBlade 느낌) */
   --t1: #3b1b1b; /* Elite-ish */
@@ -30,16 +33,16 @@
 
 /* 게임별 메인 컬러 설정 */
 .game-poe2 {
-  --game-primary: #3E63DD; /* 파란색 */
-  --game-primary-hover: rgba(62, 99, 221, 0.1);
-  --game-primary-border: #3E63DD;
+  --game-primary: #155dfc; /* 파란색 */
+  --game-primary-hover: rgba(21, 93, 252, 0.1);
+  --game-primary-border: #155dfc;
   
   /* POE2 전용 컬러 변수 */
-  --poe2-primary: #3E63DD;
+  --poe2-primary: #155dfc;
   --poe2-secondary: #ffffff;
-  --poe2-primary-rgb: 62, 99, 221;
-  --poe2-primary-hover: rgba(62, 99, 221, 0.1);
-  --poe2-primary-light: rgba(62, 99, 221, 0.05);
+  --poe2-primary-rgb: 21, 93, 252;
+  --poe2-primary-hover: rgba(21, 93, 252, 0.1);
+  --poe2-primary-light: rgba(21, 93, 252, 0.05);
 }
 
 .game-poe1 {
@@ -80,7 +83,7 @@
 }
 
 body {
-  background: #121212;
+  background: #0a0a0a;
   color: var(--text);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
@@ -225,7 +228,7 @@ body {
 
 /* 게임 네비게이션 */
 .game-nav {
-  background: #1a1a1a;
+  background: #0a0a0a;
   border-bottom: 1px solid var(--border);
   position: relative;
   z-index: 150;
@@ -248,7 +251,7 @@ body {
   align-items: center;
   color: var(--muted);
   text-decoration: none;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -276,21 +279,10 @@ body {
 }
 
 .game-nav-item.active {
-  color: var(--game-secondary, #ffffff);
-  background: var(--game-primary);
+  color: var(--text);
+  background: transparent;
   border-bottom: 2px solid var(--game-primary);
   z-index: 1;
-}
-
-.game-nav-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--game-primary);
-  z-index: 2;
 }
 
 /* 게임 배너 */
@@ -312,8 +304,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
 }
+
+/* 배경 이미지가 있을 때 */
+.game-banner.game-hero[style*="--bg-image-url"] {
+  background-image: var(--bg-image-url);
+  background-size: cover;
+  background-position: center;
+}
+
+.game-banner.game-hero[style*="--bg-image-url"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* POE2도 다른 게임들과 동일한 어두운 그라데이션 사용 */
 
 .game-hero-overlay {
   position: absolute;
@@ -321,8 +334,10 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
 }
+
+/* 모든 게임 동일한 오버레이 */
 
 .game-hero-content {
   position: relative;
@@ -349,7 +364,7 @@ body {
 
 /* 게임 서브 네비게이션 */
 .game-sub-nav {
-  background: #1a1a1a;
+  background: #0f0f0f;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0; /* 브라우저 상단에 고정 */
@@ -388,14 +403,25 @@ body {
 }
 
 .game-sub-nav-item.active {
-  color: var(--poe2-secondary, #ffffff);
+  color: var(--text);
+  background: transparent;
+  border-bottom: none;
+}
+
+.game-sub-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
   background: var(--poe2-primary, var(--game-primary));
-  border-bottom: 2px solid var(--poe2-primary, var(--game-primary));
 }
 
 /* POE2 서브 네비게이션 */
 .poe2-sub-nav {
-  background: #1a1a1a;
+  background: #0f0f0f;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -434,9 +460,20 @@ body {
 }
 
 .poe2-sub-nav-item.active {
-  color: var(--poe2-secondary, #ffffff);
+  color: var(--text);
+  background: transparent;
+  border-bottom: none;
+}
+
+.poe2-sub-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
   background: var(--poe2-primary, var(--game-primary));
-  border-bottom: 2px solid var(--poe2-primary, var(--game-primary));
 }
 
 /* 아이템 필터 레이아웃 */
@@ -488,8 +525,9 @@ body {
 }
 
 .item-filter-nav-item.active {
-  color: var(--poe2-secondary, #ffffff);
-  border-bottom-color: var(--poe2-primary, var(--game-primary));
+  color: var(--text);
+  background: transparent;
+  border-bottom: 2px solid var(--poe2-primary, var(--game-primary));
 }
 
 .item-filter-content {
@@ -499,6 +537,7 @@ body {
 /* 페이지 컨텐츠 래퍼 */
 .page-content-wrapper {
   width: 100%;
+  background: #0a0a0a;
 }
 
 /* 애드센스 사이드바 */
@@ -599,13 +638,68 @@ body {
   color: var(--muted);
 }
 
-/* 체크박스와 라디오 버튼 통일 스타일 (프리셋 디자인) */
-input[type="checkbox"],
-input[type="radio"] {
+/* 체크박스 스타일 */
+input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: var(--poe2-primary, var(--game-primary));
+  accent-color: #b65951;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+  background: transparent;
+  position: relative;
+  transition: all 0.2s;
+}
+
+input[type="checkbox"]:checked {
+  background: #b65951;
+  border-color: #b65951;
+}
+
+input[type="checkbox"]:checked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* 커스텀 라디오 버튼 스타일 */
+input[type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  background: transparent;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input[type="radio"]:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 선택된 라디오 버튼 - 완전히 채워진 원 */
+input[type="radio"]:checked {
+  border: none;
+  background: var(--game-primary);
+  box-shadow: 0 0 4px rgba(21, 93, 252, 0.3);
+}
+
+input[type="radio"]:checked::before {
+  display: none;
 }
 
 /* 전역 슬라이더 스타일 (드래그로 조절하는 모든 슬라이더에 적용) */
@@ -1113,33 +1207,19 @@ div.leveling-dropdown-item-multi.selected,
   align-items: center !important;
   gap: 10px !important;
   padding: 2px 16px 2px 32px !important;
-  min-height: auto !important;
-  border-bottom: none !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
   position: relative !important;
+  background: #141414 !important;
 }
 
 .filter-rule-item::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 32px !important;
-  right: 0 !important;
-  height: 1px !important;
-  background: #000000 !important;
-}
-
-.filter-rule-item:last-child::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 32px !important;
-  right: 0 !important;
-  height: 1px !important;
-  background: #000000 !important;
+  display: none !important;
 }
 
 .filter-rule-item:last-child {
-  border-bottom: 1px solid #000000 !important;
+  border-bottom: none !important;
 }
 
 .rule-checkbox {
@@ -1169,7 +1249,9 @@ div.leveling-dropdown-item-multi.selected,
 }
 
 .rule-edit-button {
-  padding: 6px 16px !important;
+  padding: 0 !important;
+  width: 42px !important;
+  height: 26px !important;
   background: transparent !important;
   border: 1px solid var(--border) !important;
   color: var(--muted) !important;
@@ -1179,10 +1261,31 @@ div.leveling-dropdown-item-multi.selected,
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .rule-edit-button:hover {
   background: rgba(255, 255, 255, 0.05) !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
   color: var(--text) !important;
+}
+
+/* 404 페이지 스타일 */
+.not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #0a0a0a;
+  padding: 24px;
+}
+
+.not-found-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
 }

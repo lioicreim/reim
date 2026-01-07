@@ -65,14 +65,15 @@ export default function GameBanner() {
 
   const game = gameInfo[activeGame];
 
+  // bgImage가 실제로 존재하는지 확인 (임시로 false로 설정 - 나중에 이미지 추가 시 수정)
+  const hasBgImage = false; // game.bgImage && 이미지 파일이 실제로 존재할 때 true로 변경
+  
   return (
     <div 
       className="game-banner game-hero"
-      style={{
-        backgroundImage: game.bgImage ? `url(${game.bgImage})` : "none",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      style={hasBgImage && game.bgImage ? {
+        '--bg-image-url': `url(${game.bgImage})`,
+      } : {}}
     >
       <div className="game-hero-overlay"></div>
       <div className="game-hero-content">
