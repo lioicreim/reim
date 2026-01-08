@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+
 :root {
   --bg: #0b0f14;
   --panel: #1a1a1a;
@@ -5,16 +7,39 @@
   --border: rgba(255, 255, 255, 0.08);
   --text: rgba(255, 255, 255, 0.92);
   --muted: rgba(255, 255, 255, 0.62);
+  --foreground: oklch(.145 0 0);
 
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 
   /* 사이트 기본 블랙 컬러 */
   --black: #0a0a0a;
 
+  /* 회색 컬러 - 비활성화 상태 등에 사용 */
+  --color-gray-500: oklch(.551 .027 264.364);
+  --color-gray-300: oklch(.872 .01 258.338);
+
+  /* 폰트 */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "맑은 고딕", dotum, "돋움", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* 폰트 크기 (기본: 16px = 1rem) */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px - 기본 */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+  --text-6xl: 3.75rem;   /* 60px */
+  --text-7xl: 4rem;      /* 64px */
+
   /* 게임별 메인 컬러 (기본값: POE2 파란색) */
   --game-primary: #155dfc;
   --game-primary-hover: rgba(21, 93, 252, 0.1);
   --game-primary-border: #155dfc;
+  --game-primary-bg: rgba(21, 93, 252, 0.1); /* 배경용 어두운 버전 */
 
   /* Tier colors (FilterBlade 느낌) */
   --t1: #3b1b1b; /* Elite-ish */
@@ -23,11 +48,11 @@
   --t4: #1f2b35;
 
   /* S~E Tier colors - 옵션 1: 클래식 게임 스타일 (고대비, 명확한 구분) */
-  --tier-s: #ffffff; /* S 티어 배경색 - 흰색 */
-  --tier-a: rgb(204, 90, 138); /* A 티어 배경색 */
-  --tier-b: rgb(205, 82, 80); /* B 티어 배경색 */
-  --tier-c: rgb(255, 165, 0); /* 주황색 (Exalted Orb 스타일) */
-  --tier-d: rgb(210, 178, 135); /* D 티어 배경색 - 기본값 */
+  --tier-s: #ff4757; /* S 티어 배경색 - 빨간색 */
+  --tier-a: #ff6348; /* A 티어 배경색 - 주황-빨간색 */
+  --tier-b: #FF9800; /* B 티어 배경색 - 주황색 */
+  --tier-c: #FFC107; /* C 티어 배경색 - 노란색 */
+  --tier-d: #95a5a6; /* D 티어 배경색 - 회색 */
   --tier-e: #000000; /* 검은색 - 기본값 */
 }
 
@@ -36,6 +61,7 @@
   --game-primary: #155dfc; /* 파란색 */
   --game-primary-hover: rgba(21, 93, 252, 0.1);
   --game-primary-border: #155dfc;
+  --game-primary-bg: rgba(21, 93, 252, 0.1); /* 배경용 어두운 버전 */
   
   /* POE2 전용 컬러 변수 */
   --poe2-primary: #155dfc;
@@ -43,30 +69,35 @@
   --poe2-primary-rgb: 21, 93, 252;
   --poe2-primary-hover: rgba(21, 93, 252, 0.1);
   --poe2-primary-light: rgba(21, 93, 252, 0.05);
+  --poe2-primary-bg: rgba(21, 93, 252, 0.1); /* 배경용 어두운 버전 */
 }
 
 .game-poe1 {
   --game-primary: #ff6b35; /* 주황색 */
   --game-primary-hover: rgba(255, 107, 53, 0.1);
   --game-primary-border: #ff6b35;
+  --game-primary-bg: rgba(255, 107, 53, 0.1); /* 배경용 어두운 버전 */
 }
 
 .game-wow {
-  --game-primary: #D6409F; /* 핑크/마젠타 */
-  --game-primary-hover: rgba(214, 64, 159, 0.1);
-  --game-primary-border: #D6409F;
+  --game-primary: #a3ff12; /* 밝은 녹색 */
+  --game-primary-hover: rgba(163, 255, 18, 0.1);
+  --game-primary-border: #a3ff12;
+  --game-primary-bg: rgba(163, 255, 18, 0.1); /* 배경용 어두운 버전 */
 }
 
 .game-last-epoch {
   --game-primary: #9d4edd; /* 보라색 */
   --game-primary-hover: rgba(157, 78, 221, 0.1);
   --game-primary-border: #9d4edd;
+  --game-primary-bg: rgba(157, 78, 221, 0.1); /* 배경용 어두운 버전 */
 }
 
 .game-fellowship {
   --game-primary: #ffd700; /* 금색 */
   --game-primary-hover: rgba(255, 215, 0, 0.1);
   --game-primary-border: #ffd700;
+  --game-primary-bg: rgba(255, 215, 0, 0.1); /* 배경용 어두운 버전 */
   --game-secondary: #000000; /* 검은색 텍스트 */
 }
 
@@ -74,6 +105,7 @@
   --game-primary: #ff4757; /* 빨간색 */
   --game-primary-hover: rgba(255, 71, 87, 0.1);
   --game-primary-border: #ff4757;
+  --game-primary-bg: rgba(255, 71, 87, 0.1); /* 배경용 어두운 버전 */
 }
 
 * {
@@ -83,9 +115,10 @@
 }
 
 body {
-  background: #0a0a0a;
+  background: var(--foreground);
   color: var(--text);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
   min-height: 100vh;
 }
 
@@ -148,7 +181,7 @@ body {
 }
 
 .site-name {
-  font-size: 18px;
+  font-size: var(--text-2xl);
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -241,7 +274,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0;
-  height: 48px;
+  height: 56px;
 }
 
 .game-nav-item {
@@ -348,7 +381,7 @@ body {
 .game-logo {
   font-size: 64px;
   font-weight: 800;
-  color: var(--tier-s);
+  color: var(--game-primary);
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 12px;
@@ -364,7 +397,7 @@ body {
 
 /* 게임 서브 네비게이션 */
 .game-sub-nav {
-  background: #0f0f0f;
+  background: #0a0a0a;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0; /* 브라우저 상단에 고정 */
@@ -378,23 +411,27 @@ body {
   display: flex;
   align-items: center;
   gap: 0;
-  height: 48px;
+  height: 56px;
 }
 
 .game-sub-nav-item {
-  padding: 0 20px;
+  padding: 0 10px;
   height: 100%;
   display: flex;
   align-items: center;
   color: var(--muted);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: color 0.2s, background 0.2s;
   border-bottom: 2px solid transparent;
   position: relative;
+}
+
+.game-sub-nav-item:first-child {
+  padding-left: 10px;
 }
 
 .game-sub-nav-item:hover {
@@ -421,7 +458,7 @@ body {
 
 /* POE2 서브 네비게이션 */
 .poe2-sub-nav {
-  background: #0f0f0f;
+  background: #0a0a0a;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -445,13 +482,17 @@ body {
   align-items: center;
   color: var(--muted);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: color 0.2s, background 0.2s;
   border-bottom: 2px solid transparent;
   position: relative;
+}
+
+.poe2-sub-nav-item:first-child {
+  padding-left: 0;
 }
 
 .poe2-sub-nav-item:hover {
@@ -485,7 +526,7 @@ body {
 
 /* 아이템 필터 네비게이션 */
 .item-filter-nav {
-  background: #0f0f0f;
+  background: #0f0f0f !important;
   border-bottom: 1px solid var(--border);
   padding: 0;
   position: sticky;
@@ -515,8 +556,21 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: color 0.2s, background 0.2s;
-  border-bottom: 2px solid transparent;
   position: relative;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
+  margin-right: -12px;
+}
+
+.item-filter-nav-item:first-child {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+  margin-left: 0;
+  padding-left: 10px;
+}
+
+.item-filter-nav-item:last-child {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%);
+  margin-right: 0;
+  padding-right: 24px;
 }
 
 .item-filter-nav-item:hover {
@@ -526,18 +580,65 @@ body {
 
 .item-filter-nav-item.active {
   color: var(--text);
-  background: transparent;
-  border-bottom: 2px solid var(--poe2-primary, var(--game-primary));
+  background: var(--poe2-primary, var(--game-primary));
+  z-index: 1;
 }
 
 .item-filter-content {
   flex: 1;
 }
 
+/* 필터 네비게이션 설명 영역 */
+.item-filter-description {
+  background: #141414;
+  padding: 12px 34px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.item-filter-description p {
+  margin: 0;
+  color: var(--color-gray-300);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.item-filter-description.tier-list-description {
+  background: #141414;
+  height: 72px;
+  padding: 12px 34px;
+  padding: 12px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
 /* 페이지 컨텐츠 래퍼 */
 .page-content-wrapper {
   width: 100%;
-  background: #0a0a0a;
+  background: var(--foreground);
+}
+
+/* 게임별 페이지 배경색 (임시) */
+.game-poe2 .page-content-wrapper {
+  background: var(--foreground);
+}
+
+.game-poe1 .page-content-wrapper {
+  background: var(--foreground);
+}
+
+.game-wow .page-content-wrapper {
+  background: var(--foreground);
+}
+
+.game-last-epoch .page-content-wrapper {
+  background: var(--foreground);
 }
 
 /* 애드센스 사이드바 */
@@ -565,7 +666,7 @@ body {
 
 .ad-label {
   font-size: 12px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.62) !important;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -573,7 +674,7 @@ body {
 
 .ad-content {
   font-size: 14px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.62) !important;
   opacity: 0.5;
 }
 
@@ -607,6 +708,7 @@ body {
 
 .cardBody {
   padding: 16px;
+  background: transparent;
 }
 
 .grid4 {
@@ -643,7 +745,7 @@ input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #b65951;
+  accent-color: var(--poe2-primary, var(--game-primary));
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -655,8 +757,8 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:checked {
-  background: #b65951;
-  border-color: #b65951;
+  background: var(--poe2-primary, var(--game-primary));
+  border-color: var(--poe2-primary, var(--game-primary));
 }
 
 input[type="checkbox"]:checked::before {
@@ -811,6 +913,17 @@ input[type="range"]::-moz-range-track {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.action-button-reset {
+  background: var(--panel2);
+  color: var(--text);
+  border-color: #ff4757;
+}
+
+.action-button-reset:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #ff4757;
+}
+
 .action-button .dropdown-icon {
   font-size: 10px;
   margin-left: 4px;
@@ -856,22 +969,39 @@ input[type="range"]::-moz-range-track {
   position: relative !important;
   display: flex !important;
   flex-direction: column !important;
-  min-width: 120px !important;
-  max-width: 160px !important;
+  width: 106px !important;
+  min-width: 106px !important;
+  max-width: 106px !important;
   z-index: 1 !important;
   margin: 4px !important;
 }
 
 .leveling-class-dropdown-wrapper {
-  min-width: 120px !important;
-  max-width: 160px !important;
-  margin: 4px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 4px !important;
+}
+
+.leveling-dropdown-row-item {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
 }
 
 .leveling-dropdown-row-item .leveling-dropdown-wrapper {
-  min-width: 120px !important;
-  max-width: 160px !important;
-  margin: 4px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 4px !important;
+}
+
+.leveling-dropdown-row-item .leveling-armour-dropdown-wrapper,
+.leveling-armour-dropdown-wrapper {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
 .leveling-dropdowns-row {
@@ -884,13 +1014,6 @@ input[type="range"]::-moz-range-track {
   flex-wrap: nowrap !important;
 }
 
-.leveling-dropdown-row-item {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0 !important;
-  margin: 0 !important;
-}
-
 /* section-content 내부의 leveling-dropdowns-row 강제 가로 배치 */
 .section-content .leveling-dropdowns-row {
   display: flex !important;
@@ -898,29 +1021,71 @@ input[type="range"]::-moz-range-track {
   gap: 0 !important;
   align-items: center !important;
   justify-content: center !important;
-  margin: 4px !important;
+  margin: 0 !important;
+  padding: 16px !important;
   flex-wrap: nowrap !important;
   width: 100% !important;
+  background: #141414 !important;
+  box-sizing: border-box !important;
+}
+
+/* 드롭다운 버튼과 초기화 버튼 - section-content 내부에서도 적용되도록 */
+.section-content .leveling-dropdown-button,
+.section-content .leveling-dropdowns-row .leveling-dropdown-button {
+  background: #0a0a0a !important;
+  height: 38px !important;
+  font-size: 14px !important;
+  padding: 0 10px !important;
+}
+
+.section-content .leveling-dropdown-button.selected,
+.section-content .leveling-dropdowns-row .leveling-dropdown-button.selected {
+  background: #0a0a0a !important;
+}
+
+.section-content .leveling-reset-button,
+.section-content .leveling-dropdowns-row .leveling-reset-button {
+  background: #0a0a0a !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0 !important;
+  height: 38px !important;
+  width: 78px !important;
+  padding: 0 10px !important;
+  font-size: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+.section-content .leveling-reset-button:hover,
+.section-content .leveling-dropdowns-row .leveling-reset-button:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--border) !important;
 }
 
 /* 초기화 버튼 스타일 - quick-filters 페이지용 */
 .leveling-reset-button {
-  padding: 8px 16px !important;
-  background: transparent !important;
-  border: 1px solid #3E63DD !important;
-  color: #ffffff !important;
+  height: 38px !important;
+  width: 78px !important;
+  padding: 0 10px !important;
+  background: #0a0a0a !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
   font-size: 14px !important;
   font-weight: 400 !important;
   cursor: pointer !important;
   transition: all 0.2s !important;
-  border-radius: 4px !important;
+  border-radius: 0 !important;
   margin-left: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 .leveling-reset-button:hover {
-  background: rgba(62, 99, 221, 0.1) !important;
-  border-color: #3E63DD !important;
-  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
 }
 
 /* 아이템 희귀도 섹션 스타일 - quick-filters 페이지용 */
@@ -929,7 +1094,7 @@ input[type="range"]::-moz-range-track {
   flex-direction: row !important;
   gap: 16px !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   flex-wrap: wrap !important;
   width: 100% !important;
   margin: 0 auto !important;
@@ -940,10 +1105,13 @@ input[type="range"]::-moz-range-track {
   flex-direction: row !important;
   gap: 16px !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   flex-wrap: wrap !important;
   width: 100% !important;
-  margin: 0 auto !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  background: #141414 !important;
+  box-sizing: border-box !important;
 }
 
 .leveling-rarity-title {
@@ -977,11 +1145,12 @@ input[type="range"]::-moz-range-track {
 
 .leveling-dropdown-button {
   width: 100% !important;
-  padding: 6px 10px !important;
-  background: var(--panel2) !important;
+  height: 38px !important;
+  padding: 0 10px !important;
+  background: #0a0a0a !important;
   border: 1px solid var(--border) !important;
   color: var(--text) !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
   cursor: pointer !important;
   transition: all 0.2s !important;
@@ -1004,7 +1173,7 @@ input[type="range"]::-moz-range-track {
 }
 
 .leveling-dropdown-button.selected {
-  background: var(--panel2) !important;
+  background: #0a0a0a !important;
   border-color: var(--border) !important;
   color: var(--text) !important;
 }
@@ -1143,56 +1312,117 @@ div.leveling-dropdown-item-multi.selected,
   padding: 3px 0 !important;
 }
 
-/* 섹션 헤더 스타일 - quick-filters 페이지용 */
-.section-header {
+/* 섹션 헤더 스타일 - quick-filters 페이지 및 접히는 섹션용 */
+.quick-filter-section .section-header,
+.league-start-wrapper .section-header,
+.quick-filters-column .section-header {
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
   margin-bottom: 0 !important;
-  padding: 8px 12px !important;
-  background: var(--panel2) !important;
+  padding: 12px !important;
+  height: 44px !important;
+  background: #1a1a1a !important;
   border: 1px solid var(--border) !important;
   cursor: pointer !important;
-  transition: all 0.2s !important;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  position: relative !important;
 }
 
-.section-header .section-title {
+/* 활성화된 섹션 헤더 왼쪽 수직 바 */
+.quick-filter-section .section-header.section-header-expanded::before,
+.league-start-wrapper .section-header.section-header-expanded::before,
+.quick-filters-column .section-header.section-header-expanded::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 3px !important;
+  background: var(--poe2-primary, var(--game-primary)) !important;
+}
+
+/* 활성화된(펼쳐진) 섹션 헤더 배경 컬러 - #1a1a1a 유지 */
+.quick-filter-section .section-header.section-header-expanded,
+.league-start-wrapper .section-header.section-header-expanded,
+.quick-filters-column .section-header.section-header-expanded {
+  background: #1a1a1a !important;
+}
+
+.quick-filter-section .section-header.section-header-expanded:hover,
+.league-start-wrapper .section-header.section-header-expanded:hover,
+.quick-filters-column .section-header.section-header-expanded:hover {
+  background: #1a1a1a !important;
+  border-color: var(--poe2-primary, var(--game-primary)) !important;
+}
+
+/* 마우스 오버 시 테두리 색상 */
+.quick-filter-section .section-header:hover,
+.league-start-wrapper .section-header:hover,
+.quick-filters-column .section-header:hover {
+  border-color: var(--poe2-primary, var(--game-primary)) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* quick-filters 페이지의 section-header 내부 요소들 */
+.quick-filter-section .section-header .section-title,
+.league-start-wrapper .section-header .section-title,
+.quick-filters-column .section-header .section-title {
   flex: 1 !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
   font-weight: 600 !important;
   margin: 0 !important;
   color: var(--text) !important;
 }
 
-.section-header .active-rules-count {
+.quick-filter-section .section-header .active-rules-count,
+.league-start-wrapper .section-header .active-rules-count,
+.quick-filters-column .section-header .active-rules-count {
   margin-left: auto !important;
-  font-size: 12px !important;
-  color: var(--muted) !important;
+  font-size: 14px !important;
+  color: var(--color-gray-500) !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   font-weight: 400 !important;
   letter-spacing: 0 !important;
 }
 
-.section-toggle-icon {
-  font-size: 12px !important;
+.quick-filter-section .section-header .section-toggle-icon,
+.league-start-wrapper .section-header .section-toggle-icon,
+.quick-filters-column .section-header .section-toggle-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 24px !important;
   color: var(--muted) !important;
   margin-left: 8px !important;
   flex-shrink: 0 !important;
-  white-space: nowrap !important;
 }
 
-.section-checkbox {
+.quick-filter-section .section-header .section-toggle-icon svg,
+.league-start-wrapper .section-header .section-toggle-icon svg,
+.quick-filters-column .section-header .section-toggle-icon svg {
+  width: 24px !important;
+  height: 24px !important;
+  display: block !important;
+}
+
+.quick-filter-section .section-header .section-checkbox,
+.league-start-wrapper .section-header .section-checkbox,
+.quick-filters-column .section-header .section-checkbox {
   display: flex !important;
   align-items: center !important;
   cursor: pointer !important;
   flex-shrink: 0 !important;
 }
 
-.section-checkbox input[type="checkbox"] {
+.quick-filter-section .section-header .section-checkbox input[type="checkbox"],
+.league-start-wrapper .section-header .section-checkbox input[type="checkbox"],
+.quick-filters-column .section-header .section-checkbox input[type="checkbox"] {
   width: 18px !important;
   height: 18px !important;
   cursor: pointer !important;
@@ -1254,7 +1484,7 @@ div.leveling-dropdown-item-multi.selected,
   height: 26px !important;
   background: transparent !important;
   border: 1px solid var(--border) !important;
-  color: var(--muted) !important;
+  color: var(--color-gray-500) !important;
   font-size: 13px !important;
   cursor: pointer !important;
   transition: all 0.2s !important;

@@ -1,4 +1,3 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./components/Header";
 import GameNav from "./components/GameNav";
 import GameBanner from "./components/GameBanner";
@@ -6,16 +5,6 @@ import GameSubNav from "./components/GameSubNav";
 import ItemFilterNav from "./components/ItemFilterNav";
 import GameThemeProvider from "./components/GameThemeProvider";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   title: "REIM - 게임 포털",
@@ -25,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <GameThemeProvider />
         <div className="layout-wrapper">
           {/* 좌측 애드센스 */}

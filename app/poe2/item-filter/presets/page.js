@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import presetsData from "@/data/presets.json";
+import ItemFilterActions from "@/app/components/ItemFilterActions";
 import { generateFilterCode } from "@/lib/filter-generator";
 
 export default function PresetsPage() {
@@ -71,8 +72,9 @@ export default function PresetsPage() {
     }
   }, [selectedLeague]);
 
-  // 프리셋 적용 및 다운로드
-  const handleApplyPreset = () => {
+
+  // 다운로드 핸들러
+  const handleDownload = () => {
     try {
       const filterCode = generateFilterCode({
         presetId: selectedPreset,
@@ -100,6 +102,121 @@ export default function PresetsPage() {
       alert(lang === "ko" ? "필터 생성 중 오류가 발생했습니다." : "Error generating filter.");
     }
   };
+
+  // 복사 핸들러
+  const handleCopy = async () => {
+    try {
+      const filterCode = generateFilterCode({
+        presetId: selectedPreset,
+        isPS5: isPS5,
+        excludedOptions: excludedOptions,
+        customGearTiers: customGearTiers,
+        customCurrencyTiers: customCurrencyTiers,
+        selectedLeague: selectedLeague,
+      });
+
+      await navigator.clipboard.writeText(filterCode);
+      alert(lang === "ko" ? "필터 코드가 클립보드에 복사되었습니다!" : "Filter code copied to clipboard!");
+    } catch (error) {
+      console.error("Copy failed:", error);
+      alert(lang === "ko" ? "복사 중 오류가 발생했습니다." : "Error copying to clipboard.");
+    }
+  };
+
+  // 전체 초기화 핸들러
+  const handleResetAll = (onSuccess) => {
+    // 선택된 프리셋 상태로 모든 설정 초기화
+    setSelectedPreset(selectedPreset);
+    setSoundOption("default");
+    setExcludedOptions({
+      emotionScroll: false,
+      socketItem: false,
+      craftingBaseNormal: false,
+      disassembleItem: false,
+      classChangeItem: false,
+    });
+    setCustomGearTiers({});
+    setCustomCurrencyTiers({});
+    setSelectedLeague("default");
+    
+    // 다른 페이지의 설정도 초기화 (localStorage)
+    if (typeof window !== "undefined") {
+      // 빠른설정 초기화
+      localStorage.removeItem("quickFilter_gold");
+      // 티어 리스트 초기화
+      localStorage.removeItem("tier-list-custom-gear");
+      const leagues = ["default", "normal", "early", "mid", "late", "ssf"];
+      leagues.forEach(league => {
+        localStorage.removeItem(`tier-list-custom-currency-${league}`);
+      });
+      // 사운드 설정 초기화
+      // 커스텀 규칙 초기화
+      // 설정 초기화
+    }
+    
+    if (onSuccess) {
+      onSuccess(lang === "ko" ? "전체 설정이 초기화되었습니다." : "All settings have been reset.");
+    }
+  };
+
+  // 이 페이지만 초기화 핸들러
+  const handleResetPage = (onSuccess) => {
+    // 현재 페이지의 설정만 선택한 프리셋 값으로 초기화
+    setSoundOption("default");
+    setExcludedOptions({
+      emotionScroll: false,
+      socketItem: false,
+      craftingBaseNormal: false,
+      disassembleItem: false,
+      classChangeItem: false,
+    });
+    setCustomGearTiers({});
+    setCustomCurrencyTiers({});
+    setSelectedLeague("default");
+    
+    // 현재 페이지의 localStorage 초기화
+    if (typeof window !== "undefined") {
+      const defaultKey = `preset_default_${selectedPreset}`;
+      localStorage.removeItem(defaultKey);
+    }
+    
+    if (onSuccess) {
+      onSuccess(lang === "ko" ? "이 페이지의 설정이 초기화되었습니다." : "This page's settings have been reset.");
+    }
+  };
+
+  // 기본값으로 저장 핸들러
+  const handleSaveAsDefault = (presetId) => {
+    if (
+      confirm(
+        lang === "ko"
+          ? `현재 설정을 "${
+              presetsData.presets.find((p) => p.id === presetId)?.nameKo ||
+              presetId
+            }" 프리셋의 기본값으로 저장하시겠습니까?`
+          : `Save current settings as default for "${
+              presetsData.presets.find((p) => p.id === presetId)?.name ||
+              presetId
+            }" preset?`
+      )
+    ) {
+      // TODO: 서버에 저장 (현재는 로컬스토리지에만 저장)
+      const defaultKey = `preset_default_${presetId}`;
+      const presetData = {
+        presetId: selectedPreset,
+        soundOption: soundOption,
+        excludedOptions: excludedOptions,
+      };
+      if (typeof window !== "undefined") {
+        localStorage.setItem(defaultKey, JSON.stringify(presetData));
+        alert(
+          lang === "ko" ? "기본값으로 저장되었습니다!" : "Saved as default!"
+        );
+      }
+      setShowSaveDefaultDropdown(false);
+    }
+  };
+
 
 
   return (
@@ -142,7 +259,7 @@ export default function PresetsPage() {
               {/* 사운드 선택 영역 */}
               <div className="sound-selection-section">
                 <p className="sound-selection-label">
-                  {lang === "ko" ? "사운드를 설정하세요" : "SELECT SOUND SETTING"}
+                  {lang === "ko" ? "사운드를 선택하세요" : "SELECT SOUND SETTING"}
                 </p>
                 <div className="sound-radio-group">
                   <label className="sound-radio-option">
@@ -153,7 +270,7 @@ export default function PresetsPage() {
                       checked={soundOption === "default"}
                       onChange={(e) => setSoundOption(e.target.value)}
                     />
-                    <span className="sound-radio-label">{lang === "ko" ? "기본값" : "Default"}</span>
+                    <span className="sound-radio-label">{lang === "ko" ? "PC" : "PC"}</span>
                   </label>
                   <label className="sound-radio-option">
                     <input
@@ -173,8 +290,26 @@ export default function PresetsPage() {
                       checked={soundOption === "none"}
                       onChange={(e) => setSoundOption(e.target.value)}
                     />
-                    <span className="sound-radio-label">{lang === "ko" ? "모든 사운드 제거" : "Remove All Sounds"}</span>
+                    <span className="sound-radio-label">{lang === "ko" ? "없음" : "None"}</span>
                   </label>
+                </div>
+                {/* 사운드 옵션 설명 */}
+                <div className="sound-option-description">
+                  {soundOption === "default" && (
+                    <p className="sound-description-text">
+                      {lang === "ko" ? "기본 커스텀 사운드를 적용합니다" : "Apply default custom sound"}
+                    </p>
+                  )}
+                  {soundOption === "ps5" && (
+                    <p className="sound-description-text">
+                      {lang === "ko" ? "인게임 기본 사운드로 적용합니다 (예: PlayAlertSound 6 300)" : "Apply in-game default sound (e.g., PlayAlertSound 6 300)"}
+                    </p>
+                  )}
+                  {soundOption === "none" && (
+                    <p className="sound-description-text">
+                      {lang === "ko" ? "모든 사운드를 제거합니다" : "Remove all sounds"}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -228,28 +363,24 @@ export default function PresetsPage() {
                 </div>
               </div>
 
-              <div className="preset-actions">
-                <button 
-                  className="btn-primary"
-                  onClick={handleApplyPreset}
-                >
-                  {lang === "ko" ? "이 프리셋 적용" : "Apply This Preset"}
-                </button>
-                <button 
-                  className="btn-secondary"
-                  title={lang === "ko" ? "현재 프리셋을 기반으로 새로운 커스텀 프리셋을 만듭니다" : "Create a new custom preset based on the current preset"}
-                >
-                  {lang === "ko" ? "프리셋 복제" : "Clone Preset"}
-                </button>
-              </div>
             </div>
           )}
         </div>
       </div>
 
+      {/* 하단 액션 버튼들 */}
+      <ItemFilterActions
+        lang={lang}
+        onDownload={handleDownload}
+        onCopy={handleCopy}
+        onResetAll={handleResetAll}
+        onResetPage={handleResetPage}
+        onSaveAsDefault={handleSaveAsDefault}
+      />
+
       <style jsx>{`
         .container {
-          background: #0a0a0a;
+          background: var(--foreground);
         }
 
         .card {
@@ -267,8 +398,8 @@ export default function PresetsPage() {
         }
 
         .preset-description-text {
-          font-size: 14px;
-          color: var(--text);
+          font-size: 16px;
+          color: var(--color-gray-300);
           line-height: 1.6;
           margin-top: 24px;
           margin-bottom: 0;
@@ -289,7 +420,7 @@ export default function PresetsPage() {
         .preset-selection-label {
           font-size: 16px;
           font-weight: 600;
-          color: var(--text);
+          color: var(--color-gray-300);
           margin-bottom: 16px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -314,7 +445,7 @@ export default function PresetsPage() {
           align-items: center;
           gap: 10px;
           cursor: pointer;
-          font-size: 14px;
+          font-size: 16px;
           color: var(--text);
           user-select: none;
         }
@@ -341,7 +472,7 @@ export default function PresetsPage() {
         .sound-selection-label {
           font-size: 16px;
           font-weight: 600;
-          color: var(--text);
+          color: var(--color-gray-300);
           margin-bottom: 16px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -366,7 +497,7 @@ export default function PresetsPage() {
           align-items: center;
           gap: 10px;
           cursor: pointer;
-          font-size: 14px;
+          font-size: 16px;
           color: var(--text);
           user-select: none;
         }
@@ -386,6 +517,23 @@ export default function PresetsPage() {
           color: var(--text);
         }
 
+        .sound-option-description {
+          margin-top: 16px;
+          margin-bottom: 16px;
+          text-align: center;
+          min-height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .sound-description-text {
+          font-size: 14px;
+          color: var(--color-gray-300);
+          line-height: 1.6;
+          margin: 0;
+        }
+
         .sound-section-divider {
           width: 400px;
           height: 1px;
@@ -394,9 +542,9 @@ export default function PresetsPage() {
         }
 
         .preset-details-section {
-          padding-top: 24px;
+          padding-top: 0;
+          padding-bottom: 12px;
           border-top: none;
-          min-height: 400px;
           background: transparent;
         }
 
@@ -407,7 +555,7 @@ export default function PresetsPage() {
         .exclude-options-label {
           font-size: 16px;
           font-weight: 600;
-          color: var(--text);
+          color: var(--color-gray-300);
           text-transform: uppercase;
           letter-spacing: 0.5px;
           margin-bottom: 16px;
@@ -431,7 +579,7 @@ export default function PresetsPage() {
           align-items: center;
           gap: 10px;
           cursor: pointer;
-          font-size: 14px;
+          font-size: 16px;
           color: var(--text);
           user-select: none;
         }
@@ -445,54 +593,6 @@ export default function PresetsPage() {
 
         .exclude-option:hover {
           color: var(--text);
-        }
-
-        .preset-actions {
-          display: flex;
-          gap: 12px;
-          padding-top: 24px;
-          padding-bottom: 24px;
-          border-top: none;
-          justify-content: center;
-          height: 80px;
-          align-items: center;
-          box-sizing: border-box;
-        }
-
-        .btn-primary {
-          padding: 12px 24px;
-          background: var(--poe2-primary, var(--game-primary));
-          color: var(--poe2-secondary, #ffffff);
-          border: none;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: opacity 0.2s;
-          min-width: 160px;
-          white-space: nowrap;
-          border-radius: 0;
-        }
-
-        .btn-primary:hover {
-          opacity: 0.9;
-        }
-
-        .btn-secondary {
-          padding: 12px 24px;
-          background: #1a1a1a;
-          color: var(--text);
-          border: 1px solid var(--border);
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.2s;
-          min-width: 120px;
-          white-space: nowrap;
-          border-radius: 0;
-        }
-
-        .btn-secondary:hover {
-          background: rgba(255, 255, 255, 0.05);
         }
 
         @media (max-width: 768px) {

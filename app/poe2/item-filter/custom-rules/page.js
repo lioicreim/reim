@@ -1,8 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ItemFilterActions from "@/app/components/ItemFilterActions";
 
 export default function CustomRulesPage() {
+  const [lang, setLang] = useState("ko");
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem("lang") || "ko";
+    setLang(savedLang);
+
+    const handleLangChange = () => {
+      const currentLang = localStorage.getItem("lang") || "ko";
+      setLang(currentLang);
+    };
+
+    window.addEventListener("storage", handleLangChange);
+    window.addEventListener("langchange", handleLangChange);
+
+    return () => {
+      window.removeEventListener("storage", handleLangChange);
+      window.removeEventListener("langchange", handleLangChange);
+    };
+  }, []);
+
   const [rules, setRules] = useState([
     {
       id: 1,
@@ -70,6 +91,47 @@ export default function CustomRulesPage() {
           </div>
         </div>
       </div>
+      <ItemFilterActions
+        lang={lang}
+        onDownload={() => alert(lang === "ko" ? "다운로드 기능은 준비 중입니다." : "Download feature coming soon.")}
+        onCopy={() => alert(lang === "ko" ? "복사 기능은 준비 중입니다." : "Copy feature coming soon.")}
+        onResetAll={(onSuccess) => {
+          // 전체 초기화: 모든 설정 초기화
+          setRules([]);
+          // 다른 페이지의 설정도 초기화
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("quickFilter_gold");
+            localStorage.removeItem("tier-list-custom-gear");
+            const leagues = ["default", "normal", "early", "mid", "late", "ssf"];
+            leagues.forEach(league => {
+              localStorage.removeItem(`tier-list-custom-currency-${league}`);
+            });
+          }
+          if (onSuccess) {
+            onSuccess(lang === "ko" ? "전체 설정이 초기화되었습니다." : "All settings have been reset.");
+          }
+        }}
+        onResetPage={(onSuccess) => {
+          // 이 페이지만: 현재 페이지의 설정만 초기화
+          setRules([]);
+          if (onSuccess) {
+            onSuccess(lang === "ko" ? "이 페이지의 설정이 초기화되었습니다." : "This page's settings have been reset.");
+          }
+        }}
+        onLoadFromFile={() => alert(lang === "ko" ? "파일 불러오기 기능은 준비 중입니다." : "File load feature coming soon.")}
+        onSaveAsDefault={(presetId) => {
+          if (
+            confirm(
+              lang === "ko"
+                ? `현재 설정을 기본값으로 저장하시겠습니까?`
+                : `Save current settings as default?`
+            )
+          ) {
+            // TODO: 실제 저장 로직 구현
+            alert(lang === "ko" ? "기본값으로 저장되었습니다!" : "Saved as default!");
+          }
+        }}
+      />
 
       <style jsx>{`
         .btn-primary {

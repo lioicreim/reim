@@ -53,6 +53,7 @@ export default function GameSubNav() {
           { id: "community", name: "커뮤니티", path: `/${game}/community` },
           { id: "guides", name: "가이드", path: `/${game}/guides` },
           { id: "strategy", name: "공략", path: `/${game}/strategy` },
+          { id: "item-filter", name: "아이템필터", path: `/${game}/item-filter` },
           { id: "library", name: "자료실", path: `/${game}/library` },
         ];
       case "fellowship":

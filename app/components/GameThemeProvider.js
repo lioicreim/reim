@@ -61,6 +61,13 @@ export default function GameThemeProvider() {
         body.style.setProperty("--game-primary", color);
         body.style.setProperty("--game-primary-hover", `rgba(${r}, ${g}, ${b}, 0.1)`);
         body.style.setProperty("--game-primary-border", color);
+        body.style.setProperty("--game-primary-bg", `rgba(${r}, ${g}, ${b}, 0.1)`); // 배경용 어두운 버전
+        
+        // POE2 전용 변수도 업데이트
+        if (gameId === "poe2") {
+          body.style.setProperty("--poe2-primary", color);
+          body.style.setProperty("--poe2-primary-bg", `rgba(${r}, ${g}, ${b}, 0.1)`);
+        }
       }
     }
     
@@ -78,6 +85,13 @@ export default function GameThemeProvider() {
           body.style.setProperty("--game-primary", color);
           body.style.setProperty("--game-primary-hover", `rgba(${r}, ${g}, ${b}, 0.1)`);
           body.style.setProperty("--game-primary-border", color);
+          body.style.setProperty("--game-primary-bg", `rgba(${r}, ${g}, ${b}, 0.1)`); // 배경용 어두운 버전
+          
+          // POE2 전용 변수도 업데이트
+          if (gameId === "poe2") {
+            body.style.setProperty("--poe2-primary", color);
+            body.style.setProperty("--poe2-primary-bg", `rgba(${r}, ${g}, ${b}, 0.1)`);
+          }
         }
       }
     };

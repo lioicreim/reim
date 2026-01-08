@@ -137,8 +137,12 @@ export default function Poe2Page() {
           border-radius: 0;
           overflow: hidden;
           text-decoration: none;
-          color: var(--text);
+          color: var(--text) !important;
           transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .guide-card * {
+          color: inherit;
         }
 
         .guide-card:hover {
@@ -178,6 +182,7 @@ export default function Poe2Page() {
           font-weight: 700;
           margin-bottom: 8px;
           line-height: 1.4;
+          color: var(--text);
         }
 
         .guide-description {
@@ -247,6 +252,7 @@ export default function Poe2Page() {
           font-size: 16px;
           font-weight: 600;
           margin-bottom: 4px;
+          color: var(--text);
         }
 
         .popular-meta {

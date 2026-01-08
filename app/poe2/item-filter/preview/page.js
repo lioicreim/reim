@@ -284,28 +284,33 @@ export default function PreviewPage() {
 
   // 티어별 색상 (필터 코드에서 색상이 없을 때 기본값 적용)
   const getTierColor = (tier) => {
+    // 인게임 폰트 크기 기준: S~B: 45, C~D: 42, E: 38
+    // 프리뷰에서는 50% 축소 적용 (임시 미리보기 화면이므로)
     const tierMap = {
-      S: { bg: "#ffffff", text: "#000000", beam: "#ff0000" },
-      A: { bg: "rgb(204, 90, 138)", text: "#ffffff", beam: "#ff8800" },
-      B: { bg: "rgb(205, 82, 80)", text: "#ffffff", beam: "#ffff00" },
-      C: { bg: "rgb(255, 165, 0)", text: "#000000", beam: "#ffff00" },
+      S: { bg: "#ffffff", text: "#ff0000", beam: "#ff0000", fontSize: 45 * 0.5 }, // 22.5
+      A: { bg: "rgb(204, 90, 138)", text: "#ffffff", beam: "#ff8800", fontSize: 45 * 0.5 }, // 22.5
+      B: { bg: "rgb(205, 82, 80)", text: "#ffffff", beam: "#ffff00", fontSize: 45 * 0.5 }, // 22.5
+      C: { bg: "rgb(255, 165, 0)", text: "#000000", beam: "#ffff00", fontSize: 42 * 0.5 }, // 21
       D: { 
         bg: `rgb(${DEFAULT_BACKGROUND_COLOR.r}, ${DEFAULT_BACKGROUND_COLOR.g}, ${DEFAULT_BACKGROUND_COLOR.b})`, 
         text: `rgb(${DEFAULT_TEXT_COLOR.r}, ${DEFAULT_TEXT_COLOR.g}, ${DEFAULT_TEXT_COLOR.b})`, 
-        beam: "#ffffff" 
+        beam: "#ffffff",
+        fontSize: 42 * 0.5 // 21
       },
       E: { 
         bg: `rgb(${DEFAULT_BACKGROUND_COLOR.r}, ${DEFAULT_BACKGROUND_COLOR.g}, ${DEFAULT_BACKGROUND_COLOR.b})`, 
         text: `rgb(${DEFAULT_TEXT_COLOR.r}, ${DEFAULT_TEXT_COLOR.g}, ${DEFAULT_TEXT_COLOR.b})`, 
-        beam: "#ffffff" 
+        beam: "#ffffff",
+        fontSize: 38 * 0.5 // 19
       },
-      1: { bg: "#ffffff", text: "#000000", beam: "#ff0000" },
-      2: { bg: "rgb(204, 90, 138)", text: "#ffffff", beam: "#ff8800" },
-      3: { bg: "rgb(205, 82, 80)", text: "#ffffff", beam: "#ffff00" },
+      1: { bg: "#ffffff", text: "#ff0000", beam: "#ff0000", fontSize: 45 * 0.5 }, // 22.5
+      2: { bg: "rgb(204, 90, 138)", text: "#ffffff", beam: "#ff8800", fontSize: 45 * 0.5 }, // 22.5
+      3: { bg: "rgb(205, 82, 80)", text: "#ffffff", beam: "#ffff00", fontSize: 45 * 0.5 }, // 22.5
       4: { 
         bg: `rgb(${DEFAULT_BACKGROUND_COLOR.r}, ${DEFAULT_BACKGROUND_COLOR.g}, ${DEFAULT_BACKGROUND_COLOR.b})`, 
         text: `rgb(${DEFAULT_TEXT_COLOR.r}, ${DEFAULT_TEXT_COLOR.g}, ${DEFAULT_TEXT_COLOR.b})`, 
-        beam: "#ffff00" 
+        beam: "#ffff00",
+        fontSize: 42 * 0.5 // 21
       },
     };
     return tierMap[tier] || tierMap.D;
@@ -444,7 +449,7 @@ export default function PreviewPage() {
                     className="preview-item-wrapper"
                     data-index={index}
                   >
-                    <div className="preview-item-box" style={{ background: colors.bg, color: colors.text }}>
+                    <div className="preview-item-box" style={{ background: colors.bg, color: colors.text, fontSize: colors.fontSize + 'px' }}>
                       {itemName}
                     </div>
                   </div>
@@ -745,8 +750,7 @@ export default function PreviewPage() {
 
 
         .preview-item-box {
-          padding: 4px 8px;
-          font-size: 12px;
+          padding: 4.8px 9.6px;
           font-weight: 600;
           white-space: nowrap;
           border: none;
@@ -760,6 +764,10 @@ export default function PreviewPage() {
           position: relative;
           z-index: 1;
           background: inherit;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .preview-item-wrapper:hover .preview-item-box {
