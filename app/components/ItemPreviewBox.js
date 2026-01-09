@@ -20,21 +20,22 @@ export default function ItemPreviewBox({
   backgroundImage = "/preview-ground.jpg"
 }) {
   // 인게임 기본값
-  const DEFAULT_TEXT_COLOR = { r: 210, g: 178, b: 135, a: 255 };
+  const DEFAULT_TEXT_COLOR = { r: 171, g: 159, b: 130, a: 255 }; // #ab9f82
   const DEFAULT_BACKGROUND_COLOR = { r: 0, g: 0, b: 0, a: 255 };
-  // 테두리는 기본값이 없음 (표시 안됨)
+  const DEFAULT_BORDER_COLOR = { r: 10, g: 13, b: 17, a: 255 }; // #0a0d11
 
   const {
     fontSize = 30,
     textColor: textColorRaw,
     backgroundColor: backgroundColorRaw,
-    borderColor = null, // 기본값 없음
+    borderColor: borderColorRaw = null,
     playEffect = null,
   } = styles;
 
   // null이나 undefined일 때 기본값 사용
   const textColor = textColorRaw || DEFAULT_TEXT_COLOR;
   const backgroundColor = backgroundColorRaw || DEFAULT_BACKGROUND_COLOR;
+  const borderColor = borderColorRaw || DEFAULT_BORDER_COLOR;
 
   // 인게임 폰트 크기를 프리뷰 크기로 변환 (인게임 45 = 프리뷰 약 24px 정도로 조정)
   // 인게임 폰트 크기와 웹 프리뷰 크기의 비율을 조정
@@ -63,11 +64,9 @@ export default function ItemPreviewBox({
             backgroundColor: backgroundColor
               ? `rgba(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, ${(backgroundColor.a || 255) / 255})`
               : `rgba(${DEFAULT_BACKGROUND_COLOR.r}, ${DEFAULT_BACKGROUND_COLOR.g}, ${DEFAULT_BACKGROUND_COLOR.b}, ${DEFAULT_BACKGROUND_COLOR.a / 255})`,
-            borderColor: borderColor
-              ? `rgba(${borderColor.r}, ${borderColor.g}, ${borderColor.b}, ${(borderColor.a || 255) / 255})`
-              : "transparent",
-            borderWidth: borderColor ? "1px" : "0px",
-            borderStyle: borderColor ? "solid" : "none",
+            borderColor: `rgba(${borderColor.r}, ${borderColor.g}, ${borderColor.b}, ${(borderColor.a || 255) / 255})`,
+            borderWidth: "1px",
+            borderStyle: "solid",
           }}
         >
           {itemName}

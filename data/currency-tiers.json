@@ -250,7 +250,17 @@
       "Ancient Crisis Fragment",
       "Primary Calamity Fragment",
       "Secondary Calamity Fragment",
-      "Tertiary Calamity Fragment"
+      "Tertiary Calamity Fragment",
+      "Amanamu's Gaze",
+      "Tecrod's Gaze",
+      "Concentrated Liquid Suffering",
+      "Concentrated Liquid Isolation",
+      "Soul Core of Jiquani",
+      "Quipolatl's Thesis",
+      "Jiquani's Thesis",
+      "Guatelitzi's Thesis",
+      "Idol of Sirrius",
+      "Idol of Eeshta"
     ],
     "A": [
       "Architect's Orb",
@@ -268,7 +278,14 @@
       "Weathered Crisis Fragment",
       "Cowardly Fate",
       "Deadly Fate",
-      "Victorious Fate"
+      "Victorious Fate",
+      "Kurgal's Gaze",
+      "Concentrated Liquid Fear",
+      "Tzamoto's Soul Core of Ferocity",
+      "Soul Core of Zalatl",
+      "Soul Core of Azcapa",
+      "Rabbit Idol",
+      "Fox Idol"
     ],
     "B": [
       "Ancient Infuser",
@@ -310,7 +327,26 @@
       "Chayula's Catalyst",
       "Skittering Catalyst",
       "Ritual Precursor Tablet",
-      "Abyss Precursor Tablet"
+      "Abyss Precursor Tablet",
+      "Ulaman's Gaze",
+      "Liquid Despair",
+      "Zalatl's Soul Core of Insulation",
+      "Topotante's Soul Core of Dampening",
+      "Atmohua's Soul Core of Retreat",
+      "Quipolatl's Soul Core of Flow",
+      "Opiloti's Soul Core of Assault",
+      "Guatelitzi's Soul Core of Endurance",
+      "Xopec's Soul Core of Power",
+      "Estazunti's Soul Core of Convalescence",
+      "Xipocado's Soul Core of Dominion",
+      "Soul Core of Tacati",
+      "Soul Core of Citaqualotl",
+      "Soul Core of Quipolatl",
+      "Soul Core of Ticaba",
+      "Soul Core of Zantipi",
+      "Citaqualotl's Thesis",
+      "Idol of Egrin",
+      "Idol of Ralakesh"
     ],
     "C": [
       "Arcanist's Etcher",
@@ -402,7 +438,32 @@
       "Expedition Precursor Tablet",
       "Delirium Precursor Tablet",
       "Precursor Tablet",
-      "Overseer Precursor Tablet"
+      "Overseer Precursor Tablet",
+      "Liquid Envy",
+      "Liquid Disgust",
+      "Simulacrum Splinter",
+      "Hayoxi's Soul Core of Heatproofing",
+      "Uromoti's Soul Core of Attenuation",
+      "Tacati's Soul Core of Affliction",
+      "Cholotl's Soul Core of War",
+      "Citaqualotl's Soul Core of Foulness",
+      "Soul Core of Opiloti",
+      "Soul Core of Puhuarte",
+      "Soul Core of Tzamoto",
+      "Soul Core of Xopec",
+      "Soul Core of Topotante",
+      "Soul Core of Atmohua",
+      "Soul Core of Cholotl",
+      "Idol of Thruldana",
+      "Idol of Grold",
+      "Idol of Maxarius",
+      "Snake Idol",
+      "Primate Idol",
+      "Owl Idol",
+      "Wolf Idol",
+      "Stag Idol",
+      "Bear Idol",
+      "Ox Idol"
     ],
     "D": [
       "Blacksmith's Whetstone",
@@ -460,7 +521,10 @@
       "Greater Essence of Alacrity",
       "Lesser Essence of Opulence",
       "Lesser Essence of Command",
-      "Greater Essence of Command"
+      "Greater Essence of Command",
+      "Liquid Paranoia",
+      "Cat Idol",
+      "Boar Idol"
     ],
     "E": [
       "Artificer's Shard",
@@ -513,7 +577,10 @@
       "Greater Essence of Flames",
       "Greater Essence of Electricity",
       "Greater Essence of Battle",
-      "Greater Essence of the Infinite"
+      "Greater Essence of the Infinite",
+      "Diluted Liquid Greed",
+      "Diluted Liquid Ire",
+      "Diluted Liquid Guilt"
     ]
   }
 }

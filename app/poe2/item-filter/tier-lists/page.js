@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import bases from "@/data/bases.json";
 import classes from "@/data/classes.json";
@@ -16,6 +16,7 @@ import quickFilterDefaults from "@/data/quick-filter-defaults.json";
 import NotificationModal from "@/app/components/NotificationModal";
 import StyleSettingsModal from "@/app/components/StyleSettingsModal";
 import currencyTypeDefaultColors from "@/data/currency-type-default-colors.json";
+import filterRules from "@/data/filter-rules.json";
 
 // 티어 매핑: 1->S, 2->A, 3->B, 4->C, 5->D, 6->E
 const tierMapping = {
@@ -239,10 +240,10 @@ export default function TierListPage() {
     { id: "essences", name: lang === "ko" ? "에센스" : "Essences" },
     { id: "ritual_omen", name: lang === "ko" ? "징조" : "Ritual Omen" },
     { id: "runes", name: lang === "ko" ? "룬" : "Runes" },
-    { id: "delirium", name: lang === "ko" ? "액체 감정" : "Delirium" },
+    { id: "delirium", name: lang === "ko" ? "환영" : "Delirium" },
     { id: "breach", name: lang === "ko" ? "균열" : "Breach" },
     { id: "ancient_bones", name: lang === "ko" ? "고대 뼈" : "Ancient Bones" },
-    { id: "abyssal", name: lang === "ko" ? "심연 응시" : "Abyssal" },
+    { id: "abyssal", name: lang === "ko" ? "심연" : "Abyssal" },
     { id: "expedition", name: lang === "ko" ? "탐험" : "Expedition" },
     { id: "tablet", name: lang === "ko" ? "서판" : "Tablet" },
     { id: "uncut_gems", name: lang === "ko" ? "미가공 젬" : "Uncut Gems" },
@@ -393,9 +394,16 @@ export default function TierListPage() {
         setCustomCurrencyTiers(JSON.parse(savedCurrencyTiers));
       } catch (e) {
         console.error("Failed to parse saved currency tiers:", e);
+        setCustomCurrencyTiers({});
       }
     } else {
-      setCustomCurrencyTiers({});
+      // 빈 객체는 한 번만 설정 (이미 빈 객체면 업데이트하지 않음)
+      setCustomCurrencyTiers(prev => {
+        if (Object.keys(prev).length === 0) {
+          return prev; // 이미 빈 객체면 변경하지 않음
+        }
+        return {}; // 변경이 필요한 경우만 업데이트
+      });
     }
     
     // 장비 커스텀 티어 불러오기
@@ -406,9 +414,16 @@ export default function TierListPage() {
         setCustomGearTiers(JSON.parse(savedGearTiers));
       } catch (e) {
         console.error("Failed to parse saved gear tiers:", e);
+        setCustomGearTiers({});
       }
     } else {
-      setCustomGearTiers({});
+      // 빈 객체는 한 번만 설정 (이미 빈 객체면 업데이트하지 않음)
+      setCustomGearTiers(prev => {
+        if (Object.keys(prev).length === 0) {
+          return prev; // 이미 빈 객체면 변경하지 않음
+        }
+        return {}; // 변경이 필요한 경우만 업데이트
+      });
     }
   }, [selectedLeague]);
 
@@ -810,10 +825,81 @@ export default function TierListPage() {
   }, [selectedCategory, debouncedUniqueSearchQuery, uniqueSearchMatches, isUniqueSearchResultInTiers]);
 
   // 화폐 종류별 티어 스타일 가져오기
+  // filter-rules.json에서 스타일 추출하는 헬퍼 함수
+  const getStyleFromFilterRules = (currencyTypeId, tier) => {
+    if (!currencyTypeId || !tier) return null;
+    
+    // RID 패턴 생성: "ancient_bones" -> "ancient_bone_d"
+    // 복수형을 단수형으로 변환하고 언더스코어 + 소문자 티어 추가
+    let ridPattern = currencyTypeId;
+    if (ridPattern.endsWith("s")) {
+      ridPattern = ridPattern.slice(0, -1); // 마지막 's' 제거
+    }
+    ridPattern = `${ridPattern}_${tier.toLowerCase()}`;
+    
+    // filter-rules.json에서 해당 RID 찾기
+    const rule = filterRules.rules.find(r => r.rid === ridPattern);
+    // rule이 없거나 styles 속성이 없으면 null 반환
+    // styles가 빈 배열이어도 객체를 반환 (필터 규칙이 존재하므로)
+    if (!rule || !rule.styles) return null;
+    
+    // styles 배열을 객체로 변환 (누락된 속성은 null로 설정)
+    const styleObj = {
+      fontSize: null,
+      textColor: null,
+      borderColor: null,
+      backgroundColor: null,
+      playEffect: null,
+      minimapIcon: null,
+      customSound: null,
+    };
+    
+    rule.styles.forEach(style => {
+      if (style.type === "fontSize") {
+        styleObj.fontSize = style.value;
+      } else if (style.type === "textColor") {
+        styleObj.textColor = { r: style.r, g: style.g, b: style.b, a: style.a || 255 };
+      } else if (style.type === "borderColor") {
+        styleObj.borderColor = { r: style.r, g: style.g, b: style.b, a: style.a || 255 };
+      } else if (style.type === "backgroundColor") {
+        styleObj.backgroundColor = { r: style.r, g: style.g, b: style.b, a: style.a || 255 };
+      } else if (style.type === "playEffect") {
+        styleObj.playEffect = style.value;
+      } else if (style.type === "minimapIcon") {
+        styleObj.minimapIcon = { size: style.size, color: style.color, shape: style.shape };
+      } else if (style.type === "customAlertSound") {
+        styleObj.customSound = style.file;
+        styleObj.soundPlatform = "PC";
+      } else if (style.type === "playAlertSound") {
+        styleObj.ps5Sound = style.slot;
+        styleObj.ps5SoundVolume = style.volume || 300; // 기본값 300
+        styleObj.soundPlatform = "PS5";
+        // PC/PS5 매핑 테이블을 사용하여 PC 사운드 찾기
+        const pcSoundMap = {
+          5: "custom_sound/1_currency_s.mp3",
+          1: "custom_sound/2_currency_a.mp3",
+          2: "custom_sound/3_currency_b.mp3",
+          3: "custom_sound/4_currency_c.mp3"
+        };
+        styleObj.customSound = pcSoundMap[style.slot] || null;
+      }
+    });
+    
+    return styleObj;
+  };
+
   const getCurrencyTypeTierStyle = (currencyTypeId, tier) => {
     if (!currencyTypeId || !tier) return null;
     
-    // currency-type-default-colors.json에서 기본 색상 정보 가져오기
+    // 1. filter-rules.json에서 실제 필터 규칙의 스타일 우선 가져오기
+    const filterRuleStyle = getStyleFromFilterRules(currencyTypeId, tier);
+    if (filterRuleStyle) {
+      // filter-generator.js의 getCurrencyTierColors에서 추가 정보 가져오기
+      const tierColors = getCurrencyTierColorsFromGenerator(tier);
+      return mergeTierStyles(filterRuleStyle, tierColors);
+    }
+    
+    // 2. filter-rules.json에 없으면 currency-type-default-colors.json에서 기본 색상 정보 가져오기
     const typeStyles = currencyTypeDefaultColors[currencyTypeId];
     if (!typeStyles) {
       // currencyTypeId가 없으면 "currency" 기본값 사용
@@ -894,8 +980,26 @@ export default function TierListPage() {
     localStorage.setItem(storageKey, JSON.stringify(savedStyles));
   };
 
-  // 티어의 첫 번째 아이템 이름 가져오기
-  const getFirstItemNameInTier = (tier, currencyTypeId) => {
+  // 화폐 아이템의 실제 티어 가져오기 (커스텀 티어 우선) - useCallback으로 메모이제이션하여 무한 루프 방지
+  // getFirstItemNameInTier보다 먼저 정의되어야 함
+  const getCurrencyItemTier = useCallback((itemName) => {
+    // selectedLeague를 그대로 사용 (default 키가 존재함)
+    const leagueKey = selectedLeague;
+    // 커스텀 티어가 있으면 사용
+    if (customCurrencyTiers[itemName]) {
+      return customCurrencyTiers[itemName];
+    }
+    // 기본 티어 찾기
+    for (const tier of ["S", "A", "B", "C", "D", "E"]) {
+      if (currencyTiers[leagueKey]?.[tier]?.includes(itemName)) {
+        return tier;
+      }
+    }
+    return null;
+  }, [selectedLeague, customCurrencyTiers]);
+
+  // 티어의 첫 번째 아이템 이름 가져오기 - useCallback으로 메모이제이션하여 무한 루프 방지
+  const getFirstItemNameInTier = useCallback((tier, currencyTypeId) => {
     const leagueKey = selectedLeague;
     
     // 선택된 화폐 종류에 해당하는 아이템만 필터링
@@ -932,7 +1036,7 @@ export default function TierListPage() {
     }
     
     return null;
-  };
+  }, [selectedLeague, getCurrencyItemTier]);
 
   // 티어 헤더 클릭 핸들러
   const handleTierHeaderClick = (tier) => {
@@ -982,25 +1086,6 @@ export default function TierListPage() {
       styles: currentStyles,
     });
   };
-
-
-  // 화폐 아이템의 실제 티어 가져오기 (커스텀 티어 우선)
-  const getCurrencyItemTier = (itemName) => {
-    // selectedLeague를 그대로 사용 (default 키가 존재함)
-    const leagueKey = selectedLeague;
-    // 커스텀 티어가 있으면 사용
-    if (customCurrencyTiers[itemName]) {
-      return customCurrencyTiers[itemName];
-    }
-    // 기본 티어 찾기
-    for (const tier of ["S", "A", "B", "C", "D", "E"]) {
-      if (currencyTiers[leagueKey]?.[tier]?.includes(itemName)) {
-        return tier;
-      }
-    }
-    return null;
-  };
-
 
   // 화폐 아이템 티어 변경
   const moveCurrencyItem = (itemName, fromTier, toTier) => {

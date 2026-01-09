@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 /**
  * 컬러 피커 컴포넌트
@@ -12,10 +12,12 @@ export default function ColorPicker({
   label = "",
   showCheckbox = false,
   checked = false,
-  onCheckboxChange = null
+  onCheckboxChange = null,
+  modalRef = null
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [localColor, setLocalColor] = useState(color || { r: 0, g: 0, b: 0, a: 255 });
+  const [initialColor, setInitialColor] = useState(null); // 컬러피커가 열릴 때의 색상 (취소 시 복원용)
   const [hexValue, setHexValue] = useState("");
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(100);
@@ -24,6 +26,8 @@ export default function ColorPicker({
   const [valueFormat, setValueFormat] = useState("hex"); // "hex", "rgba", "hsla"
   const pickerRef = useRef(null);
   const gradientRef = useRef(null);
+  const triggerRef = useRef(null);
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
   // S~D 티어에서 사용한 컬러 팔레트 (10개, 5개씩 2줄)
   const tierColors = [
@@ -102,22 +106,7 @@ export default function ColorPicker({
     }
   }, [color]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (pickerRef.current && !pickerRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
+  // 유틸 함수들 (먼저 정의)
   const rgbToHex = (r, g, b) => {
     return "#" + [r, g, b].map(x => {
       const hex = x.toString(16);
@@ -157,6 +146,118 @@ export default function ColorPicker({
     const v = Math.round(max * 100);
     return { h, s, v };
   };
+
+  // 취소 버튼 클릭 (초기 색상으로 되돌리기)
+  const handleCancel = useCallback(() => {
+    if (initialColor) {
+      // 초기 색상으로 되돌리기
+      setLocalColor(initialColor);
+      setHexValue(rgbToHex(initialColor.r, initialColor.g, initialColor.b));
+      const hsv = rgbToHsv(initialColor.r, initialColor.g, initialColor.b);
+      setHue(hsv.h);
+      setSaturation(hsv.s);
+      setBrightness(hsv.v);
+      setAlpha(initialColor.a || 255);
+    }
+    setIsOpen(false);
+    setInitialColor(null);
+  }, [initialColor]);
+
+  // 적용 버튼 클릭
+  const handleApply = useCallback(() => {
+    onChange(localColor);
+    setIsOpen(false);
+    setInitialColor(null);
+  }, [localColor, onChange]);
+
+  // 컬러피커가 열릴 때 초기 색상 저장
+  useEffect(() => {
+    if (isOpen && color && !initialColor) {
+      setInitialColor(color);
+    } else if (!isOpen) {
+      // 컬러피커가 닫힐 때 초기값 초기화
+      setInitialColor(null);
+    }
+  }, [isOpen, color, initialColor]);
+
+  // 팝업 위치 계산
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const popupWidth = 280; // 팝업 너비
+      const popupHeight = 350; // 대략적인 팝업 높이
+      const padding = 8;
+      
+      // 모달 내부인 경우 모달 왼쪽에 배치
+      if (modalRef && modalRef.current) {
+        const modalRect = modalRef.current.getBoundingClientRect();
+        const gap = 6; // 모달과 컬러피커 사이 간격
+        
+        setPopupPosition({
+          top: modalRect.top, // 모달의 위와 동일
+          left: modalRect.left - popupWidth - gap // 모달 왼쪽에 배치
+        });
+      } else {
+        // 기본 동작: 트리거 버튼의 위치를 계산하여 팝업 위치 설정
+        const rect = triggerRef.current.getBoundingClientRect();
+        
+        let top = rect.bottom + padding;
+        let left = rect.left;
+        
+        // 화면 오른쪽으로 나가지 않도록 조정
+        if (left + popupWidth > window.innerWidth) {
+          left = window.innerWidth - popupWidth - padding;
+        }
+        
+        // 화면 아래로 나가지 않도록 조정 (위로 표시)
+        if (top + popupHeight > window.innerHeight) {
+          top = rect.top - popupHeight - padding;
+        }
+        
+        // 화면 왼쪽으로 나가지 않도록 조정
+        if (left < padding) {
+          left = padding;
+        }
+        
+        // 화면 위로 나가지 않도록 조정
+        if (top < padding) {
+          top = padding;
+        }
+        
+        setPopupPosition({
+          top,
+          left
+        });
+      }
+    }
+  }, [isOpen, modalRef]);
+
+  // 외부 클릭 감지 및 ESC 키 감지
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target) &&
+          triggerRef.current && !triggerRef.current.contains(event.target)) {
+        // 외부 클릭 시 취소 (초기 색상으로 되돌리기)
+        handleCancel();
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        // ESC 키로 취소
+        handleCancel();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, handleCancel]);
 
   const hsvToRgb = (h, s, v) => {
     s /= 100;
@@ -221,7 +322,7 @@ export default function ColorPicker({
       if (rgb) {
         const newColor = { ...localColor, ...rgb };
         setLocalColor(newColor);
-        onChange(newColor);
+        // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
       }
     } else if (valueFormat === "rgba") {
       // rgba(255, 255, 255, 1.0) 형식 파싱
@@ -234,7 +335,7 @@ export default function ColorPicker({
         const newColor = { r, g, b, a };
         setLocalColor(newColor);
         setHexValue(rgbToHex(r, g, b));
-        onChange(newColor);
+        // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
       }
     } else if (valueFormat === "hsla") {
       // hsla(360, 100%, 50%, 1.0) 형식 파싱
@@ -248,7 +349,7 @@ export default function ColorPicker({
         const newColor = { ...rgb, a };
         setLocalColor(newColor);
         setHexValue(rgbToHex(rgb.r, rgb.g, rgb.b));
-        onChange(newColor);
+        // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
       }
     }
   };
@@ -325,7 +426,7 @@ export default function ColorPicker({
     const newColor = { ...rgb, a };
     setLocalColor(newColor);
     setHexValue(rgbToHex(rgb.r, rgb.g, rgb.b));
-    onChange(newColor);
+    // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
   };
 
   const handleColorPickerChange = (e) => {
@@ -339,7 +440,7 @@ export default function ColorPicker({
       setHue(hsv.h);
       setSaturation(hsv.s);
       setBrightness(hsv.v);
-      onChange(newColor);
+      // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
     }
   };
 
@@ -351,8 +452,7 @@ export default function ColorPicker({
     setSaturation(hsv.s);
     setBrightness(hsv.v);
     setAlpha(swatchColor.a || 255);
-    onChange(swatchColor);
-    // 팝업창은 닫지 않음
+    // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
   };
 
   const currentHex = rgbToHex(localColor.r || 0, localColor.g || 0, localColor.b || 0);
@@ -367,8 +467,8 @@ export default function ColorPicker({
   };
 
   return (
-    <div className="color-picker-container" ref={pickerRef}>
-      <div className="color-picker-trigger">
+      <div className="color-picker-container" ref={pickerRef}>
+        <div className="color-picker-trigger" ref={triggerRef}>
         {showCheckbox && (
           <div
             className={`color-checkbox-custom ${checked ? "color-checkbox-checked" : ""}`}
@@ -399,6 +499,10 @@ export default function ColorPicker({
           style={{ backgroundColor: checked ? currentColorRgba : "rgba(0, 0, 0, 1)" }}
           onClick={() => {
             if (checked) {
+              if (!isOpen) {
+                // 컬러피커가 열릴 때 현재 색상을 초기값으로 저장
+                setInitialColor(color || { r: 0, g: 0, b: 0, a: 255 });
+              }
               setIsOpen(!isOpen);
             } else if (showCheckbox && onCheckboxChange) {
               // 체크되지 않은 상태에서 원형 클릭 시 체크
@@ -415,7 +519,13 @@ export default function ColorPicker({
       </div>
 
       {isOpen && (
-        <div className="color-picker-popup">
+        <div 
+          className="color-picker-popup"
+          style={{
+            top: `${popupPosition.top}px`,
+            left: `${popupPosition.left}px`
+          }}
+        >
           <div className="color-picker-main">
             {/* 메인 그라데이션 컬러 선택 영역 */}
             <div 
@@ -473,21 +583,40 @@ export default function ColorPicker({
               </button>
             </div>
 
-            {/* 티어 컬러 팔레트 (5개씩 2줄, 10개) */}
-            <div className="color-picker-swatches-wrapper">
-              <div className="color-picker-swatches">
-                {tierColors.map((swatch, index) => {
-                  const swatchRgba = `rgba(${swatch.r}, ${swatch.g}, ${swatch.b}, ${(swatch.a || 255) / 255})`;
-                  return (
-                    <div
-                      key={index}
-                      className="color-swatch-item"
-                      style={{ backgroundColor: swatchRgba }}
-                      onClick={() => handleSwatchClick(swatch)}
-                      title={swatch.name}
-                    ></div>
-                  );
-                })}
+            {/* 티어 컬러 팔레트와 버튼을 함께 배치 */}
+            <div className="color-picker-swatches-actions-container">
+              {/* 티어 컬러 팔레트 (5개씩 2줄, 10개) */}
+              <div className="color-picker-swatches-wrapper">
+                <div className="color-picker-swatches">
+                  {tierColors.map((swatch, index) => {
+                    const swatchRgba = `rgba(${swatch.r}, ${swatch.g}, ${swatch.b}, ${(swatch.a || 255) / 255})`;
+                    return (
+                      <div
+                        key={index}
+                        className="color-swatch-item"
+                        style={{ backgroundColor: swatchRgba }}
+                        onClick={() => handleSwatchClick(swatch)}
+                        title={swatch.name}
+                      ></div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 적용/취소 버튼 (세로 배치) */}
+              <div className="color-picker-actions">
+                <button
+                  className="color-picker-apply-btn"
+                  onClick={handleApply}
+                >
+                  적용
+                </button>
+                <button
+                  className="color-picker-cancel-btn"
+                  onClick={handleCancel}
+                >
+                  취소
+                </button>
               </div>
             </div>
           </div>
@@ -563,10 +692,8 @@ export default function ColorPicker({
         }
 
         .color-picker-popup {
-          position: absolute;
-          top: calc(100% + 8px);
-          left: 0;
-          z-index: 1000;
+          position: fixed;
+          z-index: 10002;
           background: #000000;
           border: 1px solid rgba(210, 178, 135, 1);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -722,12 +849,19 @@ export default function ColorPicker({
           margin-bottom: 2px;
         }
 
+        .color-picker-swatches-actions-container {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-top: 8px;
+          gap: 12px;
+        }
+
         .color-picker-swatches-wrapper {
           display: flex;
           flex-direction: column;
           align-items: center;
-          width: 100%;
-          margin-top: 8px;
+          flex: 1;
           position: relative;
         }
 
@@ -759,6 +893,43 @@ export default function ColorPicker({
         .color-swatch-item:hover {
           transform: scale(1.1);
           border-color: var(--game-primary);
+        }
+
+        .color-picker-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .color-picker-apply-btn,
+        .color-picker-cancel-btn {
+          padding: 6px 16px;
+          border: none;
+          border-radius: 2px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .color-picker-apply-btn {
+          background: var(--game-primary);
+          color: var(--poe2-secondary, #ffffff);
+        }
+
+        .color-picker-apply-btn:hover {
+          opacity: 0.9;
+        }
+
+        .color-picker-cancel-btn {
+          background: transparent;
+          color: var(--text);
+          border: none;
+        }
+
+        .color-picker-cancel-btn:hover {
+          background: var(--panel2);
         }
       `}</style>
     </div>

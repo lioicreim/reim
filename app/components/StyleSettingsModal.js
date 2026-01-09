@@ -69,20 +69,50 @@ export default function StyleSettingsModal({
   ruleType = "show",
   onRuleTypeChange = null
 }) {
-  const [localStyles, setLocalStyles] = useState({
-    fontSize: 30,
-    textColor: { r: 210, g: 178, b: 135, a: 255 },
-    borderColor: null,
-    backgroundColor: { r: 0, g: 0, b: 0, a: 255 },
-    playEffect: null,
-    minimapIcon: {
-      size: null,
-      color: null,
-      shape: null
-    },
-    customSound: null,
-    soundType: "default",
-    ...styles
+  // 인게임 기본값 상수
+  const DEFAULT_TEXT_COLOR = { r: 171, g: 159, b: 130, a: 255 }; // #ab9f82
+  const DEFAULT_BORDER_COLOR = { r: 10, g: 13, b: 17, a: 255 }; // #0a0d11
+  
+  // PC/PS5 사운드 매핑 테이블 (1:1 대응)
+  const PC_TO_PS5_SOUND_MAP = {
+    "custom_sound/1_currency_s.mp3": 5,
+    "custom_sound/2_currency_a.mp3": 1,
+    "custom_sound/3_currency_b.mp3": 2,
+    "custom_sound/4_currency_c.mp3": 2,
+  };
+  
+  const PS5_TO_PC_SOUND_MAP = {
+    5: "custom_sound/1_currency_s.mp3",
+    1: "custom_sound/2_currency_a.mp3",
+    2: "custom_sound/3_currency_b.mp3", // B, C 모두 slot 2
+  };
+  
+  const [localStyles, setLocalStyles] = useState(() => {
+    // styles가 null 값을 덮어씌우는 것을 방지하기 위해 기본값 보장
+    return {
+      fontSize: 30,
+      textColor: DEFAULT_TEXT_COLOR,
+      borderColor: null,
+      backgroundColor: { r: 0, g: 0, b: 0, a: 255 },
+      playEffect: null,
+      minimapIcon: {
+        size: null,
+        color: null,
+        shape: null
+      },
+      customSound: null,
+      ps5Sound: null,
+      ps5SoundVolume: 300, // 기본값 300
+      soundPlatform: null,
+      soundType: "default",
+      ...styles,
+      // null 값이 덮어씌워지지 않도록 기본값 보장
+      textColor: styles.textColor || DEFAULT_TEXT_COLOR,
+      borderColor: styles.borderColor ?? null,
+      // soundType과 soundPlatform 설정
+      soundPlatform: styles.soundPlatform ?? (styles.customSound ? "PC" : null),
+      soundType: styles.soundPlatform === "PS5" ? "default" : (styles.customSound ? "custom" : "default")
+    };
   });
 
   const [localRules, setLocalRules] = useState(additionalRules || []);
@@ -109,6 +139,9 @@ export default function StyleSettingsModal({
 
   // 이전 isOpen 상태 추적 (무한 루프 방지)
   const prevIsOpenRef = useRef(false);
+  
+  // 모달 ref (컬러피커 위치 계산용)
+  const modalContentRef = useRef(null);
 
   // 언어 설정 불러오기
   useEffect(() => {
@@ -138,7 +171,7 @@ export default function StyleSettingsModal({
       // 초기 스타일 저장 (모달 열 때의 값)
       const initial = {
         fontSize: styles.fontSize ?? 30,
-        textColor: styles.textColor || { r: 210, g: 178, b: 135, a: 255 },
+        textColor: styles.textColor || DEFAULT_TEXT_COLOR,
         borderColor: styles.borderColor ?? null,
         backgroundColor: styles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 },
         playEffect: styles.playEffect ?? null,
@@ -148,7 +181,10 @@ export default function StyleSettingsModal({
           shape: null
         },
         customSound: styles.customSound ?? null,
-        soundType: styles.customSound ? "custom" : "default",
+        ps5Sound: styles.ps5Sound ?? null,
+        ps5SoundVolume: styles.ps5SoundVolume ?? 300,
+        soundPlatform: styles.soundPlatform ?? (styles.customSound ? "PC" : null),
+        soundType: styles.soundPlatform === "PS5" ? "default" : (styles.customSound ? "custom" : "default"),
         ruleType: ruleType || "show",
         ...styles
       };
@@ -259,7 +295,7 @@ export default function StyleSettingsModal({
       // 실제 붙여넣기
       setLocalStyles({
         fontSize: pastedData.fontSize ?? 30,
-        textColor: pastedData.textColor || { r: 210, g: 178, b: 135, a: 255 },
+        textColor: pastedData.textColor || { r: 255, g: 255, b: 255, a: 255 }, // 인게임 기본값 #FFF
         borderColor: pastedData.borderColor ?? null,
         backgroundColor: pastedData.backgroundColor || { r: 0, g: 0, b: 0, a: 255 },
         playEffect: pastedData.playEffect ?? null,
@@ -269,7 +305,10 @@ export default function StyleSettingsModal({
           shape: null
         },
         customSound: pastedData.customSound ?? null,
-        soundType: pastedData.soundType || (pastedData.customSound ? "custom" : "default"),
+        ps5Sound: pastedData.ps5Sound ?? null,
+        ps5SoundVolume: pastedData.ps5SoundVolume ?? 300,
+        soundPlatform: pastedData.soundPlatform ?? (pastedData.customSound ? "PC" : null),
+        soundType: pastedData.soundPlatform === "PS5" ? "default" : (pastedData.soundType || (pastedData.customSound ? "custom" : "default")),
       });
       
       if (pastedData.ruleType) {
@@ -306,7 +345,7 @@ export default function StyleSettingsModal({
     
     setLocalStyles({
       fontSize: initialStyles.fontSize ?? 30,
-      textColor: initialStyles.textColor || { r: 210, g: 178, b: 135, a: 255 },
+      textColor: initialStyles.textColor || DEFAULT_TEXT_COLOR,
       borderColor: initialStyles.borderColor ?? null,
       backgroundColor: initialStyles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 },
       playEffect: initialStyles.playEffect ?? null,
@@ -316,7 +355,10 @@ export default function StyleSettingsModal({
         shape: null
       },
       customSound: initialStyles.customSound ?? null,
-      soundType: initialStyles.soundType || (initialStyles.customSound ? "custom" : "default"),
+      ps5Sound: initialStyles.ps5Sound ?? null,
+      ps5SoundVolume: initialStyles.ps5SoundVolume ?? 300,
+      soundPlatform: initialStyles.soundPlatform ?? (initialStyles.customSound ? "PC" : null),
+      soundType: initialStyles.soundPlatform === "PS5" ? "default" : (initialStyles.soundType || (initialStyles.customSound ? "custom" : "default")),
     });
     
     if (initialStyles.ruleType) {
@@ -466,9 +508,11 @@ export default function StyleSettingsModal({
     <div className="style-settings-modal">
       <div className="style-settings-overlay" onClick={onClose}></div>
       <div className="style-settings-content-wrapper">
-      <div className="style-settings-content">
-        <div className="style-settings-header">
-          <div className="style-header-title-row">
+      <div className="style-settings-content" ref={modalContentRef}>
+        {/* 프리뷰 영역 (여백 없음) */}
+        <div className="style-preview-panel">
+          {/* 체크박스와 제목을 프리뷰 위에 오버레이 (왼쪽 위) */}
+          <div className="style-preview-overlay-title">
             <input
               type="checkbox"
               id="rule-type-checkbox"
@@ -491,30 +535,55 @@ export default function StyleSettingsModal({
                 placeholder="규칙 제목"
               />
             ) : (
-              <h2 className={localRuleType === "hide" ? "title-disabled" : ""}>스타일 설정</h2>
+              <h2 className={localRuleType === "hide" ? "title-disabled" : ""}>
+                {localRuleType === "show" ? "Show" : "Hide"}
+              </h2>
             )}
           </div>
-          <button className="close-button" onClick={onClose}>×</button>
+          {/* 닫기 버튼을 프리뷰 위에 오버레이 (오른쪽 위) */}
+          <button className="close-button preview-close-button" onClick={onClose}>×</button>
+          <ItemPreviewBox
+            itemName={itemName}
+            styles={{
+              ...localStyles,
+              // 인게임 기본값 적용 (null일 때 프리뷰에서 기본값 표시)
+              textColor: localStyles.textColor || { r: 171, g: 159, b: 130, a: 255 }, // 인게임 기본값 #ab9f82
+              borderColor: localStyles.borderColor || { r: 10, g: 13, b: 17, a: 255 } // #0a0d11
+            }}
+          />
         </div>
 
+        {/* 아래 영역 (여백 유지) */}
         <div className="style-settings-body">
-          {/* 프리뷰 (맨 위) */}
-          <div className="style-preview-panel">
-            <ItemPreviewBox
-              itemName={itemName}
-              styles={localStyles}
-            />
-          </div>
-
           {/* 공통 기본 규칙 (프리뷰 아래) */}
           <div className="style-settings-panel">
-            {/* 폰트 크기 / 테두리 색상 / 배경 색상 (한 줄) */}
+            {/* 폰트 / 테두리 / 배경 (한 줄) */}
             <div className="style-setting-group">
               <div className="color-effect-row">
                 <div className="color-effect-item-inline font-size-item-left">
-                  <label className="style-setting-label-inline">
-                    <span>폰트 크기</span>
+                  <input
+                    type="checkbox"
+                    id="text-color-checkbox"
+                    className="color-checkbox"
+                    checked={localStyles.textColor !== null}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      handleStyleChange("textColor", checked ? DEFAULT_TEXT_COLOR : null);
+                    }}
+                  />
+                  <label 
+                    htmlFor="text-color-checkbox"
+                    className={`style-setting-label-inline ${localStyles.textColor === null ? "label-disabled" : ""}`}
+                  >
+                    <span>폰트</span>
                   </label>
+                  <ColorPicker
+                    color={localStyles.textColor || DEFAULT_TEXT_COLOR}
+                    onChange={(color) => handleStyleChange("textColor", color)}
+                    showCheckbox={false}
+                    checked={localStyles.textColor !== null}
+                    modalRef={modalContentRef}
+                  />
                   <div className="font-size-control">
                     <input
                       type="range"
@@ -537,53 +606,57 @@ export default function StyleSettingsModal({
                     />
                   </div>
                 </div>
-                <div className="color-effect-item-inline">
-                  <input
-                    type="checkbox"
-                    id="border-color-checkbox"
-                    className="color-checkbox"
-                    checked={localStyles.borderColor !== null}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      handleStyleChange("borderColor", checked ? { r: 0, g: 0, b: 0, a: 255 } : null);
-                    }}
-                  />
-                  <label 
-                    htmlFor="border-color-checkbox"
-                    className={`style-setting-label-inline ${localStyles.borderColor === null ? "label-disabled" : ""}`}
-                  >
-                    <span>테두리</span>
-                  </label>
-                  <ColorPicker
-                    color={localStyles.borderColor || { r: 0, g: 0, b: 0, a: 255 }}
-                    onChange={(color) => handleStyleChange("borderColor", color)}
-                    showCheckbox={false}
-                    checked={localStyles.borderColor !== null}
-                  />
-                </div>
-                <div className="color-effect-item-inline">
-                  <input
-                    type="checkbox"
-                    id="background-color-checkbox"
-                    className="color-checkbox"
-                    checked={localStyles.backgroundColor !== null}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      handleStyleChange("backgroundColor", checked ? { r: 0, g: 0, b: 0, a: 255 } : null);
-                    }}
-                  />
-                  <label 
-                    htmlFor="background-color-checkbox"
-                    className={`style-setting-label-inline ${localStyles.backgroundColor === null ? "label-disabled" : ""}`}
-                  >
-                    <span>배경</span>
-                  </label>
-                  <ColorPicker
-                    color={localStyles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 }}
-                    onChange={(color) => handleStyleChange("backgroundColor", color)}
-                    showCheckbox={false}
-                    checked={localStyles.backgroundColor !== null}
-                  />
+                <div className="color-effect-item-group-right">
+                  <div className="color-effect-item-inline">
+                    <input
+                      type="checkbox"
+                      id="border-color-checkbox"
+                      className="color-checkbox"
+                      checked={localStyles.borderColor !== null}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        handleStyleChange("borderColor", checked ? DEFAULT_BORDER_COLOR : null);
+                      }}
+                    />
+                    <label 
+                      htmlFor="border-color-checkbox"
+                      className={`style-setting-label-inline ${localStyles.borderColor === null ? "label-disabled" : ""}`}
+                    >
+                      <span>테두리</span>
+                    </label>
+                    <ColorPicker
+                      color={localStyles.borderColor || DEFAULT_BORDER_COLOR}
+                      onChange={(color) => handleStyleChange("borderColor", color)}
+                      showCheckbox={false}
+                      checked={localStyles.borderColor !== null}
+                      modalRef={modalContentRef}
+                    />
+                  </div>
+                  <div className="color-effect-item-inline">
+                    <input
+                      type="checkbox"
+                      id="background-color-checkbox"
+                      className="color-checkbox"
+                      checked={localStyles.backgroundColor !== null}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        handleStyleChange("backgroundColor", checked ? { r: 0, g: 0, b: 0, a: 255 } : null);
+                      }}
+                    />
+                    <label 
+                      htmlFor="background-color-checkbox"
+                      className={`style-setting-label-inline ${localStyles.backgroundColor === null ? "label-disabled" : ""}`}
+                    >
+                      <span>배경</span>
+                    </label>
+                    <ColorPicker
+                      color={localStyles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 }}
+                      onChange={(color) => handleStyleChange("backgroundColor", color)}
+                      showCheckbox={false}
+                      checked={localStyles.backgroundColor !== null}
+                      modalRef={modalContentRef}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -702,40 +775,171 @@ export default function StyleSettingsModal({
                   type="checkbox"
                   id="custom-sound-checkbox"
                   className="color-checkbox"
-                  checked={localStyles.customSound !== null}
+                  checked={localStyles.customSound !== null || localStyles.ps5Sound !== null}
                   onChange={(e) => {
                     const checked = e.target.checked;
                     if (checked) {
-                      handleStyleChange("soundType", "custom");
-                      handleStyleChange("customSound", localStyles.customSound || "custom_sound/1_currency_s.mp3");
+                      // 체크 시 기존 값이 있으면 유지, 없으면 기본값 설정
+                      if (localStyles.ps5Sound) {
+                        // PS5 사운드가 있으면 그대로 유지
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          soundType: "default",
+                          soundPlatform: "PS5",
+                          ps5SoundVolume: prev.ps5SoundVolume || 300
+                        }));
+                      } else if (localStyles.customSound) {
+                        // PC 사운드가 있으면 그대로 유지
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          soundType: "custom",
+                          soundPlatform: "PC",
+                          ps5SoundVolume: 300
+                        }));
+                      } else {
+                        // 둘 다 없으면 기본 PC 사운드 설정 (한 번에 업데이트)
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          soundType: "custom",
+                          customSound: "custom_sound/1_currency_s.mp3",
+                          soundPlatform: "PC",
+                          ps5Sound: null,
+                          ps5SoundVolume: 300
+                        }));
+                      }
                     } else {
-                      handleStyleChange("customSound", null);
+                      // 체크해제 시 모든 사운드 값 초기화 (한 번에 업데이트)
+                      setLocalStyles(prev => ({
+                        ...prev,
+                        customSound: null,
+                        ps5Sound: null,
+                        ps5SoundVolume: 300,
+                        soundPlatform: null,
+                        soundType: "default"
+                      }));
                     }
                   }}
                 />
                 <label 
                   htmlFor="custom-sound-checkbox"
-                  className={`style-setting-label-inline ${localStyles.customSound === null ? "label-disabled" : ""}`}
+                  className={`style-setting-label-inline ${(localStyles.customSound === null && localStyles.ps5Sound === null) ? "label-disabled" : ""}`}
                 >
                   <span>사운드</span>
                 </label>
                 <select
                   className="style-select sound-type-select"
                   value={localStyles.soundType || "default"}
-                  onChange={(e) => handleStyleChange("soundType", e.target.value)}
-                  disabled={localStyles.customSound === null}
+                  onChange={(e) => {
+                    const newSoundType = e.target.value;
+                    const currentSound = localStyles.customSound;
+                    const currentPs5Sound = localStyles.ps5Sound;
+                    
+                    if (newSoundType === "default") {
+                      // 기본(PS5)로 변경
+                      if (currentSound && PC_TO_PS5_SOUND_MAP[currentSound]) {
+                        // PC 사운드가 있으면 PS5로 변환
+                        const ps5Slot = PC_TO_PS5_SOUND_MAP[currentSound];
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          ps5Sound: ps5Slot,
+                          ps5SoundVolume: prev.ps5SoundVolume || 300,
+                          customSound: null,
+                          soundPlatform: "PS5",
+                          soundType: "default"
+                        }));
+                      } else if (currentPs5Sound) {
+                        // 이미 PS5 사운드가 있으면 그대로 유지
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          soundPlatform: "PS5",
+                          soundType: "default"
+                        }));
+                      } else {
+                        // PC 사운드가 매핑에 없으면 체크해제 (사운드 비활성화)
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          customSound: null,
+                          ps5Sound: null,
+                          ps5SoundVolume: 300,
+                          soundPlatform: null,
+                          soundType: "default"
+                        }));
+                      }
+                    } else {
+                      // 커스텀(PC)로 변경
+                      if (currentPs5Sound && PS5_TO_PC_SOUND_MAP[currentPs5Sound]) {
+                        // PS5 사운드가 있으면 PC로 변환
+                        const pcSound = PS5_TO_PC_SOUND_MAP[currentPs5Sound];
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          customSound: pcSound,
+                          ps5Sound: null,
+                          ps5SoundVolume: 300,
+                          soundPlatform: "PC",
+                          soundType: "custom"
+                        }));
+                      } else if (currentSound) {
+                        // 이미 PC 사운드가 있으면 그대로 유지
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          soundPlatform: "PC",
+                          soundType: "custom"
+                        }));
+                      } else {
+                        // 기본값 설정
+                        setLocalStyles(prev => ({
+                          ...prev,
+                          customSound: "custom_sound/1_currency_s.mp3",
+                          ps5Sound: null,
+                          ps5SoundVolume: 300,
+                          soundPlatform: "PC",
+                          soundType: "custom"
+                        }));
+                      }
+                    }
+                  }}
+                  disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
                 >
                   <option value="default">{lang === "ko" ? "기본" : "Normal"}</option>
                   <option value="custom">{lang === "ko" ? "커스텀" : "Custom"}</option>
                 </select>
-                <input
-                  type="text"
-                  className="style-input sound-input"
-                  placeholder={lang === "ko" ? "사운드 파일 경로 (예: custom_sound/1_currency_s.mp3)" : "Sound file path (e.g. custom_sound/1_currency_s.mp3)"}
-                  value={localStyles.customSound || ""}
-                  onChange={(e) => handleStyleChange("customSound", e.target.value || null)}
-                  disabled={localStyles.soundType !== "custom" || localStyles.customSound === null}
-                />
+                {/* 커스텀 모드: 입력 필드 표시 */}
+                {localStyles.soundType === "custom" && (
+                  <input
+                    type="text"
+                    className="style-input sound-input"
+                    placeholder={lang === "ko" ? "사운드 파일 경로 (예: custom_sound/1_currency_s.mp3)" : "Sound file path (e.g. custom_sound/1_currency_s.mp3)"}
+                    value={localStyles.customSound || ""}
+                    onChange={(e) => handleStyleChange("customSound", e.target.value || null)}
+                    disabled={!localStyles.customSound && !localStyles.ps5Sound}
+                  />
+                )}
+                {/* 기본 모드: slot과 volume 드롭다운 표시 (기본 드롭다운 바로 오른쪽) */}
+                {localStyles.soundType === "default" && (
+                  <>
+                    <select
+                      className="style-select sound-slot-select"
+                      value={localStyles.ps5Sound || ""}
+                      onChange={(e) => handleStyleChange("ps5Sound", e.target.value ? parseInt(e.target.value) : null)}
+                      disabled={!localStyles.ps5Sound && !localStyles.customSound}
+                    >
+                      <option value="">{lang === "ko" ? "슬롯" : "Slot"}</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(slot => (
+                        <option key={slot} value={slot}>{slot}</option>
+                      ))}
+                    </select>
+                    <select
+                      className="style-select sound-volume-select"
+                      value={localStyles.ps5SoundVolume || 300}
+                      onChange={(e) => handleStyleChange("ps5SoundVolume", parseInt(e.target.value))}
+                      disabled={!localStyles.ps5Sound && !localStyles.customSound}
+                    >
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </select>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -1047,7 +1251,12 @@ export default function StyleSettingsModal({
           <div className="paste-preview-content">
             <ItemPreviewBox
               itemName={itemName}
-              styles={pastePreview}
+              styles={{
+                ...pastePreview,
+                // 인게임 기본값 적용 (null일 때 프리뷰에서 기본값 표시)
+                textColor: pastePreview?.textColor || DEFAULT_TEXT_COLOR,
+                borderColor: pastePreview?.borderColor || DEFAULT_BORDER_COLOR
+              }}
             />
           </div>
         </div>
@@ -1357,33 +1566,47 @@ export default function StyleSettingsModal({
           border-color: var(--game-primary);
         }
 
-        .style-settings-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px 24px;
-          border-bottom: 1px solid var(--border);
+        .style-preview-panel {
+          position: relative;
         }
 
-        .style-header-title-row {
+        .style-preview-panel .preview-label {
+          transform: scale(0.9);
+          transform-origin: center;
+        }
+
+        .style-preview-overlay-title {
+          position: absolute;
+          top: 8px;
+          left: 8px;
           display: flex;
           align-items: center;
           gap: 8px;
-          flex: 1;
+          z-index: 10;
+          background: transparent;
+          padding: 0;
         }
 
-        .style-settings-header h2 {
+        .preview-close-button {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 10;
+        }
+
+        .style-preview-overlay-title h2 {
           font-size: 16px;
           font-weight: 700;
           margin: 0;
+          color: var(--text);
         }
 
-        .style-settings-header h2.title-disabled {
+        .style-preview-overlay-title h2.title-disabled {
           color: var(--muted, #999);
         }
 
         .style-title-input {
-          flex: 1;
+          min-width: 150px;
           padding: 6px 10px;
           background: var(--panel2);
           border: 1px solid var(--border);
@@ -1594,7 +1817,6 @@ export default function StyleSettingsModal({
         .font-size-item-left {
           flex: 0 0 auto;
           min-width: 0;
-          margin-right: auto;
           max-width: 100%;
         }
 
@@ -1629,11 +1851,11 @@ export default function StyleSettingsModal({
 
         .color-effect-row {
           display: flex;
-          gap: 16px;
+          gap: 8px;
           align-items: center;
-          justify-content: flex-end;
+          justify-content: flex-start;
           width: 100%;
-          padding: 0 20px;
+          padding: 0;
           box-sizing: border-box;
         }
 
@@ -1648,13 +1870,17 @@ export default function StyleSettingsModal({
           flex: 0 0 auto;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           position: relative;
         }
 
-        .color-effect-item-inline:not(.font-size-item-left) {
+        .color-effect-item-group-right {
+          display: flex;
+          align-items: center;
+          gap: 16px;
           margin-left: auto;
         }
+
 
         .color-effect-item-inline input[type="checkbox"] {
           position: relative;
@@ -1701,6 +1927,12 @@ export default function StyleSettingsModal({
         .sound-input {
           flex: 1;
           min-width: 200px;
+        }
+
+        .sound-slot-select,
+        .sound-volume-select {
+          min-width: 80px;
+          width: auto;
         }
 
         .minimap-icon-settings-row {
@@ -1755,7 +1987,9 @@ export default function StyleSettingsModal({
           display: flex;
           flex-direction: column;
           gap: 0;
-          margin-bottom: 16px;
+          margin: 0;
+          padding: 0;
+          position: relative;
         }
 
         .style-settings-footer {
