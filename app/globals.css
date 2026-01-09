@@ -114,6 +114,12 @@
   box-sizing: border-box;
 }
 
+html {
+  /* 스크롤바로 인한 레이아웃 시프트 방지 - html에 적용 */
+  scrollbar-gutter: stable;
+  overflow-y: scroll; /* 항상 스크롤바 공간 확보 */
+}
+
 body {
   background: var(--foreground);
   color: var(--text);
@@ -128,6 +134,9 @@ body {
   min-height: 100vh;
   max-width: 1920px;
   margin: 0 auto;
+  /* 스크롤바로 인한 레이아웃 시프트 방지 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .main-content {
@@ -591,31 +600,30 @@ body {
 /* 필터 네비게이션 설명 영역 */
 .item-filter-description {
   background: #141414;
-  padding: 12px 34px;
+  padding: 16px 34px;
   text-align: left;
   border-bottom: 1px solid var(--border);
-  height: 44px;
+  min-height: 32px;
   display: flex;
   align-items: center;
+  position: relative;
+}
+
+.item-filter-description.item-filter-description-with-search {
+  justify-content: space-between;
+}
+
+.item-filter-description #unique-search-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .item-filter-description p {
   margin: 0;
   color: var(--color-gray-300);
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.5;
-}
-
-.item-filter-description.tier-list-description {
-  background: #141414;
-  height: 72px;
-  padding: 12px 34px;
-  padding: 12px 24px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  min-height: 44px;
-  display: flex;
-  align-items: center;
 }
 
 /* 페이지 컨텐츠 래퍼 */
@@ -864,6 +872,38 @@ input[type="range"]::-moz-range-track {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 2px;
+}
+
+/* 연산자 기반 슬라이더 (조건 설정용) - OperatorSlider 컴포넌트에서 사용 */
+.operator-slider-container {
+  width: 100%;
+}
+
+.operator-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.operator-slider-track {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.operator-slider-active {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.2s;
+  opacity: 0.6;
+  background: var(--poe2-primary, var(--game-primary, #155dfc));
 }
 
 /* 액션 버튼 스타일 (전역) */

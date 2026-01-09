@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import ColorPicker from "./ColorPicker";
 import ItemPreviewBox from "./ItemPreviewBox";
+import OperatorSlider from "./OperatorSlider";
 import filterConditions from "@/data/filter-conditions.json";
 
 /**
@@ -254,6 +255,20 @@ export default function StyleSettingsModal({
     { value: 2, label: "작게", labelEn: "Small" }
   ];
 
+  // 색상 이름과 실제 색상 값 매핑
+  const colorValueMap = {
+    "Red": "#FF0000",
+    "Orange": "#FF7F00",
+    "Yellow": "#FFFF00",
+    "Pink": "#FF69B4",
+    "Blue": "#0000FF",
+    "Green": "#00FF00",
+    "Brown": "#8B4513",
+    "White": "#FFFFFF",
+    "Cyan": "#00FFFF",
+    "Grey": "#808080"
+  };
+
   const minimapColorOptions = [
     { value: null, label: "없음", labelEn: "None" },
     { value: "Red", label: "빨강", labelEn: "Red" },
@@ -263,7 +278,9 @@ export default function StyleSettingsModal({
     { value: "Blue", label: "파랑", labelEn: "Blue" },
     { value: "Green", label: "초록", labelEn: "Green" },
     { value: "Brown", label: "갈색", labelEn: "Brown" },
-    { value: "White", label: "흰색", labelEn: "White" }
+    { value: "White", label: "흰색", labelEn: "White" },
+    { value: "Cyan", label: "청록", labelEn: "Cyan" },
+    { value: "Grey", label: "회색", labelEn: "Grey" }
   ];
 
   const minimapShapeOptions = [
@@ -304,9 +321,6 @@ export default function StyleSettingsModal({
         <div className="style-settings-body">
           {/* 프리뷰 (맨 위) */}
           <div className="style-preview-panel">
-            <div className="preview-header">
-              <h3>프리뷰</h3>
-            </div>
             <ItemPreviewBox
               itemName={itemName}
               styles={localStyles}
@@ -367,6 +381,11 @@ export default function StyleSettingsModal({
                   <ColorPicker
                     color={localStyles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 }}
                     onChange={(color) => handleStyleChange("backgroundColor", color)}
+                    showCheckbox={true}
+                    checked={localStyles.backgroundColor !== null}
+                    onCheckboxChange={(checked) => 
+                      handleStyleChange("backgroundColor", checked ? { r: 0, g: 0, b: 0, a: 255 } : null)
+                    }
                   />
                 </div>
                 <div className="color-effect-item">
@@ -412,15 +431,28 @@ export default function StyleSettingsModal({
                 <div className="minimap-setting-item">
                   <label className="minimap-label">색상</label>
                   <select
-                    className="style-select"
+                    className="style-select color-select"
                     value={localStyles.minimapIcon?.color || ""}
                     onChange={(e) => handleMinimapIconChange("color", e.target.value || null)}
+                    style={{
+                      color: localStyles.minimapIcon?.color ? colorValueMap[localStyles.minimapIcon.color] || "var(--text)" : "var(--text)"
+                    }}
                   >
-                    {minimapColorOptions.map((option) => (
-                      <option key={option.value || "none"} value={option.value || ""}>
-                        {lang === "ko" ? option.label : option.labelEn}
-                      </option>
-                    ))}
+                    {minimapColorOptions.map((option) => {
+                      const colorValue = option.value ? colorValueMap[option.value] : null;
+                      return (
+                        <option 
+                          key={option.value || "none"} 
+                          value={option.value || ""}
+                          style={{
+                            color: colorValue || "var(--text)",
+                            backgroundColor: "var(--panel2)"
+                          }}
+                        >
+                          {lang === "ko" ? option.label : option.labelEn}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 
@@ -451,26 +483,31 @@ export default function StyleSettingsModal({
               
               {/* StackSize 조건 */}
               {localConditions.stackSize && (
-                <div className="condition-row">
-                  <span className="condition-label">골드</span>
-                  <select
-                    className="condition-operator"
-                    value={localConditions.stackSize.operator || ">="}
-                    onChange={(e) => handleConditionChange("stackSize", "operator", e.target.value)}
-                  >
-                    <option value=">=">≥</option>
-                    <option value="<=">≤</option>
-                    <option value=">">&gt;</option>
-                    <option value="<">&lt;</option>
-                    <option value="==">==</option>
-                  </select>
-                  <input
-                    type="number"
-                    className="condition-value"
-                    value={localConditions.stackSize.value || 0}
-                    onChange={(e) => handleConditionChange("stackSize", "value", parseInt(e.target.value) || 0)}
-                    placeholder="값"
-                  />
+                <div className="condition-row-with-slider">
+                  <div className="condition-label-wrapper">
+                    <span className="condition-label">골드</span>
+                    <select
+                      className="condition-operator"
+                      value={localConditions.stackSize.operator || ">="}
+                      onChange={(e) => handleConditionChange("stackSize", "operator", e.target.value)}
+                    >
+                      <option value=">=">≥</option>
+                      <option value="<=">≤</option>
+                      <option value=">">&gt;</option>
+                      <option value="<">&lt;</option>
+                      <option value="==">==</option>
+                    </select>
+                  </div>
+                  <div className="condition-slider-wrapper">
+                    <OperatorSlider
+                      value={localConditions.stackSize.value || 0}
+                      onChange={(newValue) => handleConditionChange("stackSize", "value", newValue)}
+                      operator={localConditions.stackSize.operator || ">="}
+                      min={0}
+                      max={10000}
+                      step={10}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -481,61 +518,59 @@ export default function StyleSettingsModal({
                     const isPathTier = pathTier !== null && !areaLevelInputMode;
                     
                     return (
-                      <div className="condition-row">
-                        <span className="condition-label">지역 레벨</span>
-                        <select
-                          className="condition-operator"
-                          value={localConditions.areaLevel.operator || ">="}
-                          onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
-                        >
-                          <option value=">=">≥</option>
-                          <option value="<=">≤</option>
-                          <option value=">">&gt;</option>
-                          <option value="<">&lt;</option>
-                          <option value="==">==</option>
-                        </select>
-                        {isPathTier ? (
-                          <button
-                            type="button"
-                            className="path-tier-display"
-                            onClick={() => setAreaLevelInputMode(true)}
-                            style={{ 
-                              color: "var(--game-primary)", 
-                              fontSize: "13px",
-                              padding: "4px 12px",
-                              background: "var(--panel2)",
-                              border: "1px solid var(--border)",
-                              borderRadius: "2px",
-                              minWidth: "100px",
-                              textAlign: "center",
-                              display: "inline-block",
-                              cursor: "pointer",
-                              fontFamily: "inherit"
-                            }}
+                      <div className="condition-row-with-slider">
+                        <div className="condition-label-wrapper">
+                          <span className="condition-label">지역 레벨</span>
+                          <select
+                            className="condition-operator"
+                            value={localConditions.areaLevel.operator || ">="}
+                            onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
                           >
-                            T{pathTier} 경로석
-                          </button>
-                        ) : (
-                          <input
-                            type="number"
-                            className="condition-value"
-                            value={areaLevel}
-                            onChange={(e) => handleConditionChange("areaLevel", "value", parseInt(e.target.value) || 0)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                setAreaLevelInputMode(false);
-                                const newValue = parseInt(e.target.value) || 0;
+                            <option value=">=">≥</option>
+                            <option value="<=">≤</option>
+                            <option value=">">&gt;</option>
+                            <option value="<">&lt;</option>
+                            <option value="==">==</option>
+                          </select>
+                        </div>
+                        <div className="condition-slider-wrapper">
+                          {isPathTier ? (
+                            <button
+                              type="button"
+                              className="path-tier-display"
+                              onClick={() => setAreaLevelInputMode(true)}
+                              style={{ 
+                                color: "var(--game-primary)", 
+                                fontSize: "12px",
+                                padding: "5px 8px",
+                                background: "var(--panel2)",
+                                border: "1px solid var(--border)",
+                                borderRadius: "2px",
+                                width: "100px",
+                                height: "32px",
+                                textAlign: "center",
+                                display: "inline-block",
+                                cursor: "pointer",
+                                fontFamily: "inherit",
+                                boxSizing: "border-box"
+                              }}
+                            >
+                              T{pathTier} 경로석
+                            </button>
+                          ) : (
+                            <OperatorSlider
+                              value={areaLevel}
+                              onChange={(newValue) => {
                                 handleConditionChange("areaLevel", "value", newValue);
-                              }
-                            }}
-                            onBlur={() => {
-                              setAreaLevelInputMode(false);
-                            }}
-                            placeholder="값"
-                            autoFocus={areaLevelInputMode}
-                          />
-                        )}
+                                setAreaLevelInputMode(false);
+                              }}
+                              operator={localConditions.areaLevel.operator || ">="}
+                              min={1}
+                              max={100}
+                              step={1}
+                            />
+                          )}
+                        </div>
                       </div>
                     );
                   })()}
@@ -571,49 +606,78 @@ export default function StyleSettingsModal({
                           </div>
                           <div className="rule-controls">
                             {/* 연산자 */}
-                            <select
-                              className="rule-operator"
-                              value={rule.operator}
-                              onChange={(e) => handleRuleChange(rule.id, "operator", e.target.value)}
-                            >
-                              {condition.operators.map((op) => (
-                                <option key={op} value={op}>{op}</option>
-                              ))}
-                            </select>
-
-                            {/* 값 입력 */}
-                            {condition.type === "number" && (
-                              <input
-                                type="number"
-                                className="rule-value"
-                                value={rule.value || 0}
-                                onChange={(e) => handleRuleChange(rule.id, "value", parseInt(e.target.value) || 0)}
-                                placeholder={(rule.label || condition.label) ? (lang === "ko" ? (rule.label || condition.label).ko : (rule.label || condition.label).en) : ""}
-                              />
-                            )}
-
-                            {condition.type === "select" && condition.values && (
+                            <div className="rule-controls-row">
                               <select
-                                className="rule-value"
-                                value={rule.value || ""}
-                                onChange={(e) => handleRuleChange(rule.id, "value", e.target.value)}
+                                className="rule-operator"
+                                value={rule.operator}
+                                onChange={(e) => handleRuleChange(rule.id, "operator", e.target.value)}
                               >
-                                {condition.values.map((val) => (
-                                  <option key={val} value={val}>{val}</option>
+                                {condition.operators.map((op) => (
+                                  <option key={op} value={op}>{op}</option>
                                 ))}
                               </select>
-                            )}
 
-                            {condition.type === "boolean" && (
-                              <select
-                                className="rule-value"
-                                value={rule.value ? "true" : "false"}
-                                onChange={(e) => handleRuleChange(rule.id, "value", e.target.value === "true")}
-                              >
-                                <option value="true">True</option>
-                                <option value="false">False</option>
-                              </select>
-                            )}
+                              {/* 값 입력 - number 타입이 아닌 경우 기존 input 사용 */}
+                              {condition.type !== "number" && condition.type === "select" && condition.values && (
+                                <select
+                                  className="rule-value"
+                                  value={rule.value || ""}
+                                  onChange={(e) => handleRuleChange(rule.id, "value", e.target.value)}
+                                >
+                                  {condition.values.map((val) => (
+                                    <option key={val} value={val}>{val}</option>
+                                  ))}
+                                </select>
+                              )}
+
+                              {condition.type === "boolean" && (
+                                <select
+                                  className="rule-value"
+                                  value={rule.value ? "true" : "false"}
+                                  onChange={(e) => handleRuleChange(rule.id, "value", e.target.value === "true")}
+                                >
+                                  <option value="true">True</option>
+                                  <option value="false">False</option>
+                                </select>
+                              )}
+                            </div>
+
+                            {/* 값 입력 - number 타입인 경우 슬라이더 사용 */}
+                            {condition.type === "number" && (() => {
+                              // 조건별 기본 min/max/step 설정
+                              const getRangeForCondition = (code) => {
+                                switch (code) {
+                                  case "StackSize":
+                                    return { min: 0, max: 10000, step: 10 };
+                                  case "AreaLevel":
+                                    return { min: 1, max: 100, step: 1 };
+                                  case "ItemLevel":
+                                    return { min: 1, max: 82, step: 1 };
+                                  case "Quality":
+                                    return { min: 0, max: 28, step: 1 };
+                                  case "Sockets":
+                                    return { min: 0, max: 3, step: 1 };
+                                  case "UnidentifiedItemTier":
+                                    return { min: 1, max: 5, step: 1 };
+                                  default:
+                                    return { min: 0, max: 100, step: 1 };
+                                }
+                              };
+                              const range = getRangeForCondition(condition.code);
+                              
+                              return (
+                                <div className="rule-slider-wrapper">
+                                  <OperatorSlider
+                                    value={rule.value || range.min}
+                                    onChange={(newValue) => handleRuleChange(rule.id, "value", newValue)}
+                                    operator={rule.operator}
+                                    min={range.min}
+                                    max={range.max}
+                                    step={range.step}
+                                  />
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       );
@@ -686,6 +750,64 @@ export default function StyleSettingsModal({
       </div>
 
       <style jsx>{`
+        /* 모달창 내부 공통 스타일 - 전역 스타일 적용 */
+        .style-settings-modal input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+          accent-color: var(--poe2-primary, var(--game-primary));
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 0;
+          background: transparent;
+          position: relative;
+          transition: all 0.2s;
+        }
+
+        .style-settings-modal input[type="checkbox"]:checked {
+          background: var(--poe2-primary, var(--game-primary));
+          border-color: var(--poe2-primary, var(--game-primary));
+        }
+
+        .style-settings-modal input[type="checkbox"]:checked::before {
+          content: '✓';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: #ffffff;
+          font-size: 12px;
+          font-weight: bold;
+          line-height: 1;
+        }
+
+        .style-settings-modal input[type="radio"] {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+          position: relative;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          background: transparent;
+          outline: none;
+          transition: all 0.2s;
+        }
+
+        .style-settings-modal input[type="radio"]:hover {
+          border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .style-settings-modal input[type="radio"]:checked {
+          background: var(--poe2-primary, var(--game-primary));
+          border-color: var(--poe2-primary, var(--game-primary));
+          box-shadow: 0 0 4px rgba(21, 93, 252, 0.3);
+        }
+
         .style-settings-modal {
           position: fixed;
           top: 0;
@@ -726,15 +848,17 @@ export default function StyleSettingsModal({
         }
 
         .rule-add-button {
-          padding: 12px 20px;
+          padding: 8px 16px;
           background: var(--game-primary);
           border: none;
           color: var(--poe2-secondary, #ffffff);
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 600;
           cursor: pointer;
           transition: opacity 0.2s;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          height: 36px;
+          box-sizing: border-box;
         }
 
         .rule-add-button:hover {
@@ -761,7 +885,7 @@ export default function StyleSettingsModal({
           align-items: center;
           padding: 12px 16px;
           border-bottom: 1px solid var(--border);
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 600;
         }
 
@@ -809,8 +933,7 @@ export default function StyleSettingsModal({
         }
 
         .rule-dropdown-item .rule-code {
-          font-size: 11px;
-          font-family: monospace;
+          font-size: 16px;
           color: var(--muted);
         }
 
@@ -818,31 +941,31 @@ export default function StyleSettingsModal({
           padding: 24px;
           text-align: center;
           color: var(--muted);
-          font-size: 13px;
+          font-size: 16px;
         }
 
         .additional-rules-list {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 8px;
         }
 
         .rule-item {
-          padding: 12px;
+          padding: 8px 10px;
           background: var(--panel2);
           border: 1px solid var(--border);
-          border-radius: 4px;
+          border-radius: 2px;
         }
 
         .rule-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
         }
 
         .rule-name {
-          font-size: 13px;
+          font-size: 16px;
           font-weight: 600;
           color: var(--text);
         }
@@ -869,28 +992,41 @@ export default function StyleSettingsModal({
 
         .rule-controls {
           display: flex;
+          flex-direction: column;
           gap: 8px;
-          align-items: center;
+        }
+
+        .rule-slider-wrapper {
+          flex: 1;
         }
 
         .rule-operator,
         .rule-value {
-          padding: 6px 10px;
+          padding: 5px 8px;
           background: var(--panel);
           border: 1px solid var(--border);
           color: var(--text);
-          font-size: 13px;
+          font-size: 16px;
           outline: none;
           transition: border-color 0.2s;
+          height: 32px;
+          box-sizing: border-box;
         }
 
         .rule-operator {
-          min-width: 60px;
-          font-family: monospace;
+          min-width: 50px;
+          width: 50px;
+          text-align: center;
         }
 
         .rule-value {
-          flex: 1;
+          width: 100px;
+        }
+
+        .rule-controls-row {
+          display: flex;
+          gap: 6px;
+          align-items: center;
         }
 
         .rule-operator:focus,
@@ -931,26 +1067,47 @@ export default function StyleSettingsModal({
         .condition-row {
           display: flex;
           align-items: center;
+          gap: 6px;
+          margin-bottom: 6px;
+        }
+
+        .condition-row-with-slider {
+          display: flex;
+          flex-direction: column;
           gap: 8px;
           margin-bottom: 8px;
         }
 
+        .condition-label-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .condition-slider-wrapper {
+          flex: 1;
+        }
+
         .condition-label {
-          font-size: 13px;
+          font-size: 16px;
           color: var(--text);
-          min-width: 100px;
+          min-width: 70px;
+          font-weight: 500;
         }
 
         .condition-operator {
-          padding: 6px 10px;
+          padding: 5px 8px;
           background: var(--panel2);
           border: 1px solid var(--border);
           color: var(--text);
-          font-size: 13px;
-          font-family: monospace;
-          min-width: 60px;
+          font-size: 16px;
+          min-width: 50px;
+          width: 50px;
+          height: 32px;
           outline: none;
           transition: border-color 0.2s;
+          box-sizing: border-box;
+          text-align: center;
         }
 
         .condition-operator:focus {
@@ -958,14 +1115,16 @@ export default function StyleSettingsModal({
         }
 
         .condition-value {
-          flex: 1;
-          padding: 6px 10px;
+          width: 100px;
+          padding: 5px 8px;
           background: var(--panel2);
           border: 1px solid var(--border);
           color: var(--text);
-          font-size: 13px;
+          font-size: 16px;
           outline: none;
           transition: border-color 0.2s;
+          height: 32px;
+          box-sizing: border-box;
         }
 
         .condition-value:focus {
@@ -993,7 +1152,7 @@ export default function StyleSettingsModal({
         }
 
         .style-settings-body {
-          padding: 24px;
+          padding: 20px;
           overflow-y: auto;
           flex: 1;
         }
@@ -1001,49 +1160,101 @@ export default function StyleSettingsModal({
         .style-settings-panel {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
         }
 
         .condition-settings-group {
-          margin-top: 8px;
+          margin-top: 4px;
         }
 
         .style-setting-group {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 6px;
         }
 
         .style-setting-label {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 600;
           color: var(--text);
         }
 
         .style-setting-code {
-          font-size: 12px;
-          font-family: monospace;
+          font-size: 16px;
           color: var(--muted);
           font-weight: 400;
         }
 
         .style-input,
         .style-select {
-          padding: 8px 12px;
+          padding: 6px 10px;
           background: var(--panel2);
           border: 1px solid var(--border);
           color: var(--text);
-          font-size: 14px;
+          font-size: 16px;
           outline: none;
           transition: border-color 0.2s;
+          height: 32px;
+          box-sizing: border-box;
         }
 
         .style-input:focus,
         .style-select:focus {
           border-color: var(--game-primary);
+        }
+
+        /* 색상 드롭다운 스타일 */
+        .color-select {
+          font-weight: 500;
+        }
+
+        /* 색상 옵션 스타일 - 브라우저마다 지원이 다를 수 있음 */
+        .color-select option {
+          background: var(--panel2);
+          color: var(--text);
+        }
+
+        .color-select option[value="Red"] {
+          color: #FF0000;
+        }
+
+        .color-select option[value="Orange"] {
+          color: #FF7F00;
+        }
+
+        .color-select option[value="Yellow"] {
+          color: #FFFF00;
+        }
+
+        .color-select option[value="Pink"] {
+          color: #FF69B4;
+        }
+
+        .color-select option[value="Blue"] {
+          color: #0000FF;
+        }
+
+        .color-select option[value="Green"] {
+          color: #00FF00;
+        }
+
+        .color-select option[value="Brown"] {
+          color: #8B4513;
+        }
+
+        .color-select option[value="White"] {
+          color: #FFFFFF;
+        }
+
+        .color-select option[value="Cyan"] {
+          color: #00FFFF;
+        }
+
+        .color-select option[value="Grey"] {
+          color: #808080;
         }
 
         .font-size-control {
@@ -1052,21 +1263,27 @@ export default function StyleSettingsModal({
           gap: 8px;
         }
 
+        .font-size-control input[type="range"] {
+          flex: 1;
+        }
+
         /* 슬라이더 스타일은 전역 CSS에서 관리 */
 
         .font-size-input {
-          width: 50px;
-          padding: 4px 8px;
+          width: 48px;
+          padding: 4px 6px;
           background: var(--panel2);
           border: 1px solid var(--border);
           color: var(--text);
-          font-size: 12px;
+          font-size: 16px;
           text-align: center;
+          height: 32px;
+          box-sizing: border-box;
         }
 
         .color-effect-row {
           display: flex;
-          gap: 16px;
+          gap: 12px;
           align-items: flex-start;
         }
 
@@ -1074,12 +1291,12 @@ export default function StyleSettingsModal({
           flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 6px;
         }
 
         .minimap-icon-settings-row {
           display: flex;
-          gap: 12px;
+          gap: 8px;
           align-items: flex-start;
         }
 
@@ -1087,50 +1304,42 @@ export default function StyleSettingsModal({
           flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 4px;
         }
 
         .minimap-label {
-          font-size: 12px;
+          font-size: 16px;
           color: var(--muted);
+          font-weight: 500;
         }
 
         .style-preview-panel {
           display: flex;
           flex-direction: column;
-          gap: 16px;
-        }
-
-        .preview-header {
-          padding-bottom: 12px;
-          border-bottom: 1px solid var(--border);
-        }
-
-        .preview-header h3 {
-          font-size: 16px;
-          font-weight: 600;
-          margin: 0;
-          color: var(--text);
+          gap: 0;
+          margin-bottom: 16px;
         }
 
         .style-settings-footer {
           display: flex;
           justify-content: flex-end;
           align-items: center;
-          gap: 12px;
-          padding: 16px 24px;
+          gap: 10px;
+          padding: 12px 20px;
           border-top: 1px solid var(--border);
         }
 
         .close-button-primary {
-          padding: 10px 24px;
+          padding: 8px 20px;
           background: var(--game-primary);
           border: none;
           color: var(--poe2-secondary, #ffffff);
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 600;
           cursor: pointer;
           transition: opacity 0.2s;
+          height: 36px;
+          box-sizing: border-box;
         }
 
         .close-button-primary:hover {

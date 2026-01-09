@@ -446,7 +446,6 @@ export default function CommunityPage() {
           border-radius: 4px;
           text-decoration: none;
           display: inline-block;
-          font-family: inherit;
           box-sizing: border-box;
           margin: 0;
           line-height: 1.5;
@@ -465,7 +464,6 @@ export default function CommunityPage() {
           border-radius: 4px;
           text-decoration: none;
           display: inline-block;
-          font-family: inherit;
           box-sizing: border-box;
           line-height: 1.5;
         }
@@ -496,7 +494,6 @@ export default function CommunityPage() {
           transition: all 0.2s;
           border-radius: 4px;
           display: inline-block;
-          font-family: inherit;
           box-sizing: border-box;
           line-height: 1.5;
         }
@@ -511,7 +508,6 @@ export default function CommunityPage() {
           transition: all 0.2s !important;
           border-radius: 4px !important;
           display: inline-block !important;
-          font-family: inherit !important;
           box-sizing: border-box !important;
         }
 
@@ -551,7 +547,6 @@ export default function CommunityPage() {
           transition: all 0.2s !important;
           border-radius: 4px !important;
           display: inline-block !important;
-          font-family: inherit !important;
           box-sizing: border-box !important;
           line-height: 1.5 !important;
           -webkit-appearance: none !important;

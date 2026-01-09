@@ -860,7 +860,6 @@ export default function PreviewPage() {
         }
 
         .filter-code {
-          font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
           font-size: 13px;
           line-height: 1.7;
           color: #D4C5A9;
@@ -868,6 +867,7 @@ export default function PreviewPage() {
           white-space: pre-wrap;
           word-wrap: break-word;
           background: transparent;
+          font-family: var(--font-mono);
         }
 
         .filter-output-placeholder {

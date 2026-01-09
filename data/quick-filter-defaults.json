@@ -103,5 +103,161 @@
         }
       }
     ]
+  },
+  "uniques": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "uniques_hasvaal",
+        "enabled": true,
+        "name": "HasVaal",
+        "nameKo": "바알 모드 유니크",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Unique"
+          },
+          "hasVaalUniqueMod": {
+            "operator": "==",
+            "value": true
+          }
+        },
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": {
+            "size": 2,
+            "color": "Purple",
+            "shape": "Kite"
+          }
+        }
+      },
+      {
+        "id": "uniques_isvaal",
+        "enabled": true,
+        "name": "IsVaal",
+        "nameKo": "바알 유니크",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Unique"
+          },
+          "isVaalUnique": {
+            "operator": "==",
+            "value": true
+          }
+        },
+        "styles": {
+          "playEffect": "Red",
+          "minimapIcon": {
+            "size": 2,
+            "color": "Red",
+            "shape": "Kite"
+          }
+        }
+      },
+      {
+        "id": "uniques_sockets3",
+        "enabled": true,
+        "name": "3 소켓 유니크",
+        "nameKo": "3 소켓 유니크",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Unique"
+          },
+          "sockets": {
+            "operator": ">=",
+            "value": 3
+          },
+          "class": {
+            "operator": "==",
+            "value": ["Bows", "Crossbows", "Quarterstaves", "Talismans", "Staves", "Two Hand Maces", "Body Armours"]
+          }
+        },
+        "styles": {
+          "playEffect": "Brown",
+          "minimapIcon": {
+            "size": 2,
+            "color": "Brown",
+            "shape": "Kite"
+          }
+        }
+      },
+      {
+        "id": "uniques_sockets2",
+        "enabled": true,
+        "name": "2 소켓 유니크",
+        "nameKo": "2 소켓 유니크",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Unique"
+          },
+          "sockets": {
+            "operator": ">=",
+            "value": 2
+          },
+          "class": {
+            "operator": "==",
+            "value": ["Foci", "One Hand Maces", "Sceptres", "Spears", "Wands", "Helmets", "Gloves", "Boots", "Shields", "Bucklers"]
+          }
+        },
+        "styles": {
+          "playEffect": "Brown",
+          "minimapIcon": {
+            "size": 2,
+            "color": "Brown",
+            "shape": "Kite"
+          }
+        }
+      },
+      {
+        "id": "uniques_quality23",
+        "enabled": true,
+        "name": "퀄리티 23 이상",
+        "nameKo": "퀄리티 23 이상",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Unique"
+          },
+          "quality": {
+            "operator": ">=",
+            "value": 23
+          }
+        },
+        "styles": {
+          "playEffect": "Brown",
+          "minimapIcon": {
+            "size": 2,
+            "color": "Brown",
+            "shape": "Kite"
+          }
+        }
+      },
+      {
+        "id": "uniques_d_other",
+        "enabled": false,
+        "name": "기타 유니크",
+        "nameKo": "기타 유니크",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Unique"
+          },
+          "baseType": {
+            "operator": "==",
+            "value": ["Altar Robe", "Siphoning Wand", "Heavy Bow", "Bloodstone Amulet", "Feathered Sandals", "Fur Plate", "Iron Crown", "Broadhead Quiver", "Champion Cuirass", "Gauze Wraps", "Reflecting Staff", "Heavy Crown", "Spired Greathelm", "Rope Cuffs", "Felt Cap", "Magus Tiara", "Marabout Garb", "Effigial Tower Shield", "Coffer Relic", "Giant Maul", "Antler Focus", "Intricate Crest Shield", "Conqueror Plate", "Tattered Robe", "Aged Cuffs", "Plate Belt", "Pelage Targe", "Jade Tiara", "Fanatic Bow", "Vaal Cuirass", "Iron Ring", "Crimson Amulet", "Fine Belt", "Velvet Cap", "Covert Hood", "Vicious Talisman", "Torment Club", "Shrouded Vest", "Wyrm Quarterstaff", "Composite Bow", "Embroidered Gloves", "Lace Hood", "Corvus Mantle", "Decorated Helm", "Prismatic Ring", "Shortbow", "Ornate Belt", "Helix Spear", "Smuggler Coat", "Dualstring Bow", "Heroic Armour", "Desolate Crossbow", "Cleric Vestments", "Straw Sandals", "Wrapped Sandals", "Gilded Vestments", "Havoc Raiment", "Brimmed Helm", "Totemic Greatclub", "Death Mask", "Execratus Hammer", "Grounding Charm", "Ironclad Vestments", "Grand Cuisses", "Burnished Gauntlets", "Blazon Crest Shield", "Changeling Talisman", "Voodoo Focus", "Hermit Garb", "Hardwood Targe", "Pathfinder Coat", "Closed Helm", "Veiled Mask", "Cinched Boots", "Layered Gauntlets", "Velour Shoes", "Visceral Quiver", "Stone Greaves", "Feathered Robe", "Wrapped Greathelm", "Fire Quiver", "Ruby Ring", "Gargantuan Life Flask", "Fierce Greathelm", "Iron Buckler", "Goldcast Cuffs", "Studded Greatclub", "Rusted Cuirass", "Laced Boots", "Rhoahide Coat", "Leather Vest", "Horned Crown", "Wooden Club", "Lizardscale Boots", "Ornate Buckler", "Sombre Gloves", "Amber Amulet", "Engraved Focus", "Hunting Spear", "Leaden Greathammer", "Chain Mail", "Warrior Greathelm", "Iron Greaves", "Assassin Garb", "Mail Belt", "Cultist Crown", "Twig Circlet", "Acrid Wand", "War Spear", "Braced Sabatons", "Emerald Ring", "Doubled Gauntlets", "Twig Focus", "Elite Greathelm", "Intricate Gloves", "Splintered Tower Shield", "Braced Tower Shield", "Scale Mail", "Dyad Crossbow", "Bolstered Mitts", "Penetrating Quiver", "Leather Buckler", "Ashen Staff", "Studded Vest", "Voltaic Staff", "Iron Cuirass", "Hunter Hood", "Titan Mitts", "Volatile Wand", "Guarded Helm", "Gold Amulet", "Soldier Greathelm", "Artillery Bow", "Crescent Targe", "Omen Sceptre", "Quilted Vest", "Slim Mace", "Embossed Boots", "Threaded Shoes", "Elementalist Robe", "Waxed Jacket", "Abyssal Signet", "Firm Bracers", "Felled Greatclub", "Rusted Greathelm", "Oak Greathammer", "Shaman Mantle", "Familial Talisman", "Mail Vestments", "Sectioned Bracers", "Shabby Hood", "Vagabond Armour", "Visored Helm", "Ringmail Gauntlets", "Ridged Buckler", "Linen Belt", "Full Plate", "Jewelled Gloves", "Hooded Mask", "Rough Greaves", "Attuned Wand", "Ancestral Mail", "Lapis Amulet", "Tempered Mitts", "Rampart Tower Shield", "Omen Crest Shield", "Feathered Tiara", "Crescent Quarterstaff", "Rawhide Belt", "Makeshift Crossbow", "Toxic Quiver", "Steelpoint Quarterstaff", "Bone Raiment", "Pauascale Gloves", "Wooden Buckler", "Suede Bracers", "Sigil Crest Shield", "Stacked Sabatons", "Torn Gloves", "Cloaked Mail", "Knight Armour", "Long Quarterstaff", "Hunting Shoes", "Keth Raiment", "Serpentscale Coat", "Crumbling Maul", "Tense Crossbow", "Blunt Quiver", "Anchorite Garb", "Plated Buckler", "Lunar Amulet", "Emblem Crest Shield", "Bone Wand", "Warpick", "Plated Mace", "Tonal Focus", "Covered Sabatons", "Temple Maul", "Enlightened Robe", "Spiked Buckler", "Zealot Bow", "Spined Bracers", "Grand Visage", "Sacrificial Mantle", "Long Belt", "Hardwood Spear", "Recurve Bow", "Leatherbound Hood", "Crucible Tower Shield", "Gelid Staff", "Votive Raiment", "Rogue Armour", "Hexer's Robe", "Corsair Cap", "Wrapped Quarterstaff", "Tapestry Relic", "Seal Relic", "Wayfarer Jacket", "Rattling Sceptre", "Wicker Tiara", "Cultist Greathammer", "Crystal Focus", "Azure Amulet", "Lamellar Mail", "Hewn Mask", "Bronze Greaves", "Mail Sabatons", "Sacral Quiver", "Amphora Relic", "Verisium Cuffs", "Scout's Vest", "Raider Plate", "Pyrophyte Staff", "Gothic Quarterstaff", "Cowled Helm", "Stone Tower Shield", "Solid Mask", "Ravenous Staff", "Shielded Helm", "Withered Wand", "Utility Wraps", "Steeltoe Boots", "Pointed Maul", "Maraketh Cuirass", "Riveted Mitts", "Forge Maul", "Ironhead Spear", "Plate Gauntlets", "Plated Raiment", "Beaded Circlet", "Secured Leggings", "Steel Plate", "Crude Bow", "Barricade Tower Shield", "Silk Slippers", "Painted Tower Shield", "Smithing Hammer", "Strider Vest", "Scalper's Jacket"]
+          }
+        },
+        "styles": {}
+      }
+    ]
   }
 }

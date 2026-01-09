@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import presetsData from "@/data/presets.json";
+import NotificationModal from "./NotificationModal";
 
 export default function ItemFilterActions({
   lang = "ko",
@@ -19,15 +20,19 @@ export default function ItemFilterActions({
   showSaveAsDefaultDropdown = true,
   showReset = true,
   onShowSuccess,
+  onSaveAsLeagueDefault, // 시세 그룹별 기본값 저장 콜백
+  leagueOptions = [], // 시세 그룹 옵션 배열 [{ id: "default", name: "기본값" }, ...]
+  showSaveAsLeagueDefault = true, // 관리자 기능 표시 여부 (현재는 항상 true)
 }) {
   const [showLoadDropdown, setShowLoadDropdown] = useState(false);
   const [showSaveDefaultDropdown, setShowSaveDefaultDropdown] = useState(false);
+  const [showSaveLeagueDefaultDropdown, setShowSaveLeagueDefaultDropdown] = useState(false);
   const [showResetDropdown, setShowResetDropdown] = useState(false);
   const [hoveredMyFilter, setHoveredMyFilter] = useState(false);
   const [savedFilters, setSavedFilters] = useState([]);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmType, setConfirmType] = useState(null); // 'all' or 'page'
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
   // 저장된 필터 목록 불러오기
@@ -61,6 +66,12 @@ export default function ItemFilterActions({
         setShowSaveDefaultDropdown(false);
       }
       if (
+        showSaveLeagueDefaultDropdown &&
+        !e.target.closest(".action-button-wrapper")
+      ) {
+        setShowSaveLeagueDefaultDropdown(false);
+      }
+      if (
         showResetDropdown &&
         !e.target.closest(".action-button-wrapper")
       ) {
@@ -69,7 +80,7 @@ export default function ItemFilterActions({
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showLoadDropdown, showSaveDefaultDropdown, showResetDropdown]);
+  }, [showLoadDropdown, showSaveDefaultDropdown, showSaveLeagueDefaultDropdown, showResetDropdown]);
 
   const handleLoadFromStorage = () => {
     if (onLoadFromStorage) {
@@ -116,6 +127,13 @@ export default function ItemFilterActions({
     }
   };
 
+  const handleSaveAsLeagueDefault = (leagueId) => {
+    if (onSaveAsLeagueDefault) {
+      onSaveAsLeagueDefault(leagueId);
+      setShowSaveLeagueDefaultDropdown(false);
+    }
+  };
+
   const handleSaveAsMyFilter = () => {
     setShowSaveDefaultDropdown(false);
     if (onSaveAsMyFilter) {
@@ -139,26 +157,26 @@ export default function ItemFilterActions({
   const handleResetAll = () => {
     setShowResetDropdown(false);
     setConfirmType("all");
-    setShowConfirmDialog(true);
+    setConfirmModalOpen(true);
   };
 
   const handleResetPage = () => {
     setShowResetDropdown(false);
     setConfirmType("page");
-    setShowConfirmDialog(true);
+    setConfirmModalOpen(true);
   };
 
   const handleConfirmReset = () => {
-    setShowConfirmDialog(false);
+    setConfirmModalOpen(false);
     if (confirmType === "all" && onResetAll) {
       onResetAll((message) => {
         setSuccessMessage(message);
-        setShowSuccessDialog(true);
+        setSuccessModalOpen(true);
       });
     } else if (confirmType === "page" && onResetPage) {
       onResetPage((message) => {
         setSuccessMessage(message);
-        setShowSuccessDialog(true);
+        setSuccessModalOpen(true);
       });
     } else if (onReset) {
       // 기존 onReset 호환성 유지
@@ -168,12 +186,12 @@ export default function ItemFilterActions({
   };
 
   const handleCloseSuccess = () => {
-    setShowSuccessDialog(false);
+    setSuccessModalOpen(false);
     setSuccessMessage("");
   };
 
   const handleCancelReset = () => {
-    setShowConfirmDialog(false);
+    setConfirmModalOpen(false);
     setConfirmType(null);
   };
 
@@ -284,6 +302,36 @@ export default function ItemFilterActions({
         </div>
 
         <div className="action-buttons-right">
+          {/* 시세 기본값으로 저장 (관리자 기능) */}
+          {showSaveAsLeagueDefault && leagueOptions.length > 0 && (
+            <div className="action-button-wrapper">
+              <button
+                className="action-button action-button-admin-league"
+                onClick={() => {
+                  setShowLoadDropdown(false);
+                  setShowSaveDefaultDropdown(false);
+                  setShowSaveLeagueDefaultDropdown(!showSaveLeagueDefaultDropdown);
+                }}
+              >
+                {lang === "ko" ? "시세 기본값으로 저장" : "Save as League Default"}
+                <span className="dropdown-icon">▼</span>
+              </button>
+              {showSaveLeagueDefaultDropdown && (
+                <div className="action-dropdown">
+                  {leagueOptions.map((league) => (
+                    <button
+                      key={league.id}
+                      className="dropdown-item"
+                      onClick={() => handleSaveAsLeagueDefault(league.id)}
+                    >
+                      {league.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 기본값으로 저장 */}
           {showSaveAsDefaultDropdown && (
             <div className="action-button-wrapper">
@@ -323,10 +371,11 @@ export default function ItemFilterActions({
           {showReset && (
             <div className="action-button-wrapper">
               <button
-                className="action-button action-button-reset"
+                className="action-button action-button-reset-admin"
                 onClick={() => {
                   setShowLoadDropdown(false);
                   setShowSaveDefaultDropdown(false);
+                  setShowSaveLeagueDefaultDropdown(false);
                   setShowResetDropdown(!showResetDropdown);
                 }}
               >
@@ -457,158 +506,56 @@ export default function ItemFilterActions({
           background: rgba(255, 255, 255, 0.05);
         }
 
-        .confirm-dialog-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-        }
-
-        .confirm-dialog {
-          background: var(--panel);
-          border: 1px solid var(--border);
-          padding: 24px;
-          min-width: 400px;
-          max-width: 500px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        }
-
-        .confirm-dialog-message {
-          font-size: 16px;
-          color: var(--text);
-          margin-bottom: 24px;
-          line-height: 1.5;
-        }
-
-        .confirm-dialog-buttons {
-          display: flex;
-          justify-content: flex-end;
-          gap: 12px;
-        }
-
-        .confirm-dialog-button {
-          padding: 10px 20px;
-          font-size: 14px;
+        .action-button-admin-league {
+          border: 2px solid #ff4757 !important;
+          color: #ff4757 !important;
+          background: transparent !important;
           font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: 1px solid var(--border);
         }
 
-        .confirm-dialog-button-cancel {
-          background: var(--panel2);
-          color: var(--text);
+        .action-button-admin-league:hover {
+          background: rgba(255, 71, 87, 0.1) !important;
         }
 
-        .confirm-dialog-button-cancel:hover {
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        .confirm-dialog-button-confirm {
-          background: transparent;
-          color: #ff4757;
-          border-color: #ff4757;
-        }
-
-        .confirm-dialog-button-confirm:hover {
-          background: rgba(255, 71, 87, 0.1);
-        }
-
-        .success-dialog-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-        }
-
-        .success-dialog {
-          background: var(--panel);
-          border: 1px solid var(--border);
-          padding: 24px;
-          min-width: 400px;
-          max-width: 500px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        }
-
-        .success-dialog-message {
-          font-size: 16px;
-          color: var(--text);
-          margin-bottom: 24px;
-          line-height: 1.5;
-        }
-
-        .success-dialog-button {
-          padding: 10px 20px;
-          font-size: 14px;
+        .action-button-reset-admin {
+          border: 2px solid #ff4757 !important;
+          color: #ff4757 !important;
+          background: transparent !important;
           font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: 1px solid #ff4757;
-          background: transparent;
-          color: #ff4757;
-          width: 100%;
         }
 
-        .success-dialog-button:hover {
-          background: rgba(255, 71, 87, 0.1);
+        .action-button-reset-admin:hover {
+          background: rgba(255, 71, 87, 0.1) !important;
         }
+
       `}</style>
-      {showSuccessDialog && (
-        <div className="success-dialog-overlay" onClick={handleCloseSuccess}>
-          <div className="success-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="success-dialog-message">
-              {successMessage}
-            </div>
-            <button
-              className="success-dialog-button"
-              onClick={handleCloseSuccess}
-            >
-              {lang === "ko" ? "확인" : "OK"}
-            </button>
-          </div>
-        </div>
-      )}
-      {showConfirmDialog && (
-        <div className="confirm-dialog-overlay" onClick={handleCancelReset}>
-          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="confirm-dialog-message">
-              {confirmType === "all"
-                ? lang === "ko"
-                  ? "정말 전체를 초기화 하시겠습니까?"
-                  : "Are you sure you want to reset all settings?"
-                : lang === "ko"
-                ? "정말 이 페이지를 초기화 하시겠습니까?"
-                : "Are you sure you want to reset this page?"}
-            </div>
-            <div className="confirm-dialog-buttons">
-              <button
-                className="confirm-dialog-button confirm-dialog-button-cancel"
-                onClick={handleCancelReset}
-              >
-                {lang === "ko" ? "취소" : "Cancel"}
-              </button>
-              <button
-                className="confirm-dialog-button confirm-dialog-button-confirm"
-                onClick={handleConfirmReset}
-              >
-                {lang === "ko" ? "확인" : "Confirm"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <NotificationModal
+        isOpen={successModalOpen}
+        onClose={handleCloseSuccess}
+        type="success"
+        message={successMessage}
+        autoCloseDelay={7000}
+        lang={lang}
+      />
+      <NotificationModal
+        isOpen={confirmModalOpen}
+        onClose={handleCancelReset}
+        type="confirm"
+        message={
+          confirmType === "all"
+            ? lang === "ko"
+              ? "정말 전체를 초기화 하시겠습니까?"
+              : "Are you sure you want to reset all settings?"
+            : lang === "ko"
+            ? "정말 이 페이지를 초기화 하시겠습니까?"
+            : "Are you sure you want to reset this page?"
+        }
+        confirmText={lang === "ko" ? "확인" : "Confirm"}
+        cancelText={lang === "ko" ? "취소" : "Cancel"}
+        onConfirm={handleConfirmReset}
+        showCancel={true}
+        lang={lang}
+      />
     </>
   );
 }

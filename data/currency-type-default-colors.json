@@ -1,0 +1,1178 @@
+{
+  "currency": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 90,
+        "b": 35,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 249,
+        "g": 150,
+        "b": 25,
+        "a": 255
+      }
+    },
+    "D": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 210,
+        "g": 178,
+        "b": 135,
+        "a": 255
+      }
+    },
+    "E": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 220,
+        "g": 175,
+        "b": 132,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 220,
+        "g": 175,
+        "b": 132,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    }
+  },
+  "runes": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "A": null,
+    "B": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 90,
+        "b": 35,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 249,
+        "g": 150,
+        "b": 25,
+        "a": 255
+      }
+    },
+    "D": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 83,
+        "g": 68,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "E": null
+  },
+  "essences": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 85,
+        "b": 25,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 190,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "D": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 83,
+        "g": 68,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "E": null
+  },
+  "ritual_omen": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 85,
+        "b": 25,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 210,
+        "g": 178,
+        "b": 135,
+        "a": 255
+      }
+    },
+    "D": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 210,
+        "g": 178,
+        "b": 135,
+        "a": 255
+      }
+    },
+    "E": null
+  },
+  "waystones": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "delirium": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 85,
+        "b": 25,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 33,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 201,
+        "b": 54,
+        "a": 230
+      }
+    },
+    "D": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 83,
+        "g": 68,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "E": null
+  },
+  "breach": {
+    "S": null,
+    "A": null,
+    "B": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 90,
+        "b": 35,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 222,
+        "g": 255,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 115,
+        "g": 36,
+        "b": 62,
+        "a": 255
+      }
+    },
+    "D": {
+      "fontSize": 38,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "E": null
+  },
+  "abyssal": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 90,
+        "b": 35,
+        "a": 255
+      }
+    },
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "ancient_bones": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 90,
+        "b": 35,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 249,
+        "g": 150,
+        "b": 25,
+        "a": 255
+      }
+    },
+    "D": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "E": null
+  },
+  "expedition": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "tablet": {
+    "S": null,
+    "A": null,
+    "B": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 50,
+        "g": 116,
+        "b": 177,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 103,
+        "g": 117,
+        "b": 130,
+        "a": 255
+      }
+    },
+    "D": null,
+    "E": null
+  },
+  "uncut_gems": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "lineage_gems": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 190,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "C": {
+      "fontSize": 40,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "D": {
+      "fontSize": 38,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    },
+    "E": null
+  },
+  "jewels": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "charm": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "flask": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "pinnacle_key": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 90,
+        "b": 35,
+        "a": 255
+      }
+    },
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "map_fragments": {
+    "S": null,
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": null,
+    "C": {
+      "fontSize": 42,
+      "textColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 249,
+        "g": 150,
+        "b": 25,
+        "a": 255
+      }
+    },
+    "D": null,
+    "E": null
+  },
+  "vault_key": {
+    "S": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      }
+    },
+    "A": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 240,
+        "g": 35,
+        "b": 120,
+        "a": 255
+      }
+    },
+    "B": {
+      "fontSize": 45,
+      "textColor": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
+      "borderColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "backgroundColor": {
+        "r": 114,
+        "g": 48,
+        "b": 96,
+        "a": 255
+      }
+    },
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "incubators": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "soul_cores": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  },
+  "idosl": {
+    "S": null,
+    "A": null,
+    "B": null,
+    "C": null,
+    "D": null,
+    "E": null
+  }
+}

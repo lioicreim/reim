@@ -74,10 +74,25 @@ export default function ItemFilterNav() {
     return pathname === tab.path || pathname?.startsWith(tab.path + "/");
   });
 
-  // 빠른 설정 페이지일 때 설명 텍스트 표시
-  const showDescription = activeTab?.id === "quick-filters";
-  // 모든 아이템 필터 페이지에서 설명 표시 (임시로 동일한 내용)
-  const showTierListDescription = true;
+  // 각 탭별 설명 텍스트 정의
+  const descriptions = {
+    presets: "게임 진행 상황에 맞는 프리셋을 선택하여 필터를 시작하세요",
+    "quick-filters": "아이템 필터 규칙을 직관적으로 선택하여 나만의 최적화된 필터를 만드세요",
+    "tier-category-currency": "화폐 아이템을 S~E 티어로 분류하여 시각적으로 확인하세요",
+    "tier-category-uniques": "유니크 아이템을 S~C 티어로 분류하여 시각적으로 확인하세요",
+    "tier-category-gear-bases": "장비 베이스를 S~E 티어로 분류하여 시각적으로 확인하세요",
+    "tier-category-mods": "모드를 S~E 티어로 분류하여 시각적으로 확인하세요",
+    "custom-rules": "고급 사용자를 위한 커스텀 규칙을 직접 작성하세요",
+    "sound-manager": "아이템별 사운드 효과를 세밀하게 설정하세요",
+    preview: "생성된 필터 코드를 미리보기하고 테스트하세요",
+    settings: "필터 생성 옵션과 기본 설정을 관리하세요",
+  };
+
+  // 현재 활성화된 탭의 설명 텍스트 가져오기
+  const currentDescription = activeTab ? descriptions[activeTab.id] || "" : "";
+
+  // 설명 표시 여부 (설명이 있을 때만 표시)
+  const showDescription = currentDescription !== "";
 
   return (
     <>
@@ -99,13 +114,9 @@ export default function ItemFilterNav() {
         </div>
       </nav>
       {showDescription && (
-        <div className="item-filter-description">
-          <p>아이템 필터 규칙을 직관적으로 선택하여 나만의 최적화된 필터를 만드세요</p>
-        </div>
-      )}
-      {showTierListDescription && (
-        <div className="item-filter-description tier-list-description">
-          <p>아이템을 S~E 티어로 분류하여 시각적으로 확인하세요</p>
+        <div className={`item-filter-description ${activeTab?.id === "tier-category-uniques" ? "item-filter-description-with-search" : ""}`}>
+          <p>{currentDescription}</p>
+          <div id="unique-search-container"></div>
         </div>
       )}
     </>

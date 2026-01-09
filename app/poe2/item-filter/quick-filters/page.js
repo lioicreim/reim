@@ -314,6 +314,78 @@ export default function QuickFiltersPage() {
   // 화폐 섹션 접기/펼치기 상태
   const [isCurrencyExpanded, setIsCurrencyExpanded] = useState(true);
 
+  // 유니크 설정 로드 (골드와 동일한 구조)
+  const [uniquesSettings, setUniquesSettings] = useState(quickFilterDefaults.uniques || { enabled: true, rules: [] });
+  const [isClientUniques, setIsClientUniques] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 유니크 설정 불러오기
+  useEffect(() => {
+    setIsClientUniques(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_uniques");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const defaultRules = (quickFilterDefaults.uniques || { rules: [] }).rules;
+          const savedRules = parsed.rules || [];
+
+          // 저장된 규칙의 제목을 기본값으로 업데이트
+          const mergedRules = savedRules.map((savedRule) => {
+            const defaultRule = defaultRules.find((r) => r.id === savedRule.id);
+            if (defaultRule) {
+              return {
+                ...savedRule,
+                name: defaultRule.name,
+                nameKo: defaultRule.nameKo,
+              };
+            }
+            return savedRule;
+          });
+
+          // 기본값에 있는데 저장된 것에 없는 규칙 추가
+          defaultRules.forEach((defaultRule) => {
+            if (!mergedRules.find((r) => r.id === defaultRule.id)) {
+              mergedRules.push(defaultRule);
+            }
+          });
+
+          setUniquesSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : (quickFilterDefaults.uniques || { enabled: true }).enabled,
+            rules: mergedRules,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved uniques settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 유니크 설정 저장
+  useEffect(() => {
+    if (isClientUniques && typeof window !== "undefined") {
+      localStorage.setItem("quickFilter_uniques", JSON.stringify(uniquesSettings));
+    }
+  }, [uniquesSettings, isClientUniques]);
+
+  // 유니크 규칙 활성화/비활성화
+  const toggleUniquesRule = (ruleId) => {
+    const updatedRules = uniquesSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    // 하위 규칙 중 하나라도 활성화되면 상위 카테고리도 활성화
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setUniquesSettings({
+      ...uniquesSettings,
+      enabled: hasAnyEnabled || uniquesSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 유니크 섹션 접기/펼치기 상태
+  const [isUniquesExpanded, setIsUniquesExpanded] = useState(true);
+
   // 레벨링 단계 섹션 접기/펴기 상태
   const [isLeagueStartExpanded, setIsLeagueStartExpanded] = useState(true);
 
@@ -380,6 +452,7 @@ export default function QuickFiltersPage() {
     { id: "league-start", name: "레벨링 단계" },
     { id: "gold", name: "골드" },
     { id: "currency", name: "화폐" },
+    { id: "uniques", name: "유니크" },
   ]);
 
   // 섹션 순서 관리 (오른쪽 열)
@@ -1781,6 +1854,81 @@ export default function QuickFiltersPage() {
     </div>
   );
 
+  // 유니크 섹션 렌더링 함수
+  const renderUniquesSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${isUniquesExpanded ? "section-header-expanded" : ""}`}
+        onClick={() => setIsUniquesExpanded(!isUniquesExpanded)}
+      >
+        <label
+          className="section-checkbox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={uniquesSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              const newEnabled = e.target.checked;
+              setUniquesSettings({
+                ...uniquesSettings,
+                enabled: newEnabled,
+                rules: uniquesSettings.rules.map((rule) => ({
+                  ...rule,
+                  enabled: newEnabled ? true : false,
+                })),
+              });
+            }}
+          />
+        </label>
+        <h3
+          className="section-title"
+          style={{
+            opacity: uniquesSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "유니크" : "Uniques"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isUniquesExpanded ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
+        </span>
+      </div>
+      {isUniquesExpanded && (
+        <div className="section-content">
+          {/* 유니크 규칙들 */}
+          {uniquesSettings.rules.map((rule) => (
+            <div
+              key={rule.id}
+              className="filter-rule-item"
+              style={{
+                opacity: uniquesSettings.enabled ? 1 : 0.5,
+                filter: uniquesSettings.enabled ? "none" : "grayscale(100%)",
+              }}
+            >
+              <label className="rule-checkbox">
+                <input
+                  type="checkbox"
+                  checked={rule.enabled}
+                  onChange={() => toggleUniquesRule(rule.id)}
+                />
+              </label>
+              <span className="rule-title">{rule.nameKo || rule.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   // 골드 섹션 렌더링 함수
   const renderGoldSection = () => (
     <div className="quick-filter-section" style={{ marginTop: "0" }}>
@@ -1891,6 +2039,8 @@ export default function QuickFiltersPage() {
                   return <div key={section.id}>{renderGoldSection()}</div>;
                 } else if (section.id === "currency") {
                   return <div key={section.id}>{renderCurrencySection()}</div>;
+                } else if (section.id === "uniques") {
+                  return <div key={section.id}>{renderUniquesSection()}</div>;
                 }
                 return null;
               })}
@@ -2486,7 +2636,6 @@ export default function QuickFiltersPage() {
           cursor: pointer;
           outline: none;
           transition: border-color 0.2s;
-          font-family: monospace;
         }
 
         .area-level-operator:focus {
@@ -2913,7 +3062,6 @@ export default function QuickFiltersPage() {
         }
 
         .currency-tier-button {
-          font-family: inherit;
         }
 
         .currency-tier-button:hover:not(:disabled) {

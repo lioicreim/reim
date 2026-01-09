@@ -96,7 +96,6 @@
   border-radius: 4px;
   color: var(--text);
   font-size: 16px;
-  font-family: inherit;
 }
 
 .category-select {
@@ -174,7 +173,6 @@
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
-  font-family: inherit;
 }
 
 .editor-toolbar select:focus {
@@ -264,7 +262,6 @@
   background: var(--panel);
   padding: 2px 6px;
   border-radius: 3px;
-  font-family: 'Courier New', monospace;
   font-size: 0.9em;
   color: var(--game-primary);
 }

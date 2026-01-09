@@ -228,7 +228,6 @@ export default function GameColorSettings({ onClose }) {
           border: 1px solid var(--border);
           color: var(--text);
           font-size: 14px;
-          font-family: monospace;
           outline: none;
         }
 

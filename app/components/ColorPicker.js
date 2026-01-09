@@ -371,10 +371,10 @@ export default function ColorPicker({
       <div className="color-picker-trigger">
         {showCheckbox && (
           <div
-            className="color-checkbox-custom"
+            className={`color-checkbox-custom ${checked ? "color-checkbox-checked" : ""}`}
             style={{
-              backgroundColor: checked ? currentColorRgba : "transparent",
-              borderColor: checked ? "transparent" : "var(--border)",
+              backgroundColor: checked ? "var(--poe2-primary, var(--game-primary))" : "transparent",
+              borderColor: checked ? "var(--poe2-primary, var(--game-primary))" : "var(--border)",
             }}
             onClick={() => {
               if (onCheckboxChange) {
@@ -513,16 +513,31 @@ export default function ColorPicker({
         }
 
         .color-checkbox-custom {
-          width: 16px;
-          height: 16px;
+          width: 18px;
+          height: 18px;
           border: 1px solid var(--border);
           cursor: pointer;
           flex-shrink: 0;
           transition: all 0.2s;
+          position: relative;
+          border-radius: 0;
         }
 
         .color-checkbox-custom:hover {
           border-color: var(--game-primary);
+        }
+
+        /* 체크된 상태일 때 체크 표시 */
+        .color-checkbox-custom.color-checkbox-checked::after {
+          content: '✓';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: #ffffff;
+          font-size: 12px;
+          font-weight: bold;
+          line-height: 1;
         }
 
         .color-label {
@@ -665,11 +680,11 @@ export default function ColorPicker({
           border: 1px solid var(--border);
           color: var(--text);
           font-size: 13px;
-          font-family: monospace;
           text-transform: none;
           flex: 1;
           text-align: center;
           outline: none;
+          font-family: var(--font-mono);
         }
 
         .color-hex-input:focus {

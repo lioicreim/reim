@@ -38,7 +38,8 @@ export default function ItemPreviewBox({
 
   // 인게임 폰트 크기를 프리뷰 크기로 변환 (인게임 45 = 프리뷰 약 24px 정도로 조정)
   // 인게임 폰트 크기와 웹 프리뷰 크기의 비율을 조정
-  const previewFontSize = fontSize * 0.53; // 인게임 45 → 프리뷰 약 24px
+  // 최소 폰트 크기를 14px로 보장하여 30일 때도 보이도록 함
+  const previewFontSize = Math.max(14, fontSize * 0.53); // 인게임 45 → 프리뷰 약 24px, 최소 14px
 
 
   return (
@@ -80,12 +81,12 @@ export default function ItemPreviewBox({
 
         .preview-ground {
           position: relative;
-          height: 180px;
+          height: 140px;
           border-radius: 0;
           display: flex;
           align-items: flex-end;
           justify-content: center;
-          padding-bottom: 30px;
+          padding-bottom: 20px;
           overflow: hidden;
         }
 
@@ -98,9 +99,14 @@ export default function ItemPreviewBox({
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
           outline: none;
           min-height: 40px;
+          min-width: 80px;
           display: flex;
           align-items: center;
           justify-content: center;
+          line-height: 1.2;
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         }
       `}</style>
     </div>
