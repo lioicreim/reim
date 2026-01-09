@@ -15,6 +15,7 @@ import { useEffect } from "react";
  * @param {string} props.confirmText - 확인 버튼 텍스트 (기본: "확인")
  * @param {string} props.cancelText - 취소 버튼 텍스트 (기본: "취소")
  * @param {Function} props.onConfirm - 확인 버튼 클릭 콜백 (confirm 타입일 때만)
+ * @param {Function} props.onCancel - 취소 버튼 클릭 콜백 (confirm 타입일 때만)
  * @param {boolean} props.showCancel - 취소 버튼 표시 여부 (기본: confirm 타입일 때만 true)
  * @param {number} props.autoCloseDelay - 자동 닫기 시간(ms), 0이면 자동 닫기 안 함 (기본: success일 때 3000)
  * @param {string} props.lang - 언어 설정 (기본: "ko")
@@ -29,6 +30,7 @@ export default function NotificationModal({
   confirmText = "",
   cancelText = "",
   onConfirm = null,
+  onCancel = null,
   showCancel = null,
   autoCloseDelay = null,
   lang = "ko",
@@ -193,7 +195,13 @@ export default function NotificationModal({
             {finalShowCancel && (
               <button
                 className="notification-modal-button notification-modal-button-cancel"
-                onClick={onClose}
+                onClick={() => {
+                  if (onCancel) {
+                    onCancel();
+                  } else {
+                    onClose();
+                  }
+                }}
               >
                 {finalCancelText}
               </button>

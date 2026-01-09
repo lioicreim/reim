@@ -246,7 +246,11 @@
       "Ancient Rib",
       "Ancient Collarbone",
       "Essence of Hysteria",
-      "Essence of Horror"
+      "Essence of Horror",
+      "Ancient Crisis Fragment",
+      "Primary Calamity Fragment",
+      "Secondary Calamity Fragment",
+      "Tertiary Calamity Fragment"
     ],
     "A": [
       "Architect's Orb",
@@ -256,7 +260,15 @@
       "Preserved Cranium",
       "Perfect Essence of Battle",
       "Perfect Essence of Haste",
-      "Greater Essence of Opulence"
+      "Greater Essence of Opulence",
+      "Esh's Catalyst",
+      "Reaver Catalyst",
+      "Sibilant Catalyst",
+      "Faded Crisis Fragment",
+      "Weathered Crisis Fragment",
+      "Cowardly Fate",
+      "Deadly Fate",
+      "Victorious Fate"
     ],
     "B": [
       "Ancient Infuser",
@@ -290,7 +302,15 @@
       "Essence of Insanity",
       "Essence of the Abyss",
       "Essence of Thawing",
-      "Essence of Opulence"
+      "Essence of Opulence",
+      "Neural Catalyst",
+      "Carapace Catalyst",
+      "Xoph's Catalyst",
+      "Tul's Catalyst",
+      "Chayula's Catalyst",
+      "Skittering Catalyst",
+      "Ritual Precursor Tablet",
+      "Abyss Precursor Tablet"
     ],
     "C": [
       "Arcanist's Etcher",
@@ -372,7 +392,17 @@
       "Perfect Essence of Alacrity",
       "Perfect Essence of Opulence",
       "Essence of Command",
-      "Perfect Essence of Command"
+      "Perfect Essence of Command",
+      "Flesh Catalyst",
+      "Uul-Netol's Catalyst",
+      "Adaptive Catalyst",
+      "Breach Splinter",
+      "Kulemak's Invitation",
+      "Breach Precursor Tablet",
+      "Expedition Precursor Tablet",
+      "Delirium Precursor Tablet",
+      "Precursor Tablet",
+      "Overseer Precursor Tablet"
     ],
     "D": [
       "Blacksmith's Whetstone",

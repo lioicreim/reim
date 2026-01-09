@@ -14,6 +14,8 @@ import presetsData from "@/data/presets.json";
 import uniquesTiers from "@/data/uniques-tiers.json";
 import quickFilterDefaults from "@/data/quick-filter-defaults.json";
 import NotificationModal from "@/app/components/NotificationModal";
+import StyleSettingsModal from "@/app/components/StyleSettingsModal";
+import currencyTypeDefaultColors from "@/data/currency-type-default-colors.json";
 
 // 티어 매핑: 1->S, 2->A, 3->B, 4->C, 5->D, 6->E
 const tierMapping = {
@@ -92,6 +94,14 @@ export default function TierListPage() {
     isOpen: false,
     message: "",
     onConfirm: null,
+  });
+
+  // 티어 스타일 설정 모달 상태
+  const [tierStyleModal, setTierStyleModal] = useState({
+    isOpen: false,
+    tier: null, // "S", "A", "B", "C", "D"
+    currencyType: null, // 화폐 종류 ID (null이면 "전체")
+    styles: null, // 현재 스타일 설정
   });
   
   // 화폐 종류 드롭다운에서 선택한 카테고리 추적
@@ -214,7 +224,7 @@ export default function TierListPage() {
   }, []);
 
   // 화폐 종류 드롭다운에서 제외할 항목들
-  const excludedCurrencyTypes = ["waystones", "vault_key", "jewels", "flask", "charm"];
+  const excludedCurrencyTypes = ["waystones", "vault_key", "jewels", "flask", "charm", "uncut_gems"];
   
   // 자주 검색하는 화폐 ID 목록 (제외된 항목 제외)
   const frequentCurrencyIds = ["currency", "runes", "essences", "waystones"].filter(id => !excludedCurrencyTypes.includes(id));
@@ -241,7 +251,7 @@ export default function TierListPage() {
     { id: "charm", name: lang === "ko" ? "호신부" : "Charms" },
     { id: "flask", name: lang === "ko" ? "플라스크" : "Flasks" },
     { id: "pinnacle_key", name: lang === "ko" ? "보스 조각" : "Pinnacle Keys" },
-    { id: "map_fragments", name: lang === "ko" ? "조각" : "Map Fragments" },
+    { id: "map_fragments", name: lang === "ko" ? "맵 조각" : "Map Fragments" },
     { id: "vault_key", name: lang === "ko" ? "보관실 키" : "Vault Keys" },
     { id: "incubators", name: lang === "ko" ? "인큐베이터" : "Incubators" },
     { id: "soul_cores", name: lang === "ko" ? "영혼핵" : "Soul Cores" },
@@ -798,6 +808,181 @@ export default function TierListPage() {
       }
     }
   }, [selectedCategory, debouncedUniqueSearchQuery, uniqueSearchMatches, isUniqueSearchResultInTiers]);
+
+  // 화폐 종류별 티어 스타일 가져오기
+  const getCurrencyTypeTierStyle = (currencyTypeId, tier) => {
+    if (!currencyTypeId || !tier) return null;
+    
+    // currency-type-default-colors.json에서 기본 색상 정보 가져오기
+    const typeStyles = currencyTypeDefaultColors[currencyTypeId];
+    if (!typeStyles) {
+      // currencyTypeId가 없으면 "currency" 기본값 사용
+      const defaultStyles = currencyTypeDefaultColors["currency"];
+      if (!defaultStyles || !defaultStyles[tier]) return null;
+      
+      // filter-generator.js의 getCurrencyTierColors에서 추가 정보 가져오기
+      const tierColors = getCurrencyTierColorsFromGenerator(tier);
+      return mergeTierStyles(defaultStyles[tier], tierColors);
+    }
+    
+    const baseStyle = typeStyles[tier];
+    if (!baseStyle) return null;
+    
+    // filter-generator.js의 getCurrencyTierColors에서 추가 정보 가져오기
+    const tierColors = getCurrencyTierColorsFromGenerator(tier);
+    return mergeTierStyles(baseStyle, tierColors);
+  };
+
+  // filter-generator.js의 getCurrencyTierColors 함수와 동일한 로직
+  const getCurrencyTierColorsFromGenerator = (tier) => {
+    const tierStyles = {
+      S: {
+        playEffect: "Red",
+        minimapIcon: { size: 0, color: "Red", shape: "Star" },
+        customSound: "custom_sound/1_currency_s.mp3",
+      },
+      A: {
+        playEffect: "Orange",
+        minimapIcon: { size: 0, color: "Orange", shape: "Circle" },
+        customSound: "custom_sound/2_currency_a.mp3",
+      },
+      B: {
+        playEffect: "Yellow",
+        minimapIcon: { size: 1, color: "Yellow", shape: "Circle" },
+        customSound: "custom_sound/3_currency_b.mp3",
+      },
+      C: {
+        playEffect: null,
+        minimapIcon: { size: 1, color: "Yellow", shape: "Circle" },
+        customSound: "custom_sound/4_currency_c.mp3",
+      },
+      D: {
+        playEffect: null,
+        minimapIcon: null,
+        customSound: null,
+      },
+      E: {
+        playEffect: null,
+        minimapIcon: null,
+        customSound: null,
+      },
+    };
+    return tierStyles[tier] || { playEffect: null, minimapIcon: null, customSound: null };
+  };
+
+  // 스타일 병합 함수 (baseStyle에 tierColors의 정보 추가)
+  const mergeTierStyles = (baseStyle, tierColors) => {
+    return {
+      ...baseStyle,
+      playEffect: tierColors.playEffect || baseStyle.playEffect || null,
+      minimapIcon: tierColors.minimapIcon || baseStyle.minimapIcon || { size: null, color: null, shape: null },
+      customSound: tierColors.customSound || baseStyle.customSound || null,
+    };
+  };
+
+  // 화폐 종류별 티어 스타일 저장하기
+  const saveCurrencyTypeTierStyle = (currencyTypeId, tier, styles) => {
+    // localStorage에 저장 (나중에 서버로 저장)
+    const storageKey = `currency-type-tier-styles-${selectedLeague}`;
+    const savedStyles = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    
+    if (!savedStyles[currencyTypeId]) {
+      savedStyles[currencyTypeId] = {};
+    }
+    savedStyles[currencyTypeId][tier] = styles;
+    
+    localStorage.setItem(storageKey, JSON.stringify(savedStyles));
+  };
+
+  // 티어의 첫 번째 아이템 이름 가져오기
+  const getFirstItemNameInTier = (tier, currencyTypeId) => {
+    const leagueKey = selectedLeague;
+    
+    // 선택된 화폐 종류에 해당하는 아이템만 필터링
+    let itemsInSelectedCategories = new Set();
+    if (currencyTypeId) {
+      const categoryItems = currencyItemCategories[currencyTypeId] || [];
+      categoryItems.forEach(itemName => {
+        itemsInSelectedCategories.add(itemName);
+      });
+    } else {
+      // 전체 선택: 모든 화폐 아이템 포함
+      Object.values(currencyItemCategories).forEach(categoryItems => {
+        categoryItems.forEach(itemName => {
+          itemsInSelectedCategories.add(itemName);
+        });
+      });
+    }
+    
+    // 해당 티어의 아이템들 중에서 첫 번째 아이템 찾기
+    const allItems = [];
+    ["S", "A", "B", "C", "D", "E"].forEach((t) => {
+      const items = currencyTiers[leagueKey]?.[t] || [];
+      items.forEach((itemName) => {
+        const actualTier = getCurrencyItemTier(itemName);
+        if (actualTier === tier && itemsInSelectedCategories.has(itemName)) {
+          allItems.push(itemName);
+        }
+      });
+    });
+    
+    // 첫 번째 아이템이 있으면 번역된 이름 반환
+    if (allItems.length > 0) {
+      return translateItemName(allItems[0]);
+    }
+    
+    return null;
+  };
+
+  // 티어 헤더 클릭 핸들러
+  const handleTierHeaderClick = (tier) => {
+    if (selectedCategory !== "currency") return;
+    
+    const currencyTypeId = selectedCurrencyTypes.length === 0 
+      ? null 
+      : selectedCurrencyTypes.length === 1 
+        ? selectedCurrencyTypes[0] 
+        : null; // 다중 선택 시 null (전체와 동일하게 처리)
+    
+    // 현재 스타일 가져오기
+    let currentStyles = null;
+    if (currencyTypeId) {
+      // 특정 화폐 종류의 티어 스타일
+      const storageKey = `currency-type-tier-styles-${selectedLeague}`;
+      const savedStyles = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      currentStyles = savedStyles[currencyTypeId]?.[tier] || getCurrencyTypeTierStyle(currencyTypeId, tier);
+    } else {
+      // 전체 상태: 기본 스타일 사용 (또는 "currency" 종류의 기본 스타일)
+      const defaultStyle = getCurrencyTypeTierStyle("currency", tier);
+      if (defaultStyle) {
+        currentStyles = defaultStyle;
+      } else {
+        // 기본값이 없을 때만 fallback 사용
+        const tierColorsFromGen = getCurrencyTierColorsFromGenerator(tier);
+        currentStyles = {
+          fontSize: 45,
+          textColor: { r: 255, g: 255, b: 255, a: 255 },
+          borderColor: { r: 255, g: 255, b: 255, a: 255 },
+          backgroundColor: tierColors[tier] === "var(--tier-s)" ? { r: 255, g: 71, b: 87, a: 255 } :
+                           tierColors[tier] === "var(--tier-a)" ? { r: 255, g: 99, b: 72, a: 255 } :
+                           tierColors[tier] === "var(--tier-b)" ? { r: 255, g: 152, b: 0, a: 255 } :
+                           tierColors[tier] === "var(--tier-c)" ? { r: 255, g: 193, b: 7, a: 255 } :
+                           { r: 149, g: 165, b: 166, a: 255 },
+          playEffect: tierColorsFromGen.playEffect,
+          minimapIcon: tierColorsFromGen.minimapIcon || { size: null, color: null, shape: null },
+          customSound: tierColorsFromGen.customSound,
+        };
+      }
+    }
+    
+    setTierStyleModal({
+      isOpen: true,
+      tier,
+      currencyType: currencyTypeId,
+      styles: currentStyles,
+    });
+  };
+
 
   // 화폐 아이템의 실제 티어 가져오기 (커스텀 티어 우선)
   const getCurrencyItemTier = (itemName) => {
@@ -1399,18 +1584,11 @@ export default function TierListPage() {
                     // 제외된 항목들을 필터링하고, 빈 id도 제외
                     const filteredTypes = currencyTypes.filter(t => t.id !== "" && !excludedCurrencyTypes.includes(t.id));
                     
-                    // 자주 검색하는 화폐와 나머지 분리
-                    const frequentTypes = filteredTypes.filter(t => frequentCurrencyIds.includes(t.id));
-                    const otherTypes = filteredTypes.filter(t => !frequentCurrencyIds.includes(t.id));
+                    // "화폐"는 고정 위치에 두고, 나머지는 정렬
+                    const currencyType = filteredTypes.find(t => t.id === "currency");
+                    const otherTypes = filteredTypes.filter(t => t.id !== "currency");
                     
-                    // 자주 검색하는 화폐는 정의된 순서대로 유지
-                    const sortedFrequent = frequentTypes.sort((a, b) => {
-                      const indexA = frequentCurrencyIds.indexOf(a.id);
-                      const indexB = frequentCurrencyIds.indexOf(b.id);
-                      return indexA - indexB;
-                    });
-                    
-                    // 나머지 화폐는 언어별 정렬
+                    // 나머지 화폐는 언어별 정렬 (ㄱ-ㅎ 순서)
                     const sortedOther = otherTypes.sort((a, b) => {
                       if (lang === "ko") {
                         return a.name.localeCompare(b.name, "ko");
@@ -1419,8 +1597,8 @@ export default function TierListPage() {
                       }
                     });
                     
-                    // 자주 검색하는 화폐를 먼저, 나머지를 나중에 배치
-                    return [...sortedFrequent, ...sortedOther];
+                    // "화폐"를 먼저, 나머지를 ㄱ-ㅎ 순서로 배치
+                    return currencyType ? [currencyType, ...sortedOther] : sortedOther;
                   })().map((type) => {
                     const isSelected = tempSelectedCurrencyTypes.includes(type.id);
                     return (
@@ -1913,7 +2091,9 @@ export default function TierListPage() {
                   style={{
                     background: tierColors[tier],
                     color: tier === "C" ? "#000000" : "#ffffff",
+                    cursor: selectedCategory === "currency" ? "pointer" : "default",
                   }}
+                  onClick={() => selectedCategory === "currency" && handleTierHeaderClick(tier)}
                 >
                   <div className="tier-label">{tier} 티어</div>
                   <div className="tier-count">
@@ -2101,17 +2281,18 @@ export default function TierListPage() {
                           }
                         }
                         
-                        // 모든 화폐 아이템을 가져와서 실제 티어로 필터링
-                        const allCurrencyItems = [];
+                        // 모든 화폐 아이템을 가져와서 실제 티어로 필터링 (중복 제거)
+                        const allCurrencyItemsSet = new Set();
                         ["S", "A", "B", "C", "D", "E"].forEach((t) => {
                           const items = currencyTiers[leagueKey]?.[t] || [];
                           items.forEach((itemName) => {
                             const actualTier = getCurrencyItemTier(itemName);
                             if (actualTier === tier) {
-                              allCurrencyItems.push(itemName);
+                              allCurrencyItemsSet.add(itemName);
                             }
                           });
                         });
+                        const allCurrencyItems = Array.from(allCurrencyItemsSet);
                         
                         // 화폐 종류로 필터링 및 그룹화
                         let categoryFilteredItems = allCurrencyItems;
@@ -2130,12 +2311,16 @@ export default function TierListPage() {
                             itemsInSelectedCategories.has(itemName)
                           );
                         } else {
-                          // 전체 선택일 때: 각 화폐 종류별로 그룹화
+                          // 전체 선택일 때: 각 화폐 종류별로 그룹화 (중복 제거)
                           Object.keys(currencyItemCategories).forEach(categoryId => {
                             const categoryItems = currencyItemCategories[categoryId] || [];
-                            const itemsInCategory = allCurrencyItems.filter(itemName => 
-                              categoryItems.includes(itemName)
-                            );
+                            const itemsInCategorySet = new Set();
+                            allCurrencyItems.forEach(itemName => {
+                              if (categoryItems.includes(itemName)) {
+                                itemsInCategorySet.add(itemName);
+                              }
+                            });
+                            const itemsInCategory = Array.from(itemsInCategorySet);
                             if (itemsInCategory.length > 0) {
                               itemsByCategory[categoryId] = itemsInCategory;
                             }
@@ -2170,14 +2355,17 @@ export default function TierListPage() {
                             const categoryItems = filteredItemsByCategory[categoryId];
                             const categoryName = currencyTypes.find(t => t.id === categoryId)?.name || categoryId;
                             
+                            // 중복 제거 (같은 카테고리 내에서 같은 아이템이 여러 번 나타날 수 있음)
+                            const uniqueCategoryItems = Array.from(new Set(categoryItems));
+                            
                             return (
                               <div key={categoryId} className="tier-class-group">
                                 <div className="tier-class-name">{categoryName}</div>
-                                {categoryItems.map((itemName) => {
+                                {uniqueCategoryItems.map((itemName, index) => {
                                   const actualTier = getCurrencyItemTier(itemName);
                                   return (
                                     <div
-                                      key={`${categoryId}-${itemName}`}
+                                      key={`${categoryId}-${itemName}-${index}`}
                                       className="tier-item"
                                       draggable
                                       onDragStart={(e) => handleDragStart(e, itemName, actualTier)}
@@ -2963,7 +3151,13 @@ export default function TierListPage() {
       {/* 확인 모달 (confirm 대체) */}
       <NotificationModal
         isOpen={confirmModal.isOpen}
-        onClose={() => setConfirmModal({ isOpen: false, message: "", onConfirm: null })}
+        onClose={() => {
+          setConfirmModal({ isOpen: false, message: "", onConfirm: null });
+          // 확인 모달 닫을 때 티어 스타일 모달도 닫기 (취소 시)
+          if (tierStyleModal.isOpen) {
+            setTierStyleModal({ isOpen: false, tier: null, currencyType: null, styles: null });
+          }
+        }}
         type="confirm"
         message={confirmModal.message}
         confirmText={lang === "ko" ? "확인" : "Confirm"}
@@ -2973,9 +3167,81 @@ export default function TierListPage() {
             confirmModal.onConfirm();
           }
         }}
+        onCancel={() => {
+          setConfirmModal({ isOpen: false, message: "", onConfirm: null });
+          // 취소 시 티어 스타일 모달도 닫기
+          if (tierStyleModal.isOpen) {
+            setTierStyleModal({ isOpen: false, tier: null, currencyType: null, styles: null });
+          }
+        }}
         showCancel={true}
         lang={lang}
       />
+
+      {/* 티어 스타일 설정 모달 */}
+      {tierStyleModal.isOpen && tierStyleModal.tier && tierStyleModal.styles && (
+        <StyleSettingsModal
+          isOpen={tierStyleModal.isOpen && !confirmModal.isOpen}
+          onClose={() => {
+            if (!confirmModal.isOpen) {
+              setTierStyleModal({ isOpen: false, tier: null, currencyType: null, styles: null });
+            }
+          }}
+          styles={tierStyleModal.styles}
+          onChange={(newStyles) => {
+            // onChange는 모달이 닫히기 전에 호출되므로, 여기서 확인 모달을 먼저 표시
+            const { tier, currencyType } = tierStyleModal;
+            
+            if (currencyType === null) {
+              // 전체 상태: 모든 화폐 종류에 적용
+              // 확인 모달 표시
+              setConfirmModal({
+                isOpen: true,
+                message: lang === "ko" 
+                  ? "모든 화폐 종류에 변경된 옵션이 적용됩니다. 계속하시겠습니까?"
+                  : "The changed options will be applied to all currency types. Continue?",
+                onConfirm: () => {
+                  // 모든 화폐 종류에 적용
+                  Object.keys(currencyItemCategories).forEach(categoryId => {
+                    if (categoryId !== "") {
+                      saveCurrencyTypeTierStyle(categoryId, tier, newStyles);
+                    }
+                  });
+                  setConfirmModal({ isOpen: false, message: "", onConfirm: null });
+                  setTierStyleModal({ isOpen: false, tier: null, currencyType: null, styles: null });
+                  
+                  // 페이지 새로고침 또는 상태 업데이트로 변경사항 반영
+                  window.location.reload();
+                },
+              });
+            } else {
+              // 특정 화폐 종류에만 적용
+              saveCurrencyTypeTierStyle(currencyType, tier, newStyles);
+              setTierStyleModal({ isOpen: false, tier: null, currencyType: null, styles: null });
+              
+              // 페이지 새로고침 또는 상태 업데이트로 변경사항 반영
+              window.location.reload();
+            }
+          }}
+          itemName={(() => {
+            // 티어의 첫 번째 아이템 이름 가져오기
+            const firstItemName = getFirstItemNameInTier(tierStyleModal.tier, tierStyleModal.currencyType);
+            
+            // 데이터가 있으면 첫 번째 아이템 이름 사용
+            if (firstItemName) {
+              return firstItemName;
+            }
+            
+            // 데이터가 없으면 기본 이름 사용
+            if (tierStyleModal.currencyType) {
+              return `${currencyTypes.find(t => t.id === tierStyleModal.currencyType)?.name || tierStyleModal.currencyType} ${tierStyleModal.tier} 티어`;
+            } else {
+              return `모든 화폐 종류 ${tierStyleModal.tier} 티어`;
+            }
+          })()}
+          isGear={false}
+        />
+      )}
 
       {/* 하단 액션 버튼들 */}
       <ItemFilterActions
