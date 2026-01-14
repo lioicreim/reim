@@ -2648,6 +2648,74 @@ export default function StyleSettingsModal({
             max-width: 300px;
           }
         }
+
+        @media (max-width: 768px) {
+          .style-settings-modal {
+            width: 95vw;
+            max-width: none;
+            margin: 10px;
+          }
+
+          .style-settings-header {
+            padding: 12px 16px;
+          }
+
+          .style-settings-body {
+            padding: 12px;
+            max-height: 70vh;
+          }
+
+          .style-row {
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+
+          .style-label {
+            min-width: 100%;
+            margin-bottom: 4px;
+          }
+
+          .style-controls {
+            width: 100%;
+            flex-wrap: wrap;
+          }
+
+          .style-select,
+          .style-input {
+            min-width: 0;
+            flex: 1;
+          }
+
+          .sound-controls {
+            flex-wrap: wrap;
+          }
+
+          .sound-volume-select {
+            min-width: 70px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .style-settings-modal {
+            width: 100vw;
+            margin: 0;
+            border-radius: 0;
+          }
+
+          .style-settings-body {
+            padding: 8px;
+          }
+
+          .style-label {
+            font-size: 12px;
+          }
+
+          .style-select,
+          .style-input {
+            font-size: 13px;
+            padding: 6px 8px;
+          }
+        }
       `}</style>
     </div>
   );

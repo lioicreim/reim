@@ -529,6 +529,55 @@ export default function ItemFilterActions({
           background: rgba(255, 71, 87, 0.1) !important;
         }
 
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+          .quick-filters-actions {
+            flex-direction: column;
+            padding: 12px 16px;
+            gap: 12px;
+          }
+
+          .action-buttons-left,
+          .action-buttons-right {
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+          }
+
+          .action-button {
+            padding: 8px 12px;
+            font-size: 13px;
+          }
+
+          .action-dropdown {
+            min-width: 180px;
+          }
+
+          .dropdown-item {
+            padding: 10px 12px;
+            font-size: 13px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .quick-filters-actions {
+            padding: 8px 12px;
+          }
+
+          .action-buttons-left,
+          .action-buttons-right {
+            gap: 4px;
+          }
+
+          .action-button {
+            padding: 6px 10px;
+            font-size: 12px;
+          }
+
+          .dropdown-icon {
+            font-size: 8px;
+          }
+        }
       `}</style>
       <NotificationModal
         isOpen={successModalOpen}

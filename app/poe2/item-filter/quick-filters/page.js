@@ -4583,6 +4583,82 @@ export default function QuickFiltersPage() {
           position: relative;
           z-index: 1;
         }
+
+        /* 모바일 반응형 (768px 이하) */
+        @media (max-width: 768px) {
+          .quick-filters-layout {
+            gap: 16px;
+          }
+
+          .column-header {
+            padding: 6px 10px;
+          }
+
+          .column-header .column-title {
+            font-size: 14px;
+          }
+
+          .section-header {
+            padding: 10px 12px !important;
+          }
+
+          .section-content {
+            padding: 12px !important;
+          }
+
+          .leveling-dropdowns-row {
+            flex-wrap: wrap !important;
+            padding: 12px !important;
+          }
+
+          .section-content .leveling-dropdowns-row {
+            flex-wrap: wrap !important;
+            padding: 12px !important;
+          }
+
+          .leveling-dropdown-wrapper {
+            width: 90px !important;
+            min-width: 90px !important;
+            max-width: 90px !important;
+            margin: 2px !important;
+          }
+
+          .leveling-dropdown-button {
+            padding: 6px 8px !important;
+            font-size: 12px !important;
+          }
+
+          .currency-tier-selection {
+            flex-wrap: wrap;
+            gap: 6px !important;
+          }
+
+          .currency-tier-button {
+            min-width: 50px !important;
+            padding: 8px 12px !important;
+            font-size: 13px !important;
+          }
+        }
+
+        /* 소형 모바일 (480px 이하) */
+        @media (max-width: 480px) {
+          .leveling-dropdown-wrapper {
+            width: 80px !important;
+            min-width: 80px !important;
+            max-width: 80px !important;
+          }
+
+          .leveling-dropdown-button {
+            padding: 5px 6px !important;
+            font-size: 11px !important;
+          }
+
+          .currency-tier-button {
+            min-width: 44px !important;
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+          }
+        }
       `}</style>
     </main>
   );

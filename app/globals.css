@@ -1891,3 +1891,266 @@ div.leveling-dropdown-item-multi.selected,
 .footer-link:hover {
   color: var(--text);
 }
+
+/* ===== 모바일 반응형 스타일 ===== */
+
+/* 태블릿 (1024px 이하) */
+@media (max-width: 1024px) {
+  .container {
+    padding: 16px;
+  }
+
+  .cardHeader {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cardBody {
+    padding: 12px;
+  }
+
+  .grid4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .site-footer {
+    padding: 20px 24px;
+  }
+
+  .footer-wrapper {
+    gap: 16px;
+  }
+
+  .footer-copyright,
+  .footer-slogan,
+  .footer-email,
+  .footer-link {
+    font-size: 11px;
+  }
+}
+
+/* 모바일 (768px 이하) */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  .cardHeader {
+    padding: 12px 16px;
+  }
+
+  .cardBody {
+    padding: 8px;
+  }
+
+  .grid4 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  /* 푸터 모바일 레이아웃 */
+  .site-footer {
+    padding: 24px 16px;
+  }
+
+  .footer-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .footer-left,
+  .footer-center,
+  .footer-right {
+    flex: none;
+    text-align: center;
+  }
+
+  .footer-center {
+    order: -1;
+  }
+
+  .footer-copyright,
+  .footer-slogan,
+  .footer-email,
+  .footer-link {
+    font-size: 11px;
+  }
+
+  /* 헤더 모바일 */
+  .top-header-container {
+    padding: 0 12px;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+
+  .header-discord-link {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header-discord-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .lang-select {
+    width: 50px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .site-logo {
+    gap: 6px;
+  }
+
+  .site-name {
+    font-size: 18px;
+  }
+
+  .logo-placeholder {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
+  }
+
+  /* 게임 서브 네비게이션 모바일 */
+  .game-sub-nav-container {
+    padding: 0 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .game-sub-nav-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .game-sub-nav-item {
+    padding: 0 8px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  /* 아이템 필터 네비게이션 모바일 */
+  .item-filter-nav-container {
+    padding: 0 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .item-filter-nav-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .item-filter-nav-item {
+    padding: 0 10px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .item-filter-nav-item:first-child {
+    clip-path: none;
+    padding-left: 10px;
+  }
+
+  .item-filter-nav-item:last-child {
+    clip-path: none;
+    padding-right: 10px;
+  }
+
+  .item-filter-description {
+    padding: 8px 12px;
+  }
+
+  .item-filter-description p {
+    font-size: 12px;
+  }
+}
+
+/* 소형 모바일 (480px 이하) */
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+
+  .cardHeader {
+    padding: 10px 12px;
+  }
+
+  .cardBody {
+    padding: 6px;
+  }
+
+  /* 헤더 소형 모바일 */
+  .top-header-container {
+    padding: 0 8px;
+  }
+
+  .header-right {
+    gap: 4px;
+  }
+
+  .header-discord-link {
+    width: 28px;
+    height: 28px;
+  }
+
+  .header-discord-link svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .lang-select {
+    width: 44px;
+    height: 28px;
+    font-size: 11px;
+    padding: 0 4px;
+  }
+
+  .site-name {
+    font-size: 16px;
+  }
+
+  .logo-placeholder {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 12px !important;
+  }
+
+  .site-footer {
+    padding: 20px 12px;
+  }
+
+  .footer-copyright,
+  .footer-slogan,
+  .footer-email,
+  .footer-link {
+    font-size: 10px;
+  }
+
+  /* 아이템 필터 네비게이션 소형 모바일 */
+  .item-filter-nav-container {
+    padding: 0 4px;
+    height: 38px;
+  }
+
+  .item-filter-nav-item {
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .item-filter-description {
+    padding: 6px 8px;
+  }
+
+  .item-filter-description p {
+    font-size: 11px;
+  }
+}
