@@ -70,15 +70,15 @@ export default function GameBanner() {
   
   return (
     <div 
-      className="game-banner game-hero"
+      className="game-banner game-hero ad-banner-placeholder"
       style={hasBgImage && game.bgImage ? {
         '--bg-image-url': `url(${game.bgImage})`,
       } : {}}
     >
       <div className="game-hero-overlay"></div>
-      <div className="game-hero-content">
-        <div className="game-logo">{game.logo}</div>
-        <div className="game-name">{game.name}</div>
+      <div className="game-hero-content ad-placeholder-content">
+        <div className="game-logo" style={{ fontSize: '42px', fontWeight: '900', color: 'var(--neon-blue)', marginBottom: '8px' }}>{game.logo}</div>
+        <div className="ad-label">Advertisement</div>
       </div>
     </div>
   );

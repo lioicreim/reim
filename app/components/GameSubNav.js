@@ -42,11 +42,12 @@ export default function GameSubNav() {
         ];
       case "poe2":
         return [
-          { id: "community", name: "커뮤니티", path: `/${game}/community` },
-          { id: "guides", name: "가이드", path: `/${game}/guides` },
-          { id: "leveling", name: "레벨링", path: `/${game}/leveling` },
+          // { id: "community", name: "커뮤니티", path: `/${game}/community` },
+          // { id: "guides", name: "가이드", path: `/${game}/guides` },
+          // { id: "leveling", name: "레벨링", path: `/${game}/leveling` },
           { id: "item-filter", name: "아이템 필터", path: `/${game}/item-filter` },
-          { id: "library", name: "자료실", path: `/${game}/library` },
+          { id: "modifiers", name: "모드DB", path: `/${game}/modifiers` },
+          // { id: "library", name: "자료실", path: `/${game}/library` },
         ];
       case "last-epoch":
         return [

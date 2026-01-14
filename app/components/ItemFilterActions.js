@@ -112,10 +112,11 @@ export default function ItemFilterActions({
     if (onAccountLink) {
       onAccountLink();
     } else {
-      alert(
-        lang === "ko"
-          ? "계정 연동 기능은 준비 중입니다."
-          : "Account link feature coming soon."
+      // 공식 사이트의 아이템 필터 페이지로 새 창에서 열기
+      window.open(
+        "https://poe.game.daum.net/account/view-profile/riozio-6470/item-filters",
+        "_blank",
+        "noopener,noreferrer"
       );
     }
   };

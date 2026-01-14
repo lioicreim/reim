@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 export default function ColorPicker({ 
   color, 
   onChange, 
+  onPreview, // 실시간 미리보기 콜백 추가
   label = "",
   showCheckbox = false,
   checked = false,
@@ -16,6 +17,7 @@ export default function ColorPicker({
   modalRef = null
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  // 초기값을 props.color로 설정하되, null이면 검정색 기본값 사용
   const [localColor, setLocalColor] = useState(color || { r: 0, g: 0, b: 0, a: 255 });
   const [initialColor, setInitialColor] = useState(null); // 컬러피커가 열릴 때의 색상 (취소 시 복원용)
   const [hexValue, setHexValue] = useState("");
@@ -95,7 +97,7 @@ export default function ColorPicker({
   };
 
   useEffect(() => {
-    if (color) {
+    if (color && !isOpen) { // isOpen이 아닐 때만 외부 props 반영 (내부 수정 중 덮어쓰기 방지)
       setLocalColor(color);
       setHexValue(rgbToHex(color.r, color.g, color.b));
       const hsv = rgbToHsv(color.r, color.g, color.b);
@@ -104,9 +106,9 @@ export default function ColorPicker({
       setBrightness(hsv.v);
       setAlpha(color.a || 255);
     }
-  }, [color]);
+  }, [color, isOpen]); // isOpen 의존성 추가
 
-  // 유틸 함수들 (먼저 정의)
+  // 유틸 함수들
   const rgbToHex = (r, g, b) => {
     return "#" + [r, g, b].map(x => {
       const hex = x.toString(16);
@@ -158,14 +160,19 @@ export default function ColorPicker({
       setSaturation(hsv.s);
       setBrightness(hsv.v);
       setAlpha(initialColor.a || 255);
+      
+      // onPreview가 있으면 원래 색상으로 복원했음을 알림
+      if (onPreview) {
+        onPreview(initialColor);
+      }
     }
     setIsOpen(false);
     setInitialColor(null);
-  }, [initialColor]);
+  }, [initialColor, onPreview]);
 
   // 적용 버튼 클릭
   const handleApply = useCallback(() => {
-    onChange(localColor);
+    onChange(localColor); // 최종 확정
     setIsOpen(false);
     setInitialColor(null);
   }, [localColor, onChange]);
@@ -175,12 +182,11 @@ export default function ColorPicker({
     if (isOpen && color && !initialColor) {
       setInitialColor(color);
     } else if (!isOpen) {
-      // 컬러피커가 닫힐 때 초기값 초기화
-      setInitialColor(null);
+      setInitialColor(null); // 닫힐 때 초기화
     }
   }, [isOpen, color, initialColor]);
 
-  // 팝업 위치 계산
+  // 팝업 위치 계산 (생략 - 기존 코드 유지)
   useEffect(() => {
     if (isOpen && triggerRef.current) {
       const popupWidth = 280; // 팝업 너비
@@ -192,9 +198,15 @@ export default function ColorPicker({
         const modalRect = modalRef.current.getBoundingClientRect();
         const gap = 6; // 모달과 컬러피커 사이 간격
         
+        let left = modalRect.left - popupWidth - gap;
+        // 화면 왼쪽으로 나가면 모달 오른쪽에 배치 시도
+        if (left < padding) {
+          left = modalRect.right + gap;
+        }
+
         setPopupPosition({
           top: modalRect.top, // 모달의 위와 동일
-          left: modalRect.left - popupWidth - gap // 모달 왼쪽에 배치
+          left: left 
         });
       } else {
         // 기본 동작: 트리거 버튼의 위치를 계산하여 팝업 위치 설정
@@ -231,14 +243,14 @@ export default function ColorPicker({
     }
   }, [isOpen, modalRef]);
 
-  // 외부 클릭 감지 및 ESC 키 감지
+  // 외부 클릭 감지 및 ESC 키 감지 (생략 - 기존 코드 유지)
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (event) => {
       if (pickerRef.current && !pickerRef.current.contains(event.target) &&
           triggerRef.current && !triggerRef.current.contains(event.target)) {
-        // 외부 클릭 시 취소 (초기 색상으로 되돌리기)
+        // 외부 클릭 시 취소
         handleCancel();
       }
     };
@@ -285,7 +297,7 @@ export default function ColorPicker({
     return { r, g, b };
   };
 
-  // HSL을 RGB로 변환
+  // HSL을 RGB로 변환 (생략 - 기존 코드 유지)
   const hslToRgb = (h, s, l) => {
     h /= 360;
     let r, g, b;
@@ -322,7 +334,8 @@ export default function ColorPicker({
       if (rgb) {
         const newColor = { ...localColor, ...rgb };
         setLocalColor(newColor);
-        // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
+        // 실시간 미리보기
+        if (onPreview) onPreview(newColor);
       }
     } else if (valueFormat === "rgba") {
       // rgba(255, 255, 255, 1.0) 형식 파싱
@@ -335,7 +348,8 @@ export default function ColorPicker({
         const newColor = { r, g, b, a };
         setLocalColor(newColor);
         setHexValue(rgbToHex(r, g, b));
-        // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
+        // 실시간 미리보기
+        if (onPreview) onPreview(newColor);
       }
     } else if (valueFormat === "hsla") {
       // hsla(360, 100%, 50%, 1.0) 형식 파싱
@@ -349,7 +363,8 @@ export default function ColorPicker({
         const newColor = { ...rgb, a };
         setLocalColor(newColor);
         setHexValue(rgbToHex(rgb.r, rgb.g, rgb.b));
-        // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
+        // 실시간 미리보기
+        if (onPreview) onPreview(newColor);
       }
     }
   };
@@ -426,10 +441,13 @@ export default function ColorPicker({
     const newColor = { ...rgb, a };
     setLocalColor(newColor);
     setHexValue(rgbToHex(rgb.r, rgb.g, rgb.b));
-    // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
+    // 실시간 미리보기
+    if (onPreview) onPreview(newColor);
   };
 
   const handleColorPickerChange = (e) => {
+    // 이 함수는 사용되지 않는 것으로 보임 (삭제 또는 유지)
+    // handleHexChange가 input change 이벤트를 처리함
     const hex = e.target.value;
     setHexValue(hex);
     const rgb = hexToRgb(hex);
@@ -440,7 +458,7 @@ export default function ColorPicker({
       setHue(hsv.h);
       setSaturation(hsv.s);
       setBrightness(hsv.v);
-      // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
+      if (onPreview) onPreview(newColor);
     }
   };
 
@@ -452,7 +470,8 @@ export default function ColorPicker({
     setSaturation(hsv.s);
     setBrightness(hsv.v);
     setAlpha(swatchColor.a || 255);
-    // onChange는 즉시 호출하지 않음 (적용 버튼 클릭 시만 호출)
+    // 실시간 미리보기
+    if (onPreview) onPreview(swatchColor);
   };
 
   const currentHex = rgbToHex(localColor.r || 0, localColor.g || 0, localColor.b || 0);

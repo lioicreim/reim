@@ -17,6 +17,11 @@ import NotificationModal from "@/app/components/NotificationModal";
 import StyleSettingsModal from "@/app/components/StyleSettingsModal";
 import currencyTypeDefaultColors from "@/data/currency-type-default-colors.json";
 import filterRules from "@/data/filter-rules.json";
+import { generateFilterCode } from "@/lib/filter-generator";
+import modsTiersData from "@/data/mods-tiers.json";
+import ModDetailModal from "@/app/components/ModDetailModal";
+import ItemTooltip from "@/app/components/ItemTooltip";
+import itemDefinitions from "@/data/item-definitions-ko.json";
 
 // 티어 매핑: 1->S, 2->A, 3->B, 4->C, 5->D, 6->E
 const tierMapping = {
@@ -36,6 +41,24 @@ const tierColors = {
   D: "var(--tier-d)",
   E: "var(--tier-e)",
 };
+
+const FALLBACK_ICON_SRC = "/item-fallback.svg";
+
+function getItemIconSrc(itemDef) {
+  const url = itemDef?.iconUrl;
+  if (!url) return FALLBACK_ICON_SRC;
+
+  // poe2db CDN에서 일부 폴더 아이콘이 403/404로 막히는 케이스가 있어
+  // (예: ReliquaryKeys, SoulCores) 해당 경로는 즉시 fallback을 사용합니다.
+  if (
+    url.includes("/Currency/ReliquaryKeys/") ||
+    url.includes("/Currency/SoulCores/")
+  ) {
+    return FALLBACK_ICON_SRC;
+  }
+
+  return url;
+}
 
 function getTierLabel(numTier) {
   const mapping = {
@@ -97,6 +120,10 @@ export default function TierListPage() {
     onConfirm: null,
   });
 
+  // 모드 상세 모달 상태
+  const [selectedModForDetail, setSelectedModForDetail] = useState(null);
+  const [isModDetailModalOpen, setIsModDetailModalOpen] = useState(false);
+
   // 티어 스타일 설정 모달 상태
   const [tierStyleModal, setTierStyleModal] = useState({
     isOpen: false,
@@ -116,11 +143,16 @@ export default function TierListPage() {
   const [customCurrencyTiers, setCustomCurrencyTiers] = useState({});
   const [customGearTiers, setCustomGearTiers] = useState({});
   const [customUniquesTiers, setCustomUniquesTiers] = useState({});
+  const [customModsTiers, setCustomModsTiers] = useState({});
   
   // 다중 선택 상태 (화폐 아이템 선택)
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [isColorEditorOpen, setIsColorEditorOpen] = useState(false);
   const [editingCurrencyType, setEditingCurrencyType] = useState(null);
+  const [soundOption, setSoundOption] = useState("default");
+  
+  // 제외된 아이템 (기본 리스트에서 제거된 항목들)
+  const [excludedItems, setExcludedItems] = useState({}); // { category: [itemNames] }
   
   // 외부 클릭 시 드롭다운 닫기 및 스크롤바 레이아웃 시프트 방지
   useEffect(() => {
@@ -224,8 +256,36 @@ export default function TierListPage() {
     };
   }, []);
 
+  // 사운드 옵션 불러오기
+  useEffect(() => {
+    const savedOption = localStorage.getItem("poe2_sound_option") || "default";
+    setSoundOption(savedOption);
+
+    const handleStorage = (e) => {
+      if (e.key === "poe2_sound_option") setSoundOption(e.newValue || "default");
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  // 제외된 아이템 로드
+  useEffect(() => {
+    const savedExcluded = localStorage.getItem("tier-list-excluded-items");
+    if (savedExcluded) {
+      setExcludedItems(JSON.parse(savedExcluded));
+    }
+  }, []);
+
+  // 제외된 아이템 저장
+  useEffect(() => {
+    if (Object.keys(excludedItems).length > 0) {
+      localStorage.setItem("tier-list-excluded-items", JSON.stringify(excludedItems));
+    }
+  }, [excludedItems]);
+
   // 화폐 종류 드롭다운에서 제외할 항목들
-  const excludedCurrencyTypes = ["waystones", "vault_key", "jewels", "flask", "charm", "uncut_gems"];
+  const excludedCurrencyTypes = ["waystones", "jewels", "flask", "charm", "uncut_gems"];
   
   // 자주 검색하는 화폐 ID 목록 (제외된 항목 제외)
   const frequentCurrencyIds = ["currency", "runes", "essences", "waystones"].filter(id => !excludedCurrencyTypes.includes(id));
@@ -244,7 +304,6 @@ export default function TierListPage() {
     { id: "breach", name: lang === "ko" ? "균열" : "Breach" },
     { id: "ancient_bones", name: lang === "ko" ? "고대 뼈" : "Ancient Bones" },
     { id: "abyssal", name: lang === "ko" ? "심연" : "Abyssal" },
-    { id: "expedition", name: lang === "ko" ? "탐험" : "Expedition" },
     { id: "tablet", name: lang === "ko" ? "서판" : "Tablet" },
     { id: "uncut_gems", name: lang === "ko" ? "미가공 젬" : "Uncut Gems" },
     { id: "lineage_gems", name: lang === "ko" ? "혈통 젬" : "Lineage Gems" },
@@ -253,8 +312,7 @@ export default function TierListPage() {
     { id: "flask", name: lang === "ko" ? "플라스크" : "Flasks" },
     { id: "pinnacle_key", name: lang === "ko" ? "보스 조각" : "Pinnacle Keys" },
     { id: "map_fragments", name: lang === "ko" ? "맵 조각" : "Map Fragments" },
-    { id: "vault_key", name: lang === "ko" ? "보관실 키" : "Vault Keys" },
-    { id: "incubators", name: lang === "ko" ? "인큐베이터" : "Incubators" },
+    { id: "vault_key", name: lang === "ko" ? "금고실 열쇠" : "Vault Keys" },
     { id: "soul_cores", name: lang === "ko" ? "영혼핵" : "Soul Cores" },
     { id: "idosl", name: lang === "ko" ? "우상" : "Idols" },
   ];
@@ -328,6 +386,21 @@ export default function TierListPage() {
     return "D";
   };
 
+  // 모드 아이템의 실제 티어 가져오기 (커스텀 티어 우선)
+  const getModsItemTier = (modId) => {
+    // 커스텀 티어가 있으면 사용
+    if (customModsTiers[modId]) {
+      return customModsTiers[modId];
+    }
+    // 기본 티어 찾기
+    for (const t of ["S", "A", "B", "C"]) {
+      if (modsTiersData[t] && modsTiersData[t].some(m => m.id === modId)) {
+        return t;
+      }
+    }
+    return "D";
+  };
+
   // 모든 아이템을 티어별로 그룹화 (커스텀 티어 반영)
   const itemsByTier = useMemo(() => {
     const result = {
@@ -376,6 +449,19 @@ export default function TierListPage() {
           setCustomUniquesTiers(JSON.parse(savedUniquesTiers));
         } catch (e) {
           console.error("Failed to parse saved uniques tiers", e);
+        }
+      }
+    }
+    
+    // 모드 커스텀 티어 불러오기
+    if (selectedCategory === "mods") {
+      const modsKey = "tier-list-custom-mods";
+      const savedModsTiers = localStorage.getItem(modsKey);
+      if (savedModsTiers) {
+        try {
+          setCustomModsTiers(JSON.parse(savedModsTiers));
+        } catch (e) {
+          console.error("Failed to parse saved mods tiers", e);
         }
       }
     }
@@ -588,8 +674,8 @@ export default function TierListPage() {
     setAddedItemInfo(null);
   };
 
-  // 유니크 아이템 삭제 확인 모달 열기
-  const handleDeleteUniqueItemClick = (baseType) => {
+  // 아이템 삭제 확인 모달 열기
+  const handleDeleteItemClick = (baseType) => {
     if (!baseType) return;
     setItemToDelete(baseType);
     setDeleteModalOpen(true);
@@ -598,18 +684,59 @@ export default function TierListPage() {
     setContextMenuItem(null);
   };
 
-  // 유니크 아이템 삭제 실행
-  const handleDeleteUniqueItemConfirm = () => {
+  // 아이템 삭제 실행 (통합 로직)
+  const handleDeleteItemConfirm = () => {
     if (!itemToDelete) return;
+    const category = contextMenu?.category || selectedCategory;
     
-    // 커스텀 티어에서 제거
-    const newCustomTiers = { ...customUniquesTiers };
-    delete newCustomTiers[itemToDelete];
-    setCustomUniquesTiers(newCustomTiers);
+    // 1. 커스텀 티어에서 제거 시도
+    let customTierFound = false;
     
-    // 로컬스토리지에 저장
-    const uniquesKey = "tier-list-custom-uniques";
-    localStorage.setItem(uniquesKey, JSON.stringify(newCustomTiers));
+    if (category === "currency") {
+      if (customCurrencyTiers[itemToDelete]) {
+        const newTiers = { ...customCurrencyTiers };
+        delete newTiers[itemToDelete];
+        setCustomCurrencyTiers(newTiers);
+        localStorage.setItem("tier-list-custom-currency-" + selectedLeague, JSON.stringify(newTiers));
+        customTierFound = true;
+      }
+    } else if (category === "gear-bases") {
+      if (customGearTiers[itemToDelete]) {
+        const newTiers = { ...customGearTiers };
+        delete newTiers[itemToDelete];
+        setCustomGearTiers(newTiers);
+        localStorage.setItem("tier-list-custom-gear", JSON.stringify(newTiers));
+        customTierFound = true;
+      }
+    } else if (category === "uniques") {
+      if (customUniquesTiers[itemToDelete]) {
+        const newTiers = { ...customUniquesTiers };
+        delete newTiers[itemToDelete];
+        setCustomUniquesTiers(newTiers);
+        localStorage.setItem("tier-list-custom-uniques", JSON.stringify(newTiers));
+        customTierFound = true;
+      }
+    } else if (category === "mods") {
+      if (customModsTiers[itemToDelete]) {
+        const newTiers = { ...customModsTiers };
+        delete newTiers[itemToDelete];
+        setCustomModsTiers(newTiers);
+        localStorage.setItem("tier-list-custom-mods", JSON.stringify(newTiers));
+        customTierFound = true;
+      }
+    }
+
+    // 2. 커스텀 티어가 아니거나, 기본 리스트에서도 제거하고 싶은 경우 excludedItems에 추가
+    // (사용자가 우클릭-제거를 했다는 것은 이 리스트에서 더이상 보고싶지 않다는 뜻이므로 무조건 제외 목록에 추가)
+    const newExcluded = { ...excludedItems };
+    if (!newExcluded[category]) {
+      newExcluded[category] = [];
+    }
+    if (!newExcluded[category].includes(itemToDelete)) {
+      newExcluded[category].push(itemToDelete);
+    }
+    setExcludedItems(newExcluded);
+    localStorage.setItem("tier-list-excluded-items", JSON.stringify(newExcluded));
     
     // 모달 닫기
     setDeleteModalOpen(false);
@@ -623,21 +750,13 @@ export default function TierListPage() {
   };
 
   // 우클릭 컨텍스트 메뉴 핸들러
-  const handleContextMenu = (e, baseType) => {
-    if (selectedCategory !== "uniques") return;
-    
+  const handleContextMenu = (e, baseType, category = null) => {
     e.preventDefault();
-    e.stopPropagation();
-    
-    // 커스텀 티어에 있는 아이템만 삭제 가능
-    if (!customUniquesTiers[baseType]) {
-      return;
-    }
-    
     setContextMenuItem(baseType);
     setContextMenu({
       x: e.clientX,
       y: e.clientY,
+      category: category || selectedCategory
     });
   };
 
@@ -829,16 +948,22 @@ export default function TierListPage() {
   const getStyleFromFilterRules = (currencyTypeId, tier) => {
     if (!currencyTypeId || !tier) return null;
     
-    // RID 패턴 생성: "ancient_bones" -> "ancient_bone_d"
-    // 복수형을 단수형으로 변환하고 언더스코어 + 소문자 티어 추가
-    let ridPattern = currencyTypeId;
-    if (ridPattern.endsWith("s")) {
-      ridPattern = ridPattern.slice(0, -1); // 마지막 's' 제거
+    // RID 패턴 생성 및 시도
+    let baseId = currencyTypeId;
+    if (baseId === "ritual_omen") baseId = "omem";
+    
+    const possibleRids = [
+      `${baseId}_${tier.toLowerCase()}`, // 원본 (예: lineage_gems_s, omem_s)
+    ];
+    
+    // 복수형을 단수형으로 변환하여 시도 (예: ancient_bones -> ancient_bone_s)
+    if (baseId.endsWith("s")) {
+      const singular = baseId.slice(0, -1);
+      possibleRids.push(`${singular}_${tier.toLowerCase()}`);
     }
-    ridPattern = `${ridPattern}_${tier.toLowerCase()}`;
     
     // filter-rules.json에서 해당 RID 찾기
-    const rule = filterRules.rules.find(r => r.rid === ridPattern);
+    const rule = filterRules.rules.find(r => possibleRids.includes(r.rid));
     // rule이 없거나 styles 속성이 없으면 null 반환
     // styles가 빈 배열이어도 객체를 반환 (필터 규칙이 존재하므로)
     if (!rule || !rule.styles) return null;
@@ -1137,6 +1262,19 @@ export default function TierListPage() {
     localStorage.setItem(uniquesKey, JSON.stringify(newCustomTiers));
   };
 
+  // 모드 아이템 티어 변경
+  const moveModsItem = (modId, fromTier, toTier) => {
+    if (fromTier === toTier) return;
+    
+    const newCustomTiers = { ...customModsTiers };
+    newCustomTiers[modId] = toTier;
+    setCustomModsTiers(newCustomTiers);
+    
+    // 로컬스토리지에 저장
+    const modsKey = "tier-list-custom-mods";
+    localStorage.setItem(modsKey, JSON.stringify(newCustomTiers));
+  };
+
   // 드래그 시작
   const handleDragStart = (e, itemName, tier) => {
     setDraggedItem(itemName);
@@ -1162,6 +1300,8 @@ export default function TierListPage() {
       moveGearItem(draggedItem, draggedFromTier, toTier);
     } else if (selectedCategory === "uniques") {
       moveUniquesItem(draggedItem, draggedFromTier, toTier);
+    } else if (selectedCategory === "mods") {
+      moveModsItem(draggedItem, draggedFromTier, toTier);
     }
 
     setDraggedItem(null);
@@ -1216,61 +1356,92 @@ export default function TierListPage() {
     }
   };
 
-  // 다운로드 (JSON 파일로)
+  // 다운로드 (.filter 파일 생성)
   const handleDownload = () => {
-    let data = {};
-    if (selectedCategory === "currency") {
-      // selectedLeague를 그대로 사용 (default 키가 존재함)
-      const leagueKey = selectedLeague;
-      data = {
-        category: "currency",
-        league: selectedLeague,
-        customTiers: customCurrencyTiers
+    try {
+      // 퀵 필터 설정 로드
+      const goldSettings = JSON.parse(localStorage.getItem("quickFilter_gold") || "null");
+      const quickFilterSettings = {
+        gold: goldSettings,
+        // 필요하다면 다른 퀵 필터 설정도 여기서 로드 가능
       };
-    } else if (selectedCategory === "gear-bases") {
-      data = {
-        category: "gear-bases",
-        customTiers: customGearTiers
-      };
+
+      const soundSettings = JSON.parse(localStorage.getItem("poe2_sound_settings") || "[]");
+      const filterCode = generateFilterCode({
+        presetId: "starter", // 기본 프리셋
+        soundOption: soundOption,
+        soundSettings: soundSettings,
+        excludedOptions: {},
+        customGearTiers: customGearTiers,
+        customCurrencyTiers: customCurrencyTiers,
+        customModsTiers: customModsTiers,
+        excludedItems: excludedItems,
+        selectedLeague: selectedLeague,
+        quickFilterSettings: quickFilterSettings
+      });
+      
+      const blob = new Blob([filterCode], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      a.href = url;
+      a.download = `reim-filter-${timestamp}.filter`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      if (setNotificationModal) {
+        setNotificationModal({
+          isOpen: true,
+          type: "success",
+          title: "",
+          message: lang === "ko" ? "필터 파일이 생성되어 다운로드되었습니다." : "Filter file has been generated and downloaded.",
+          autoCloseDelay: 3000,
+        });
+      }
+    } catch (e) {
+      console.error("Failed to generate filter:", e);
+      if (setNotificationModal) {
+        setNotificationModal({
+          isOpen: true,
+          type: "error",
+          title: "",
+          message: lang === "ko" ? "필터 생성에 실패했습니다." : "Failed to generate filter.",
+          autoCloseDelay: 3000,
+        });
+      }
     }
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `tier-list-${selectedCategory}-${Date.now()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   // 복사하기 (클립보드)
   const handleCopy = async () => {
-    let data = {};
-    if (selectedCategory === "currency") {
-      // selectedLeague를 그대로 사용 (default 키가 존재함)
-      const leagueKey = selectedLeague;
-      data = {
-        category: "currency",
-        league: selectedLeague,
-        customTiers: customCurrencyTiers
-      };
-    } else if (selectedCategory === "gear-bases") {
-      data = {
-        category: "gear-bases",
-        customTiers: customGearTiers
-      };
-    }
-    
     try {
-      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      const goldSettings = JSON.parse(localStorage.getItem("quickFilter_gold") || "null");
+      const quickFilterSettings = {
+        gold: goldSettings,
+      };
+
+      const soundSettings = JSON.parse(localStorage.getItem("poe2_sound_settings") || "[]");
+      const filterCode = generateFilterCode({
+        presetId: "starter",
+        soundOption: soundOption,
+        soundSettings: soundSettings,
+        excludedOptions: {},
+        customGearTiers: customGearTiers,
+        customCurrencyTiers: customCurrencyTiers,
+        customModsTiers: customModsTiers,
+        selectedLeague: selectedLeague,
+        quickFilterSettings: quickFilterSettings
+      });
+
+      await navigator.clipboard.writeText(filterCode);
       setNotificationModal({
         isOpen: true,
         type: "success",
         title: "",
-        message: lang === "ko" ? "클립보드에 복사되었습니다." : "Copied to clipboard!",
-        autoCloseDelay: 7000,
+        message: lang === "ko" ? "필터 코드가 클립보드에 복사되었습니다." : "Filter code copied to clipboard!",
+        autoCloseDelay: 3000,
       });
     } catch (e) {
       console.error("Failed to copy:", e);
@@ -1279,7 +1450,7 @@ export default function TierListPage() {
         type: "error",
         title: "",
         message: lang === "ko" ? "복사에 실패했습니다." : "Failed to copy!",
-        autoCloseDelay: 7000,
+        autoCloseDelay: 3000,
       });
     }
   };
@@ -1993,6 +2164,100 @@ export default function TierListPage() {
               )}
         </div>
       )}
+
+      {/* 모드 카테고리일 때 클래스 선택 드롭다운 (장비 탭과 동일한 디자인) */}
+      {selectedCategory === "mods" && (
+        <div className="class-selector">
+          <label className="class-selector-label">
+            {lang === "ko" ? "아이템 종류" : "ITEM CLASS"}
+          </label>
+          <div className="custom-dropdown">
+            <div
+              className="dropdown-trigger"
+              onClick={() => setIsClassDropdownOpen(!isClassDropdownOpen)}
+            >
+              {selectedClass ? translateClassName(selectedClass) : (lang === "ko" ? "전체 종류" : "All Classes")}
+              <span className="dropdown-arrow">▼</span>
+            </div>
+            {isClassDropdownOpen && (
+              <div className="dropdown-menu">
+                <div
+                  className="dropdown-option"
+                  onClick={() => {
+                    setSelectedClass("");
+                    setIsClassDropdownOpen(false);
+                    setSelectedArmourType("");
+                  }}
+                >
+                  {lang === "ko" ? "전체 종류" : "All Classes"}
+                </div>
+                {Object.keys(classCategories).map((category) => (
+                  <div key={category}>
+                    <div className="dropdown-category">{category}</div>
+                    {classCategories[category]
+                      .filter((className) => classes[className])
+                      .map((className) => (
+                        <div
+                          key={className}
+                          className={`dropdown-option dropdown-option-indented ${
+                            selectedClass === className ? "selected" : ""
+                          }`}
+                          onClick={() => {
+                            setSelectedClass(className);
+                            setIsClassDropdownOpen(false);
+                            if (!classesWithArmourType.includes(className)) {
+                              setSelectedArmourType("");
+                            }
+                          }}
+                        >
+                          {translateClassName(className)}
+                        </div>
+                      ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* 방어구 타입 드롭다운 */}
+          {selectedClass && classesWithArmourType.includes(selectedClass) && (
+            <>
+              <label className="class-selector-label">
+                {lang === "ko" ? "방어구 타입" : "ARMOUR TYPE"}
+              </label>
+              <div className="custom-dropdown">
+                <div
+                  className="dropdown-trigger"
+                  onClick={() => setIsArmourTypeDropdownOpen(!isArmourTypeDropdownOpen)}
+                >
+                  {selectedArmourType
+                    ? armourTypes.find(t => t.id === selectedArmourType)?.name || (lang === "ko" ? "전체" : "All")
+                    : (lang === "ko" ? "전체" : "All")}
+                  <span className="dropdown-arrow">▼</span>
+                </div>
+                {isArmourTypeDropdownOpen && (
+                  <div className="dropdown-menu">
+                    {armourTypes.map((type) => (
+                      <div
+                        key={type.id}
+                        className={`dropdown-option ${
+                          selectedArmourType === type.id ? "selected" : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedArmourType(type.id);
+                          setIsArmourTypeDropdownOpen(false);
+                        }}
+                      >
+                        {type.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
       
       {/* 유니크 카테고리일 때 검색창 (화폐 검색창과 동일한 디자인) */}
       {selectedCategory === "uniques" && (
@@ -2169,7 +2434,7 @@ export default function TierListPage() {
           {/* 모든 카테고리에서 티어 그리드 표시 */}
           {/* S, A, B, C, D 티어 그리드 */}
           <div className={`tier-grid-main ${selectedCategory === "uniques" || selectedCategory === "mods" ? "tier-grid-spaced" : ""}`}>
-            {(selectedCategory === "uniques" ? ["S", "A", "B", "C", "D"] : ["S", "A", "B", "C", "D"]).map((tier) => (
+            {(selectedCategory === "mods" ? ["A", "B", "C"] : (selectedCategory === "uniques" ? ["S", "A", "B", "C", "D"] : ["S", "A", "B", "C", "D"])).map((tier) => (
               <div key={tier} className={`tier-column ${selectedCategory === "uniques" || selectedCategory === "mods" ? "tier-column-spaced" : ""} ${selectedCategory === "uniques" && tier === "D" ? "tier-column-dimmed" : ""}`}>
                 <div
                   className="tier-header"
@@ -2440,14 +2705,17 @@ export default function TierListPage() {
                             const categoryItems = filteredItemsByCategory[categoryId];
                             const categoryName = currencyTypes.find(t => t.id === categoryId)?.name || categoryId;
                             
-                            // 중복 제거 (같은 카테고리 내에서 같은 아이템이 여러 번 나타날 수 있음)
-                            const uniqueCategoryItems = Array.from(new Set(categoryItems));
+                            // 중복 제거 및 제외된 아이템 필터링
+                            const uniqueCategoryItems = Array.from(new Set(categoryItems))
+                              .filter(itemName => !excludedItems["currency"]?.includes(itemName));
                             
                             return (
                               <div key={categoryId} className="tier-class-group">
                                 <div className="tier-class-name">{categoryName}</div>
                                 {uniqueCategoryItems.map((itemName, index) => {
                                   const actualTier = getCurrencyItemTier(itemName);
+                                  const resolvedItemName = itemDefinitions[itemName] ? itemName : (itemDefinitions[`Greater ${itemName}`] ? `Greater ${itemName}` : itemName);
+                                  const itemDef = itemDefinitions[resolvedItemName];
                                   return (
                                     <div
                                       key={`${categoryId}-${itemName}-${index}`}
@@ -2455,10 +2723,10 @@ export default function TierListPage() {
                                       draggable
                                       onDragStart={(e) => handleDragStart(e, itemName, actualTier)}
                                       onDragOver={handleDragOver}
+                                      onContextMenu={(e) => handleContextMenu(e, itemName, "currency")}
                                       style={{
                                         cursor: "grab",
                                       }}
-                                      title={translateItemName(itemName)}
                                     >
                                       <div className="tier-item-drag-handle">
                                         <div className="tier-item-drag-handle-dots">
@@ -2474,14 +2742,30 @@ export default function TierListPage() {
                                           <div className="tier-item-drag-handle-dot"></div>
                                         </div>
                                       </div>
-                                      <div 
-                                        className="tier-item-name"
-                                        style={{
-                                          color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined
-                                        }}
-                                      >
-                                        {translateItemName(itemName)}
-                                      </div>
+                                      <ItemTooltip itemName={resolvedItemName}>
+                                        <div 
+                                          className="tier-item-name"
+                                          style={{
+                                            color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                          }}
+                                        >
+                                          <img
+                                            src={getItemIconSrc(itemDef)}
+                                            alt=""
+                                            onError={(e) => {
+                                              // 일부 아이콘 CDN 경로(예: ReliquaryKeys, SoulCores)가 403/404로 막히는 경우가 있어
+                                              // 로드 실패 시 로컬 fallback 아이콘으로 대체합니다.
+                                              e.currentTarget.onerror = null;
+                                              e.currentTarget.src = FALLBACK_ICON_SRC;
+                                            }}
+                                            style={{ width: '28px', height: 'auto', objectFit: 'contain' }}
+                                          />
+                                          {translateItemName(itemName)}
+                                        </div>
+                                      </ItemTooltip>
                                     </div>
                                   );
                                 })}
@@ -2502,9 +2786,13 @@ export default function TierListPage() {
                           return "#000000";
                         };
                         
-                        return filteredItems.map((itemName) => {
+                        return filteredItems
+                          .filter(itemName => !excludedItems["currency"]?.includes(itemName))
+                          .map((itemName) => {
                           const actualTier = getCurrencyItemTier(itemName);
                           const isSelected = selectedItems.has(itemName);
+                          const resolvedItemName = itemDefinitions[itemName] ? itemName : (itemDefinitions[`Greater ${itemName}`] ? `Greater ${itemName}` : itemName);
+                          const itemDef = itemDefinitions[resolvedItemName];
                           return (
                             <div
                               key={itemName}
@@ -2518,6 +2806,7 @@ export default function TierListPage() {
                                 }
                               }}
                               onDragOver={handleDragOver}
+                              onContextMenu={(e) => handleContextMenu(e, itemName, "currency")}
                               onClick={(e) => {
                                 // 아이템 클릭 시 자동으로 선택/해제 (편집 모드 없이)
                                 e.stopPropagation();
@@ -2534,7 +2823,6 @@ export default function TierListPage() {
                               style={{
                                 cursor: selectedItems.size > 0 ? "pointer" : "grab",
                               }}
-                              title={translateItemName(itemName)}
                             >
                               <input
                                 type="checkbox"
@@ -2560,14 +2848,28 @@ export default function TierListPage() {
                                   </div>
                                 </div>
                               )}
-                              <div 
-                                className="tier-item-name"
-                                style={{
-                                  color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined
-                                }}
-                              >
-                                {translateItemName(itemName)}
-                              </div>
+                              <ItemTooltip itemName={resolvedItemName}>
+                                <div 
+                                  className="tier-item-name"
+                                  style={{
+                                    color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px'
+                                  }}
+                                >
+                                  <img
+                                    src={getItemIconSrc(itemDef)}
+                                    alt=""
+                                    onError={(e) => {
+                                      e.currentTarget.onerror = null;
+                                      e.currentTarget.src = FALLBACK_ICON_SRC;
+                                    }}
+                                    style={{ width: '28px', height: 'auto', objectFit: 'contain' }}
+                                  />
+                                  {translateItemName(itemName)}
+                                </div>
+                              </ItemTooltip>
                             </div>
                           );
                         });
@@ -2612,8 +2914,9 @@ export default function TierListPage() {
                                 return null;
                               }
                               
-                              // 검색어로 필터링
-                              const finalETierItems = searchFilter(eTierItems);
+                              // 검색어 및 제외 목록으로 필터링
+                              const finalETierItems = searchFilter(eTierItems)
+                                .filter(itemName => !excludedItems["currency"]?.includes(itemName));
                               
                               // 검색 후에도 아이템이 없으면 헤더 포함 전체 숨김
                               if (finalETierItems.length === 0) {
@@ -2633,6 +2936,13 @@ export default function TierListPage() {
                                   {finalETierItems.map((itemName, index) => {
                                     const actualTier = getCurrencyItemTier(itemName);
                                     const isSelected = selectedItems.has(itemName);
+                                    const trimmedItemName = itemName.trim();
+                                    const resolvedItemName = itemDefinitions[trimmedItemName]
+                                      ? trimmedItemName
+                                      : (itemDefinitions[`Greater ${trimmedItemName}`]
+                                        ? `Greater ${trimmedItemName}`
+                                        : trimmedItemName);
+                                    const itemDef = itemDefinitions[resolvedItemName];
                                     const getTierTextColor = (tier) => {
                                       if (tier === "S") return "#000000";
                                       if (tier === "A" || tier === "B") return "#ffffff";
@@ -2651,6 +2961,7 @@ export default function TierListPage() {
                                             e.preventDefault();
                                           }
                                         }}
+                                        onContextMenu={(e) => handleContextMenu(e, itemName, "currency")}
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setSelectedItems(prev => {
@@ -2666,7 +2977,6 @@ export default function TierListPage() {
                                         style={{
                                           cursor: selectedItems.size > 0 || isSelected ? "pointer" : "grab",
                                         }}
-                                        title={translateItemName(itemName)}
                                       >
                                         <input
                                           type="checkbox"
@@ -2692,14 +3002,28 @@ export default function TierListPage() {
                                             </div>
                                           </div>
                                         )}
-                                        <div 
-                                          className="tier-item-name"
-                                          style={{
-                                            color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined
-                                          }}
-                                        >
-                                          {translateItemName(itemName)}
-                                        </div>
+                                        <ItemTooltip itemName={resolvedItemName}>
+                                          <div 
+                                            className="tier-item-name"
+                                            style={{
+                                              color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined,
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '8px'
+                                            }}
+                                          >
+                                            <img
+                                              src={getItemIconSrc(itemDef)}
+                                              alt=""
+                                              onError={(e) => {
+                                                e.currentTarget.onerror = null;
+                                                e.currentTarget.src = FALLBACK_ICON_SRC;
+                                              }}
+                                              style={{ width: '28px', height: 'auto', objectFit: 'contain' }}
+                                            />
+                                            {translateItemName(itemName)}
+                                          </div>
+                                        </ItemTooltip>
                                       </div>
                                     );
                                   })}
@@ -2763,6 +3087,9 @@ export default function TierListPage() {
                                         {categoryItems.map((itemName) => {
                                           const actualTier = getCurrencyItemTier(itemName);
                                           const isSelected = selectedItems.has(itemName);
+                                           const trimmedItemName = itemName.trim();
+                                           const resolvedItemName = itemDefinitions[trimmedItemName] ? trimmedItemName : (itemDefinitions[`Greater ${trimmedItemName}`] ? `Greater ${trimmedItemName}` : trimmedItemName);
+                                           const itemDef = itemDefinitions[resolvedItemName];
                                           return (
                                             <div
                                               key={`E-${categoryId}-${itemName}`}
@@ -2790,7 +3117,6 @@ export default function TierListPage() {
                                               style={{
                                                 cursor: selectedItems.size > 0 || isSelected ? "pointer" : "grab",
                                               }}
-                                              title={translateItemName(itemName)}
                                             >
                                               <input
                                                 type="checkbox"
@@ -2816,14 +3142,28 @@ export default function TierListPage() {
                                                   </div>
                                                 </div>
                                               )}
-                                              <div 
-                                                className="tier-item-name"
-                                                style={{
-                                                  color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined
-                                                }}
-                                              >
-                                                {translateItemName(itemName)}
-                                              </div>
+                                              <ItemTooltip itemName={resolvedItemName}>
+                                                <div
+                                                  className="tier-item-name"
+                                                  style={{
+                                                    color: debouncedSearchQuery.trim() ? "#a3ff12" : undefined,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px'
+                                                  }}
+                                                >
+                                                  <img
+                                                    src={getItemIconSrc(itemDef)}
+                                                    alt=""
+                                                    onError={(e) => {
+                                                      e.currentTarget.onerror = null;
+                                                      e.currentTarget.src = FALLBACK_ICON_SRC;
+                                                    }}
+                                                    style={{ width: '28px', height: 'auto', objectFit: 'contain' }}
+                                                  />
+                                                  {translateItemName(itemName)}
+                                                </div>
+                                              </ItemTooltip>
                                             </div>
                                           );
                                         })}
@@ -2882,8 +3222,9 @@ export default function TierListPage() {
                           }
                         });
                         
-                        // 검색어로 필터링 (유니크 전용 검색 필터 사용)
-                        const filteredItems = uniqueSearchFilter(finalTierItems);
+                        // 검색어 및 제외 목록으로 필터링 (유니크 전용 검색 필터 사용)
+                        const filteredItems = uniqueSearchFilter(finalTierItems)
+                          .filter(baseType => !excludedItems["uniques"]?.includes(baseType));
                         
                         if (filteredItems.length === 0) {
                           return null;
@@ -2898,7 +3239,7 @@ export default function TierListPage() {
                               className={`tier-item ${isCustomTier ? "tier-item-custom" : ""}`}
                               draggable
                               onDragStart={(e) => handleDragStart(e, baseType, actualTier)}
-                              onContextMenu={(e) => handleContextMenu(e, baseType)}
+                              onContextMenu={(e) => handleContextMenu(e, baseType, "uniques")}
                               style={{
                                 cursor: "grab",
                               }}
@@ -2950,7 +3291,7 @@ export default function TierListPage() {
                           // 커스텀 티어를 반영하여 현재 티어에 표시할 아이템 필터링
                           classItems = classItems.filter((item) => {
                             const actualTier = getGearItemTier(item.name);
-                            return actualTier === tier;
+                            return actualTier === tier && !excludedItems["gear-bases"]?.includes(item.name);
                           });
                           
                           if (classItems.length === 0) return null;
@@ -2974,6 +3315,7 @@ export default function TierListPage() {
                                     className="tier-item"
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, item.name, actualTier)}
+                                    onContextMenu={(e) => handleContextMenu(e, item.name, "gear-bases")}
                                     style={{
                                       cursor: "grab",
                                     }}
@@ -3020,7 +3362,7 @@ export default function TierListPage() {
                                         const allEItems = itemsByTier.E || [];
                                         const actualEItems = allEItems.filter(item => {
                                           const actualTier = getGearItemTier(item.name);
-                                          return actualTier === "E";
+                                          return actualTier === "E" && !excludedItems["gear-bases"]?.includes(item.name);
                                         });
                                         return actualEItems.length;
                                       }
@@ -3043,7 +3385,7 @@ export default function TierListPage() {
                                   // 커스텀 티어를 반영하여 E 티어에 표시할 아이템 필터링
                                   classItems = classItems.filter((item) => {
                                     const actualTier = getGearItemTier(item.name);
-                                    return actualTier === "E";
+                                    return actualTier === "E" && !excludedItems["gear-bases"]?.includes(item.name);
                                   });
                                   
                                   if (classItems.length === 0) return null;
@@ -3073,6 +3415,7 @@ export default function TierListPage() {
                                                 e.preventDefault();
                                               }
                                             }}
+                                            onContextMenu={(e) => handleContextMenu(e, item.name, "gear-bases")}
                                             style={{
                                               cursor: "grab",
                                             }}
@@ -3106,30 +3449,92 @@ export default function TierListPage() {
                     </>
                   )}
                   
-                  {/* 다른 카테고리들 (모드 등) - 각 티어별로 아이템이 없으면 빈 버튼 표시 */}
-                  {selectedCategory !== "gear-bases" && selectedCategory !== "currency" && selectedCategory !== "uniques" && (() => {
-                    // 현재 티어에 아이템이 있는지 확인 (현재는 데이터가 없으므로 항상 빈 버튼)
-                    // TODO: 실제 데이터가 추가되면 여기서 아이템 개수를 확인
-                    const hasItems = false; // 임시로 false
-                    
-                    if (!hasItems) {
-                      return (
-                        <div className="tier-item tier-empty-button">
-                          <div style={{ 
-                            color: "var(--muted)", 
-                            fontSize: 13, 
-                            textAlign: "center",
-                            lineHeight: "1.5",
-                            width: "100%",
-                            padding: "0 8px"
-                          }}>
-                            해당하는 데이터가 없거나<br />업데이트 예정입니다.
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
+                  {/* 모드 카테고리일 때 아이템 표시 */}
+                  {selectedCategory === "mods" && (
+                    <>
+                      {(() => {
+                        // 모든 가용 모드 그룹 목록 (modsTiersData.groups에서 추출)
+                        const allModGroups = Object.values(modsTiersData.groups || {});
+                        
+                        // 현재 티어에 해당하는 모드들 필터링
+                        const finalTierMods = allModGroups.filter(mod => {
+                          // customModsTiers[mod.id]가 있으면 그것을 우선, 없으면 modsTiersData[tier] 배열 확인
+                          const customTier = customModsTiers[mod.id];
+                          if (customTier) return customTier === tier;
+                          
+                          return modsTiersData[tier]?.includes(mod.id);
+                        });
+                        
+                        // 검색어 및 클래스로 필터링
+                        const filteredMods = finalTierMods.filter(m => {
+                          const matchesSearch = !debouncedSearchQuery.trim() || 
+                            m.nameEn.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+                            m.nameKo.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+                          
+                          const matchesClass = !selectedClass || (m.classes && m.classes.includes(selectedClass));
+                          
+                          const isExcluded = excludedItems["mods"]?.includes(m.id);
+                          
+                          return matchesSearch && matchesClass && !isExcluded;
+                        });
+                        
+                        if (filteredMods.length === 0) {
+                          return (
+                            <div className="tier-item tier-empty-button">
+                              <div style={{ color: "var(--muted)", fontSize: 13 }}>
+                                {lang === "ko" ? "데이터가 없습니다." : "No data found."}
+                              </div>
+                            </div>
+                          );
+                        }
+                        
+                        return filteredMods.map((mod) => {
+                          const isCustomTier = !!customModsTiers[mod.id];
+                          return (
+                            <div
+                              key={mod.id}
+                              className={`tier-item mod-tier-item ${isCustomTier ? "tier-item-custom" : ""}`}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, mod.id, tier)}
+                              onContextMenu={(e) => {
+                                e.stopPropagation();
+                                handleContextMenu(e, mod.id, "mods");
+                              }}
+                              onClick={() => {
+                                setSelectedModForDetail(mod);
+                                setIsModDetailModalOpen(true);
+                              }}
+                              style={{ cursor: "pointer", height: "auto", minHeight: "50px", padding: "10px" }}
+                              title={`${mod.nameKo} (${mod.nameEn})`}
+                            >
+                              <div className="tier-item-drag-handle">
+                                <div className="tier-item-drag-handle-dots">
+                                  <div className="tier-item-drag-handle-dot"></div>
+                                  <div className="tier-item-drag-handle-dot"></div>
+                                </div>
+                                <div className="tier-item-drag-handle-dots">
+                                  <div className="tier-item-drag-handle-dot"></div>
+                                  <div className="tier-item-drag-handle-dot"></div>
+                                </div>
+                              </div>
+                              <div className="mod-item-content" style={{ flex: 1 }}>
+                                <div className="tier-item-name" style={{ color: "#eee", fontSize: "14px" }}>
+                                  {lang === "ko" ? mod.nameKo : mod.nameEn}
+                                </div>
+                                <div className="mod-item-tags" style={{ display: "flex", gap: "4px", marginTop: "4px" }}>
+                                  {mod.tags && mod.tags.map((tag, idx) => (
+                                    <span key={idx} className={`mod-tag tag-${tag}`} style={{ fontSize: "10px", padding: "1px 4px", borderRadius: "2px", background: "rgba(255,255,255,0.05)" }}>
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -3173,7 +3578,7 @@ export default function TierListPage() {
         >
           <div
             className="context-menu-item context-menu-item-danger"
-            onClick={() => handleDeleteUniqueItemClick(contextMenuItem)}
+            onClick={() => handleDeleteItemClick(contextMenuItem)}
           >
             {lang === "ko" ? "삭제" : "Delete"}
           </div>
@@ -3199,8 +3604,7 @@ export default function TierListPage() {
         }
         confirmText={lang === "ko" ? "삭제" : "Delete"}
         cancelText={lang === "ko" ? "취소" : "Cancel"}
-        onConfirm={handleDeleteUniqueItemConfirm}
-        showCancel={true}
+        onConfirm={handleDeleteItemConfirm}
         lang={lang}
       />
 
@@ -3230,6 +3634,13 @@ export default function TierListPage() {
         title={notificationModal.title}
         message={notificationModal.message}
         autoCloseDelay={notificationModal.autoCloseDelay}
+        lang={lang}
+      />
+
+      <ModDetailModal
+        isOpen={isModDetailModalOpen}
+        onClose={() => setIsModDetailModalOpen(false)}
+        mod={selectedModForDetail}
         lang={lang}
       />
 
@@ -3428,6 +3839,44 @@ export default function TierListPage() {
           margin-left: 4px;
           font-size: 12px;
           opacity: 0.7;
+        }
+
+        /* 모드 아이템 태그 스타일 */
+        .mod-tag {
+          font-size: 10px;
+          padding: 1px 6px;
+          border-radius: 2px;
+          color: #aaa;
+          background: rgba(255, 255, 255, 0.05);
+          font-weight: 800;
+          letter-spacing: -0.2px;
+        }
+
+        .mod-tag.tag-피해 { color: #ff4d4d; background: rgba(255, 77, 77, 0.1); }
+        .mod-tag.tag-물리 { color: #d4af37; background: rgba(212, 175, 55, 0.1); }
+        .mod-tag.tag-공격 { color: #82ccdd; background: rgba(130, 204, 221, 0.1); }
+        .mod-tag.tag-원소 { color: #60a3bc; background: rgba(96, 163, 188, 0.1); }
+        .mod-tag.tag-냉기 { color: #70a1ff; background: rgba(112, 161, 255, 0.1); }
+        .mod-tag.tag-능력치 { color: #2ed573; background: rgba(46, 213, 115, 0.1); }
+
+        .mod-item-content {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .mod-item-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .mod-tier-item {
+          transition: transform 0.1s, background 0.2s;
+        }
+
+        .mod-tier-item:active {
+          transform: scale(0.98);
         }
 
         .currency-filter-row {

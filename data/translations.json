@@ -2,7 +2,7 @@
   "classes": {
     "Wands": { "ko": "마법봉", "en": "Wands" },
     "Staves": { "ko": "지팡이", "en": "Staves" },
-    "Foci": { "ko": "포커스", "en": "Foci" },
+    "Foci": { "ko": "집중구", "en": "Foci" },
     "Sceptres": { "ko": "셉터", "en": "Sceptres" },
     "Bows": { "ko": "활", "en": "Bows" },
     "Quivers": { "ko": "화살통", "en": "Quivers" },

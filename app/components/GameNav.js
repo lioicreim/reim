@@ -27,7 +27,7 @@ export default function GameNav() {
     };
   }, []);
 
-  const games = [
+  const allGames = [
     { id: "wow", name: "WOW", nameKo: "WOW" },
     { id: "poe1", name: "POE1", nameKo: "POE1" },
     { id: "poe2", name: "POE2", nameKo: "POE2" },
@@ -36,13 +36,16 @@ export default function GameNav() {
     { id: "fellowship", name: "Fellowship", nameKo: "Fellowship" },
   ];
 
+  // 애드센스 심사 기간 동안 POE2만 표시
+  const games = allGames.filter(game => game.id === "poe2");
+
   return (
     <nav className="game-nav">
       <div className="game-nav-container">
         {games.map((game) => (
           <Link
             key={game.id}
-            href={`/${game.id}`}
+            href={game.id === "poe2" ? "/poe2/item-filter/presets" : `/${game.id}`}
             className={`game-nav-item ${
               pathname?.startsWith(`/${game.id}`) ? "active" : ""
             }`}

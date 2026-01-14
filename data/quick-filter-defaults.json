@@ -93,7 +93,7 @@
       {
         "id": "gold_default",
         "enabled": true,
-        "name": "골드 기본값",
+        "name": "Default Gold Rule",
         "nameKo": "골드 기본값",
         "type": "show",
         "conditions": {},
@@ -111,7 +111,7 @@
         "id": "uniques_hasvaal",
         "enabled": true,
         "name": "HasVaal",
-        "nameKo": "바알 모드 유니크",
+        "nameKo": "HasVaal 강조",
         "type": "show",
         "conditions": {
           "rarity": {
@@ -136,7 +136,7 @@
         "id": "uniques_isvaal",
         "enabled": true,
         "name": "IsVaal",
-        "nameKo": "바알 유니크",
+        "nameKo": "IsVaal 강조",
         "type": "show",
         "conditions": {
           "rarity": {
@@ -160,8 +160,8 @@
       {
         "id": "uniques_sockets3",
         "enabled": true,
-        "name": "3 소켓 유니크",
-        "nameKo": "3 소켓 유니크",
+        "name": "3 Socket Unique",
+        "nameKo": "유니크 3 소켓",
         "type": "show",
         "conditions": {
           "rarity": {
@@ -189,8 +189,8 @@
       {
         "id": "uniques_sockets2",
         "enabled": true,
-        "name": "2 소켓 유니크",
-        "nameKo": "2 소켓 유니크",
+        "name": "2 Socket Unique",
+        "nameKo": "유니크 2 소켓",
         "type": "show",
         "conditions": {
           "rarity": {
@@ -218,8 +218,8 @@
       {
         "id": "uniques_quality23",
         "enabled": true,
-        "name": "퀄리티 23 이상",
-        "nameKo": "퀄리티 23 이상",
+        "name": "Quality",
+        "nameKo": "퀄리티",
         "type": "show",
         "conditions": {
           "rarity": {
@@ -259,5 +259,167 @@
         "styles": {}
       }
     ]
+  },
+  "jewels": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "jewels_timelost",
+        "enabled": true,
+        "name": "Time-Lost Jewels",
+        "nameKo": "오래된 주얼",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": ["Normal", "Magic", "Rare"]
+          },
+          "class": {
+            "operator": "==",
+            "value": "Jewels"
+          },
+          "baseType": {
+            "operator": "==",
+            "value": ["Time-Lost Emerald", "Time-Lost Ruby", "Time-Lost Sapphire"]
+          }
+        },
+        "styles": {
+          "fontSize": 42,
+          "textColor": { "r": 0, "g": 240, "b": 190, "a": 255 },
+          "borderColor": { "r": 0, "g": 240, "b": 190, "a": 255 },
+          "backgroundColor": { "r": 0, "g": 75, "b": 30, "a": 255 },
+          "customSound": "custom_sound/6_item_t2.mp3",
+          "playEffect": "Blue",
+          "minimapIcon": {
+            "size": 0,
+            "color": "Blue",
+            "shape": "Diamond"
+          }
+        }
+      },
+      {
+        "id": "jewels_rare",
+        "enabled": true,
+        "name": "Rare Jewels",
+        "nameKo": "레어 주얼",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Rare"
+          },
+          "class": {
+            "operator": "==",
+            "value": "Jewels"
+          }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 220, "g": 220, "b": 0, "a": 255 },
+          "borderColor": { "r": 220, "g": 220, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 120, "g": 120, "b": 0, "a": 255 },
+          "customSound": "custom_sound/6_item_t2.mp3",
+          "minimapIcon": {
+            "size": 2,
+            "color": "Orange",
+            "shape": "Diamond"
+          }
+        }
+      },
+      {
+        "id": "jewels_magic",
+        "enabled": true,
+        "name": "Magic Jewels",
+        "nameKo": "마법 주얼",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": "==",
+            "value": "Magic"
+          },
+          "class": {
+            "operator": "==",
+            "value": "Jewels"
+          }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 0, "g": 75, "b": 250, "a": 255 },
+          "borderColor": { "r": 0, "g": 240, "b": 190, "a": 255 },
+          "backgroundColor": { "r": 0, "g": 20, "b": 40, "a": 255 },
+          "customSound": "custom_sound/6_item_t2.mp3",
+          "minimapIcon": {
+            "size": 2,
+            "color": "Blue",
+            "shape": "Diamond"
+          }
+        }
+      }
+    ]
+  },
+  "vaultKeys": {
+    "enabled": true,
+    "minTier": "D",
+    "tiers": {
+      "S": {
+        "enabled": true,
+        "baseTypes": ["Xesht's Reliquary Key", "The Trialmaster's Reliquary Key", "Tangmazu's Reliquary Key", "Olroth's Reliquary Key", "The Arbiter's Reliquary Key", "Zarokh's Reliquary Key: Against the Darkness", "Zarokh's Reliquary Key: Sandstorm Visage", "Zarokh's Reliquary Key: Blessed Bonds", "Zarokh's Reliquary Key: Sekhema's Resolve", "Zarokh's Reliquary Key: Temporalis", "Azmeri Reliquary Key"],
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 0, "b": 0, "a": 255 },
+          "borderColor": { "r": 255, "g": 0, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "playEffect": "Red",
+          "customSound": "custom_sound/1_currency_s.mp3",
+          "minimapIcon": { "size": 0, "color": "Red", "shape": "Star" }
+        }
+      },
+      "A": {
+        "enabled": true,
+        "baseTypes": ["Ritualistic Reliquary Key"],
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 240, "g": 35, "b": 120, "a": 255 },
+          "playEffect": "Orange",
+          "customSound": "custom_sound/2_currency_a.mp3",
+          "minimapIcon": { "size": 0, "color": "Orange", "shape": "Circle" }
+        }
+      },
+      "B": {
+        "enabled": true,
+        "baseTypes": [],
+        "styles": {
+          "fontSize": 42,
+          "textColor": { "r": 255, "g": 170, "b": 0, "a": 255 },
+          "borderColor": { "r": 255, "g": 170, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 50, "g": 25, "b": 0, "a": 255 },
+          "customSound": "custom_sound/3_currency_b.mp3",
+          "minimapIcon": { "size": 1, "color": "Yellow", "shape": "Circle" }
+        }
+      },
+      "C": {
+        "enabled": true,
+        "baseTypes": [],
+        "styles": {
+          "fontSize": 40,
+          "textColor": { "r": 255, "g": 255, "b": 0, "a": 255 },
+          "borderColor": { "r": 255, "g": 255, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 60, "g": 60, "b": 0, "a": 255 },
+          "customSound": "custom_sound/4_currency_c.mp3"
+        }
+      },
+      "D": {
+        "enabled": true,
+        "baseTypes": ["Twilight Reliquary Key"],
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 114, "g": 48, "b": 96, "a": 255 }
+        }
+      }
+    }
   }
 }

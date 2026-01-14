@@ -1,0 +1,78 @@
+{
+  "categories": [
+    {
+      "id": "weapons",
+      "name": "무기",
+      "items": [
+        { "id": "One Handed Sword", "name": "한손 검" },
+        { "id": "One Handed Axe", "name": "한손 도끼" },
+        { "id": "One Handed Mace", "name": "한손 철퇴" },
+        { "id": "Dagger", "name": "단검" },
+        { "id": "Wand", "name": "마법봉" },
+        { "id": "Sceptre", "name": "셉터" },
+        { "id": "Spear", "name": "창" },
+        { "id": "Flail", "name": "도리깨" },
+        { "id": "Bow", "name": "활" },
+        { "id": "Staff", "name": "지팡이" },
+        { "id": "Two Handed Sword", "name": "양손 검" },
+        { "id": "Two Handed Axe", "name": "양손 도끼" },
+        { "id": "Two Handed Mace", "name": "양손 철퇴" },
+        { "id": "Quarterstaff", "name": "육척봉" },
+        { "id": "Crossbow", "name": "쇠뇌" }
+      ]
+    },
+    {
+      "id": "armour",
+      "name": "방어구",
+      "items": [
+        { "id": "Body Armour", "name": "갑옷" },
+        { "id": "Helmet", "name": "투구" },
+        { "id": "Gloves", "name": "장갑" },
+        { "id": "Boots", "name": "장화" },
+        { "id": "Shield", "name": "방패" },
+        { "id": "Buckler", "name": "버클러" }
+      ]
+    },
+    {
+      "id": "accessory",
+      "name": "장신구",
+      "items": [
+        { "id": "Amulet", "name": "목걸이" },
+        { "id": "Ring", "name": "반지" },
+        { "id": "Belt", "name": "허리띠" }
+      ]
+    }
+  ],
+  "modifiers": {
+    "One Handed Sword": {
+      "prefixes": [
+        { "id": "local_physical_damage", "nameKo": "물리 피해 % 증가", "nameEn": "Increased Physical Damage", "tags": ["물리", "공격"] },
+        { "id": "local_flat_physical_damage", "nameKo": "물리 피해 추가", "nameEn": "Adds Physical Damage", "tags": ["물리", "공격"] },
+        { "id": "local_attack_speed", "nameKo": "공격 속도 % 증가", "nameEn": "Increased Attack Speed", "tags": ["공격", "속도"] }
+      ],
+      "suffixes": [
+        { "id": "local_critical_strike_chance", "nameKo": "치명타 확률 % 증가", "nameEn": "Increased Critical Strike Chance", "tags": ["공격", "치명타"] },
+        { "id": "local_accuracy_rating", "nameKo": "명중률 추가", "nameEn": "Adds Accuracy Rating", "tags": ["공격", "명중"] }
+      ]
+    },
+    "Body Armour": {
+      "prefixes": [
+        { "id": "local_base_max_life", "nameKo": "최대 생명력 추가", "nameEn": "Adds maximum Life", "tags": ["생명력"] },
+        { "id": "local_armour", "nameKo": "방어구 % 증가", "nameEn": "Increased Armour", "tags": ["방어"] }
+      ],
+      "suffixes": [
+        { "id": "base_fire_resistance", "nameKo": "화염 저항 %", "nameEn": "Fire Resistance", "tags": ["저항", "원소"] },
+        { "id": "base_cold_resistance", "nameKo": "냉기 저항 %", "nameEn": "Cold Resistance", "tags": ["저항", "원소"] },
+        { "id": "base_lightning_resistance", "nameKo": "번개 저항 %", "nameEn": "Lightning Resistance", "tags": ["저항", "원소"] }
+      ]
+    },
+    "Amulet": {
+      "prefixes": [
+        { "id": "base_all_attributes", "nameKo": "모든 능력치 추가", "nameEn": "Adds to all Attributes", "tags": ["능력치"] }
+      ],
+      "suffixes": [
+        { "id": "critical_strike_multiplier", "nameKo": "글로벌 치명타 피해 배율 % 증가", "nameEn": "Global Critical Strike Multiplier", "tags": ["공격", "치명타"] }
+      ]
+    }
+  }
+}

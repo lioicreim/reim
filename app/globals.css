@@ -54,7 +54,93 @@
   --tier-c: #FFC107; /* C 티어 배경색 - 노란색 */
   --tier-d: #95a5a6; /* D 티어 배경색 - 회색 */
   --tier-e: #000000; /* 검은색 - 기본값 */
+
+  /* 메인 화면 포인트 컬러 (Sharp Neon) */
+  --neon-blue: #155dfc;
+  --neon-green: #a3ff12;
+  --neon-orange: #ff6b35;
+  --neon-pink: #ff4757;
+  --neon-yellow: #ffd700;
 }
+
+/* 한글 가독성을 고려한 개선된 텍스트 스타일 (v7) */
+.sharp-stroke {
+  /* 지저분한 stroke 제거 */
+  -webkit-text-stroke: 0;
+  /* 깔끔하고 강렬한 다중 그림자 효과 */
+  text-shadow: 
+    1.5px 1.5px 0px #000,
+    -1.5px -1.5px 0px #000,
+    1.5px -1.5px 0px #000,
+    -1.5px 1.5px 0px #000,
+    2px 2px 0px #000;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-family: var(--font-sans); /* Pretendard 사용 */
+}
+
+.sharp-stroke-blue { color: var(--neon-blue); }
+.sharp-stroke-green { color: var(--neon-green); }
+.sharp-stroke-orange { color: var(--neon-orange); }
+.sharp-stroke-white { color: #fff; }
+
+/* 대각선 오버레이 전용 (정리됨) */
+.diagonal-split-unused {
+  display: none;
+}
+
+/* 대시보드 카드 스타일 */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 40px 0;
+}
+
+.service-card {
+  background: #111;
+  border: 1px solid var(--border);
+  padding: 32px;
+  position: relative;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: currentColor;
+}
+
+.service-card:hover {
+  background: #161616;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+}
+
+.service-icon {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.service-name {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.service-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 
 /* 게임별 메인 컬러 설정 */
 .game-poe2 {
@@ -238,6 +324,21 @@ body {
   opacity: 0.7;
 }
 
+.header-discord-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: #5865F2;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.header-discord-link:hover {
+  color: #7289da;
+  opacity: 0.9;
+}
+
 .lang-select {
   width: 60px;
   height: 36px;
@@ -402,6 +503,37 @@ body {
   color: var(--text);
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* 광고 플레이스홀더 스타일 (v7: 400px 고정) */
+.ad-banner-placeholder {
+  height: 400px !important;
+  background: #0f0f0f !important;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.ad-placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.ad-main-text {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.ad-banner-placeholder .ad-label {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
 }
 
 /* 게임 서브 네비게이션 */
@@ -798,8 +930,152 @@ input[type="radio"] {
 }
 
 input[type="radio"]:hover {
-  border-color: rgba(255, 255, 255, 0.5);
+  border-color: var(--poe2-primary, var(--game-primary));
 }
+
+input[type="radio"]:checked {
+  background: var(--poe2-primary, var(--game-primary));
+  border-color: var(--poe2-primary, var(--game-primary));
+}
+
+input[type="radio"]:checked::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* 
+  ========================================
+  PoE Tooltip Styles (poe2db mimic)
+  ========================================
+*/
+.newItemPopup {
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid #534835; /* Darker border */
+    color: #dfcf99;
+    font-family: 'Fontin', 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    max-width: 450px;
+    min-width: 300px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.8);
+    z-index: 1000;
+    position: relative;
+    border-radius: 2px;
+}
+
+.newItemPopup a {
+    color: inherit;
+    text-decoration: none;
+    pointer-events: none;
+}
+
+.newItemPopup a.Currency { color: #aa9e82; }
+.newItemPopup a.ItemClasses { color: #aa9e82; }
+
+/* Headers */
+.newItemPopup .itemHeader {
+    background: linear-gradient(to bottom, #24221b 0%, #151410 100%);
+    padding: 8px 12px;
+    border-bottom: 1px solid #534835;
+    position: relative;
+}
+
+.newItemPopup .itemName {
+    color: #fff; 
+    font-weight: 700;
+    font-size: 18px; /* Larger title */
+    line-height: 1.2;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.newItemPopup .itemName.typeLine {
+    font-size: 18px;
+}
+
+/* Rarity Colors */
+.newItemPopup.currencyPopup .itemName { color: #aa9e82; } 
+
+/* Content */
+.newItemPopup .content {
+    padding: 12px 14px;
+    background-color: transparent;
+}
+
+.newItemPopup .property {
+    color: #7f7f7f;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.newItemPopup .colourDefault {
+    color: #fff;
+}
+
+.newItemPopup .separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #a38d6d, transparent);
+    margin: 8px auto;
+    width: 90%;
+    opacity: 0.8;
+}
+
+.newItemPopup .explicitMod {
+    color: #8888ff;
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.newItemPopup .requirements {
+    color: #7f7f7f;
+    display: block;
+    font-size: 13px;
+}
+
+.newItemPopup .secDescrText {
+    color: #7f7f7f;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.newItemPopup .FlavourText {
+    color: #af6025;
+    font-style: italic;
+    margin-top: 10px;
+    font-family: serif;
+    font-size: 13px;
+}
+
+.newItemPopup .default {
+    color: #7f7f7f;
+}
+
+.newItemPopup .fst-italic {
+    font-style: italic;
+}
+
+/* Gem specific styling */
+.newItemPopup .GemTags {
+    color: #7f7f7f;
+    font-style: italic;
+    margin-bottom: 4px;
+}
+
+/* Images inside tooltip - usually filtered out or decorative */
+.newItemPopup img {
+    max-width: 100%;
+    display: none; /* Hide images inside text descriptions if they break layout */
+}
+
 
 /* 선택된 라디오 버튼 - 완전히 채워진 원 */
 input[type="radio"]:checked {

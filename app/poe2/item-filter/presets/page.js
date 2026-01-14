@@ -9,6 +9,23 @@ export default function PresetsPage() {
   const [selectedPreset, setSelectedPreset] = useState("starter");
   const [lang, setLang] = useState("ko");
 
+  // 선택된 프리셋을 전역(다른 페이지)에서 참조할 수 있도록 저장
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const savedPreset = localStorage.getItem("poe2_selected_preset");
+    if (savedPreset) {
+      setSelectedPreset(savedPreset);
+    } else {
+      localStorage.setItem("poe2_selected_preset", "starter");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("poe2_selected_preset", selectedPreset);
+    window.dispatchEvent(new CustomEvent("poe2_presetchange", { detail: { presetId: selectedPreset } }));
+  }, [selectedPreset]);
+
   useEffect(() => {
     const savedLang = localStorage.getItem("lang") || "ko";
     setLang(savedLang);
@@ -76,9 +93,11 @@ export default function PresetsPage() {
   // 다운로드 핸들러
   const handleDownload = () => {
     try {
+      const soundSettings = JSON.parse(localStorage.getItem("poe2_sound_settings") || "[]");
       const filterCode = generateFilterCode({
         presetId: selectedPreset,
-        isPS5: isPS5,
+        soundOption: soundOption,
+        soundSettings: soundSettings,
         excludedOptions: excludedOptions,
         customGearTiers: customGearTiers,
         customCurrencyTiers: customCurrencyTiers,
@@ -106,9 +125,11 @@ export default function PresetsPage() {
   // 복사 핸들러
   const handleCopy = async () => {
     try {
+      const soundSettings = JSON.parse(localStorage.getItem("poe2_sound_settings") || "[]");
       const filterCode = generateFilterCode({
         presetId: selectedPreset,
-        isPS5: isPS5,
+        soundOption: soundOption,
+        soundSettings: soundSettings,
         excludedOptions: excludedOptions,
         customGearTiers: customGearTiers,
         customCurrencyTiers: customCurrencyTiers,
@@ -286,11 +307,21 @@ export default function PresetsPage() {
                     <input
                       type="radio"
                       name="sound"
+                      value="s_only"
+                      checked={soundOption === "s_only"}
+                      onChange={(e) => setSoundOption(e.target.value)}
+                    />
+                    <span className="sound-radio-label">{lang === "ko" ? "S 티어만 듣기" : "S-Tier Only"}</span>
+                  </label>
+                  <label className="sound-radio-option">
+                    <input
+                      type="radio"
+                      name="sound"
                       value="none"
                       checked={soundOption === "none"}
                       onChange={(e) => setSoundOption(e.target.value)}
                     />
-                    <span className="sound-radio-label">{lang === "ko" ? "없음" : "None"}</span>
+                    <span className="sound-radio-label">{lang === "ko" ? "무음" : "Silent"}</span>
                   </label>
                 </div>
                 {/* 사운드 옵션 설명 */}
@@ -305,9 +336,14 @@ export default function PresetsPage() {
                       {lang === "ko" ? "인게임 기본 사운드로 적용합니다 (예: PlayAlertSound 6 300)" : "Apply in-game default sound (e.g., PlayAlertSound 6 300)"}
                     </p>
                   )}
+                  {soundOption === "s_only" && (
+                    <p className="sound-description-text">
+                      {lang === "ko" ? "가장 가치 있는 S 티어 아이템에 대해서만 사운드가 출력됩니다" : "Sounds will only play for the most valuable S-tier items"}
+                    </p>
+                  )}
                   {soundOption === "none" && (
                     <p className="sound-description-text">
-                      {lang === "ko" ? "모든 사운드를 제거합니다" : "Remove all sounds"}
+                      {lang === "ko" ? "모든 아이템의 사운드를 제거하여 정숙한 플레이가 가능합니다" : "Removes sounds from all items for silent gameplay"}
                     </p>
                   )}
                 </div>

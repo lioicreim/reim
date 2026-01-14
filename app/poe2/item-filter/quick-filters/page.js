@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useRef } from "react";
 import quickFilterDefaults from "@/data/quick-filter-defaults.json";
 import ItemPreviewBox from "@/app/components/ItemPreviewBox";
 import ColorPicker from "@/app/components/ColorPicker";
@@ -33,7 +33,12 @@ export default function QuickFiltersPage() {
   }, []);
 
   // 골드 설정 로드 (서버와 클라이언트에서 동일한 초기값 사용)
-  const [goldSettings, setGoldSettings] = useState(quickFilterDefaults.gold);
+  const [goldSettings, setGoldSettings] = useState({
+    enabled: true,
+    minStackSize: 100,
+    rules: quickFilterDefaults.gold.rules || [], // rules 초기화 복구
+  });
+
   const [isClient, setIsClient] = useState(false);
 
   // 클라이언트에서만 localStorage에서 값 불러오기
@@ -48,13 +53,14 @@ export default function QuickFiltersPage() {
           const defaultRules = quickFilterDefaults.gold.rules;
           const savedRules = parsed.rules || [];
 
-          // 저장된 규칙의 제목을 기본값으로 업데이트
+          // 저장된 규칙의 제목을 기본값으로 업데이트하고, 새로운 스타일 속성 등 기본값 병합
           const mergedRules = savedRules.map((savedRule) => {
             const defaultRule = defaultRules.find((r) => r.id === savedRule.id);
             if (defaultRule) {
               return {
-                ...savedRule,
-                name: defaultRule.name,
+                ...defaultRule, // 기본값 먼저 적용 (새로운 필드 추가 등)
+                ...savedRule,   // 저장된 값으로 덮어쓰기 (null 포함)
+                name: defaultRule.name,   // 이름은 항상 최신 기본값 사용
                 nameKo: defaultRule.nameKo,
               };
             }
@@ -179,7 +185,136 @@ export default function QuickFiltersPage() {
   };
 
   // 골드 섹션 접기/펼치기 상태
-  const [isGoldExpanded, setIsGoldExpanded] = useState(true);
+  // 빠른 설정 진입 시 기본은 "닫힘"
+  const [isGoldExpanded, setIsGoldExpanded] = useState(false);
+
+  // 주얼 설정 로드
+  const [jewelsSettings, setJewelsSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.jewels?.rules || [],
+  });
+  const [isClientJewels, setIsClientJewels] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 주얼 설정 불러오기
+  useEffect(() => {
+    setIsClientJewels(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_jewels");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const defaultRules = quickFilterDefaults.jewels?.rules || [];
+          const savedRules = parsed.rules || [];
+
+          const mergedRules = savedRules.map((savedRule) => {
+            const defaultRule = defaultRules.find((r) => r.id === savedRule.id);
+            if (defaultRule) {
+              return {
+                ...defaultRule,
+                ...savedRule,
+                name: defaultRule.name,
+                nameKo: defaultRule.nameKo,
+              };
+            }
+            return savedRule;
+          });
+
+          defaultRules.forEach((defaultRule) => {
+            if (!mergedRules.find((r) => r.id === defaultRule.id)) {
+              mergedRules.push(defaultRule);
+            }
+          });
+
+          setJewelsSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergedRules,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved jewels settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 주얼 설정 저장
+  useEffect(() => {
+    if (isClientJewels && typeof window !== "undefined") {
+      localStorage.setItem("quickFilter_jewels", JSON.stringify(jewelsSettings));
+    }
+  }, [jewelsSettings, isClientJewels]);
+
+  // 주얼 규칙 활성화/비활성화
+  const toggleJewelsRule = (ruleId) => {
+    const updatedRules = jewelsSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setJewelsSettings({
+      ...jewelsSettings,
+      enabled: hasAnyEnabled || jewelsSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 주얼 섹션 접기/펼치기 상태
+  const [isJewelsExpanded, setIsJewelsExpanded] = useState(false);
+
+  // 금고실 열쇠 설정 로드
+  const [vaultKeysSettings, setVaultKeysSettings] = useState({
+    enabled: true,
+    minTier: "D",
+    tiers: quickFilterDefaults.vaultKeys?.tiers || {},
+  });
+  const [isClientVaultKeys, setIsClientVaultKeys] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 금고실 열쇠 설정 불러오기
+  useEffect(() => {
+    setIsClientVaultKeys(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_vaultKeys");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const defaultTiers = quickFilterDefaults.vaultKeys?.tiers || {};
+          
+          // 기본값과 병합
+          const mergedTiers = {};
+          ["S", "A", "B", "C", "D"].forEach((tier) => {
+            const defaultTier = defaultTiers[tier] || { enabled: true, baseTypes: [], styles: {} };
+            const savedTier = parsed.tiers?.[tier] || {};
+            mergedTiers[tier] = {
+              ...defaultTier,
+              ...savedTier,
+              styles: {
+                ...defaultTier.styles,
+                ...(savedTier.styles || {}),
+              },
+            };
+          });
+
+          setVaultKeysSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            minTier: parsed.minTier || "D",
+            tiers: mergedTiers,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved vault keys settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 금고실 열쇠 설정 저장
+  useEffect(() => {
+    if (isClientVaultKeys && typeof window !== "undefined") {
+      localStorage.setItem("quickFilter_vaultKeys", JSON.stringify(vaultKeysSettings));
+    }
+  }, [vaultKeysSettings, isClientVaultKeys]);
+
+  // 금고실 열쇠 섹션 접기/펼치기 상태
+  const [isVaultKeysExpanded, setIsVaultKeysExpanded] = useState(false);
 
   // 화폐 설정 로드 (골드와 동일한 구조)
   const [currencySettings, setCurrencySettings] = useState({
@@ -199,8 +334,7 @@ export default function QuickFiltersPage() {
         try {
           const parsed = JSON.parse(saved);
           setCurrencySettings({
-            enabled:
-              parsed.enabled !== undefined ? parsed.enabled : true,
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
             rules: parsed.rules || [],
             selectedTiers: parsed.selectedTiers || [],
             minTier: parsed.minTier || "E",
@@ -312,11 +446,16 @@ export default function QuickFiltersPage() {
   };
 
   // 화폐 섹션 접기/펼치기 상태
-  const [isCurrencyExpanded, setIsCurrencyExpanded] = useState(true);
+  const [isCurrencyExpanded, setIsCurrencyExpanded] = useState(false);
 
   // 유니크 설정 로드 (골드와 동일한 구조)
-  const [uniquesSettings, setUniquesSettings] = useState(quickFilterDefaults.uniques || { enabled: true, rules: [] });
+  const [uniquesSettings, setUniquesSettings] = useState({
+    enabled: true,
+    rules: (quickFilterDefaults.uniques || { rules: [] }).rules,
+    minTier: "D", // 최소 표시 티어 (D = 전체 표시)
+  });
   const [isClientUniques, setIsClientUniques] = useState(false);
+  // qualityInput State는 상단에서 정의됨 (line 44)
 
   // 클라이언트에서만 localStorage에서 유니크 설정 불러오기
   useEffect(() => {
@@ -326,15 +465,17 @@ export default function QuickFiltersPage() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          const defaultRules = (quickFilterDefaults.uniques || { rules: [] }).rules;
+          const defaultRules = (quickFilterDefaults.uniques || { rules: [] })
+            .rules;
           const savedRules = parsed.rules || [];
 
-          // 저장된 규칙의 제목을 기본값으로 업데이트
+          // 저장된 규칙의 제목을 기본값으로 업데이트하고, 새로운 스타일 속성 등 기본값 병합
           const mergedRules = savedRules.map((savedRule) => {
             const defaultRule = defaultRules.find((r) => r.id === savedRule.id);
             if (defaultRule) {
               return {
-                ...savedRule,
+                ...defaultRule, // 기본값 먼저 적용
+                ...savedRule,   // 저장된 값으로 덮어쓰기
                 name: defaultRule.name,
                 nameKo: defaultRule.nameKo,
               };
@@ -350,8 +491,12 @@ export default function QuickFiltersPage() {
           });
 
           setUniquesSettings({
-            enabled: parsed.enabled !== undefined ? parsed.enabled : (quickFilterDefaults.uniques || { enabled: true }).enabled,
+            enabled:
+              parsed.enabled !== undefined
+                ? parsed.enabled
+                : (quickFilterDefaults.uniques || { enabled: true }).enabled,
             rules: mergedRules,
+            minTier: parsed.minTier || "D",
           });
         } catch (e) {
           console.error("Failed to parse saved uniques settings", e);
@@ -363,7 +508,10 @@ export default function QuickFiltersPage() {
   // 유니크 설정 저장
   useEffect(() => {
     if (isClientUniques && typeof window !== "undefined") {
-      localStorage.setItem("quickFilter_uniques", JSON.stringify(uniquesSettings));
+      localStorage.setItem(
+        "quickFilter_uniques",
+        JSON.stringify(uniquesSettings)
+      );
     }
   }, [uniquesSettings, isClientUniques]);
 
@@ -384,17 +532,17 @@ export default function QuickFiltersPage() {
   };
 
   // 유니크 섹션 접기/펼치기 상태
-  const [isUniquesExpanded, setIsUniquesExpanded] = useState(true);
+  const [isUniquesExpanded, setIsUniquesExpanded] = useState(false);
 
   // 레벨링 단계 섹션 접기/펴기 상태
-  const [isLeagueStartExpanded, setIsLeagueStartExpanded] = useState(true);
+  const [isLeagueStartExpanded, setIsLeagueStartExpanded] = useState(false);
 
   // 레벨링 단계 활성화 상태
   const [isLeagueStartEnabled, setIsLeagueStartEnabled] = useState(true);
 
   // 직업 선택 섹션 접기/펴기 상태
   const [isClassSelectionExpanded, setIsClassSelectionExpanded] =
-    useState(true);
+    useState(false);
 
   // 게임 메인 컬러 상태
   const [gamePrimaryColor, setGamePrimaryColor] = useState("#155dfc");
@@ -406,37 +554,39 @@ export default function QuickFiltersPage() {
         // body나 documentElement에서 컬러 가져오기
         const body = document.body;
         const root = document.documentElement;
-        
+
         // 먼저 body의 스타일에서 확인 (GameThemeProvider가 설정한 값)
         const bodyStyle = getComputedStyle(body);
-        let color = bodyStyle.getPropertyValue("--poe2-primary")?.trim() ||
-                   bodyStyle.getPropertyValue("--game-primary")?.trim();
-        
+        let color =
+          bodyStyle.getPropertyValue("--poe2-primary")?.trim() ||
+          bodyStyle.getPropertyValue("--game-primary")?.trim();
+
         // 없으면 root에서 확인
         if (!color) {
           const rootStyle = getComputedStyle(root);
-          color = rootStyle.getPropertyValue("--poe2-primary")?.trim() ||
-                 rootStyle.getPropertyValue("--game-primary")?.trim();
+          color =
+            rootStyle.getPropertyValue("--poe2-primary")?.trim() ||
+            rootStyle.getPropertyValue("--game-primary")?.trim();
         }
-        
+
         // 여전히 없으면 기본값
         if (!color) {
           color = "#155dfc";
         }
-        
+
         setGamePrimaryColor(color);
       };
-      
+
       // 초기 로드 시 약간의 지연 후 실행 (CSS가 로드된 후)
       const timeoutId = setTimeout(updateColor, 100);
-      
+
       // 컬러 변경 이벤트 리스너
       window.addEventListener("gamecolorchange", updateColor);
       window.addEventListener("storage", updateColor);
-      
+
       // 주기적으로 확인 (동적 변경 대응)
       const intervalId = setInterval(updateColor, 500);
-      
+
       return () => {
         clearTimeout(timeoutId);
         clearInterval(intervalId);
@@ -448,8 +598,7 @@ export default function QuickFiltersPage() {
 
   // 섹션 순서 관리 (왼쪽 열)
   const [leftColumnSections, setLeftColumnSections] = useState([
-    { id: "class-selection", name: "직업 선택" },
-    { id: "league-start", name: "레벨링 단계" },
+    { id: "class-selection", name: "클래스 선택" },
     { id: "gold", name: "골드" },
     { id: "currency", name: "화폐" },
     { id: "uniques", name: "유니크" },
@@ -457,8 +606,44 @@ export default function QuickFiltersPage() {
 
   // 섹션 순서 관리 (오른쪽 열)
   const [rightColumnSections, setRightColumnSections] = useState([
-    { id: "my-equipment", name: "내 장비" },
+    { id: "jewels", name: "주얼" },
+    { id: "vaultKeys", name: "금고실 열쇠" },
   ]);
+
+  // 체크리스트 상태 텍스트(숨김/강조/표시) 공통 규칙
+  const getRuleStatus = (rule) => {
+    const styles = rule?.styles;
+
+    if (rule?.type === "hide") {
+      return {
+        text: lang === "ko" ? "숨김" : "Hide",
+        color: "#ff4757",
+        fontWeight: "normal",
+      };
+    }
+
+    const hasMinimapIcon =
+      !!styles?.minimapIcon &&
+      (styles.minimapIcon.size !== null ||
+        styles.minimapIcon.color !== null ||
+        styles.minimapIcon.shape !== null);
+
+    const hasPlayEffect = !!styles?.playEffect;
+
+    if (hasMinimapIcon || hasPlayEffect) {
+      return {
+        text: lang === "ko" ? "강조" : "Highlight",
+        color: "#a5ff14",
+        fontWeight: "bold",
+      };
+    }
+
+    return {
+      text: lang === "ko" ? "표시" : "Show",
+      color: "var(--text-muted)",
+      fontWeight: "bold",
+    };
+  };
 
   // 섹션 순서 이동 함수
   const moveSection = (sectionId, direction, column) => {
@@ -609,6 +794,13 @@ export default function QuickFiltersPage() {
   const [showClassDropdown, setShowClassDropdown] = useState(false);
   const [showWeaponDropdown, setShowWeaponDropdown] = useState(false);
   const [showArmourDropdown, setShowArmourDropdown] = useState(false);
+  
+  // 사용자가 드롭다운에서 한 번이라도 선택했는지 (초기 기본 상태 vs '전체' 명시 선택 구분용)
+  const [levelingDropdownTouched, setLevelingDropdownTouched] = useState({
+    class: false,
+    weapon: false,
+    armour: false,
+  });
 
   // 드롭다운 버튼 마우스 오버 상태 (추천 무기/방어구 팝업)
   const [hoveredDropdown, setHoveredDropdown] = useState(null); // "weapon" | "armour" | null
@@ -617,7 +809,6 @@ export default function QuickFiltersPage() {
   const [styleModalOpen, setStyleModalOpen] = useState(false);
   const [editingRuleId, setEditingRuleId] = useState(null);
   const [editingRuleSection, setEditingRuleSection] = useState(null); // "gold" or "currency"
-
 
   // 활성화된 규칙 개수 계산
   const activeRulesCount = goldSettings.rules.filter((r) => r.enabled).length;
@@ -715,41 +906,163 @@ export default function QuickFiltersPage() {
   };
 
   // 초기화 핸들러
+  const getActivePresetId = () => {
+    if (typeof window === "undefined") return "starter";
+    return localStorage.getItem("poe2_selected_preset") || "starter";
+  };
+
+  const mergeRulesWithDefaults = (defaultRules = [], savedRules = []) => {
+    const mergedRules = (savedRules || []).map((savedRule) => {
+      const defaultRule = (defaultRules || []).find((r) => r.id === savedRule.id);
+      if (defaultRule) {
+        return {
+          ...defaultRule, // 기본값 먼저 적용 (새 필드 포함)
+          ...savedRule,   // 저장값으로 덮어쓰기 (null 포함)
+          name: defaultRule.name,
+          nameKo: defaultRule.nameKo,
+        };
+      }
+      return savedRule;
+    });
+
+    (defaultRules || []).forEach((defaultRule) => {
+      if (!mergedRules.find((r) => r.id === defaultRule.id)) {
+        mergedRules.push(defaultRule);
+      }
+    });
+
+    return mergedRules;
+  };
+
+  const getQuickFilterBaseline = (presetId) => {
+    const fallback = {
+      gold: quickFilterDefaults.gold,
+      jewels: quickFilterDefaults.jewels,
+      vaultKeys: quickFilterDefaults.vaultKeys,
+      uniques: quickFilterDefaults.uniques,
+      currency: { enabled: true, rules: [], selectedTiers: [], minTier: "E" },
+    };
+
+    if (typeof window === "undefined") return fallback;
+
+    const key = `quickFilter_default_${presetId}`;
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+
+    try {
+      const parsed = JSON.parse(raw);
+
+      // 구버전 호환: goldSettings 단독 저장 형태
+      const stored =
+        parsed && (parsed.gold || parsed.jewels || parsed.uniques || parsed.currency)
+          ? parsed
+          : { gold: parsed };
+
+      const goldDefaultRules = quickFilterDefaults.gold?.rules || [];
+      const jewelsDefaultRules = quickFilterDefaults.jewels?.rules || [];
+      const uniquesDefaultRules = (quickFilterDefaults.uniques || { rules: [] }).rules || [];
+
+      return {
+        gold: {
+          ...quickFilterDefaults.gold,
+          ...(stored.gold || {}),
+          enabled:
+            stored.gold?.enabled !== undefined
+              ? stored.gold.enabled
+              : quickFilterDefaults.gold?.enabled ?? true,
+          rules: mergeRulesWithDefaults(goldDefaultRules, stored.gold?.rules || []),
+        },
+        jewels: {
+          ...quickFilterDefaults.jewels,
+          ...(stored.jewels || {}),
+          enabled: stored.jewels?.enabled !== undefined ? stored.jewels.enabled : true,
+          rules: mergeRulesWithDefaults(jewelsDefaultRules, stored.jewels?.rules || []),
+        },
+        uniques: {
+          ...(quickFilterDefaults.uniques || { enabled: true, rules: [] }),
+          ...(stored.uniques || {}),
+          enabled:
+            stored.uniques?.enabled !== undefined
+              ? stored.uniques.enabled
+              : (quickFilterDefaults.uniques || { enabled: true }).enabled,
+          rules: mergeRulesWithDefaults(uniquesDefaultRules, stored.uniques?.rules || []),
+          minTier: stored.uniques?.minTier || "D",
+        },
+        currency: {
+          enabled: stored.currency?.enabled !== undefined ? stored.currency.enabled : true,
+          rules: stored.currency?.rules || [],
+          selectedTiers: stored.currency?.selectedTiers || [],
+          minTier: stored.currency?.minTier || "E",
+        },
+        vaultKeys: {
+          enabled: stored.vaultKeys?.enabled !== undefined ? stored.vaultKeys.enabled : true,
+          minTier: stored.vaultKeys?.minTier || "D",
+          tiers: stored.vaultKeys?.tiers || quickFilterDefaults.vaultKeys?.tiers || {},
+        },
+      };
+    } catch (e) {
+      console.error("Failed to parse quick filter default:", e);
+      return fallback;
+    }
+  };
+
   const handleResetAll = (onSuccess) => {
     // 전체 초기화: 모든 설정 초기화
-    setGoldSettings(quickFilterDefaults.gold);
-    
+    const presetId = getActivePresetId();
+    const baseline = getQuickFilterBaseline(presetId);
+    setGoldSettings(baseline.gold);
+    setJewelsSettings(baseline.jewels);
+    setUniquesSettings(baseline.uniques);
+    setCurrencySettings(baseline.currency);
+    setVaultKeysSettings(baseline.vaultKeys);
+
     // 다른 페이지의 설정도 초기화
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "quickFilter_gold",
-        JSON.stringify(quickFilterDefaults.gold)
-      );
+      localStorage.setItem("quickFilter_gold", JSON.stringify(baseline.gold));
+      localStorage.setItem("quickFilter_jewels", JSON.stringify(baseline.jewels));
+      localStorage.setItem("quickFilter_uniques", JSON.stringify(baseline.uniques));
+      localStorage.setItem("quickFilter_currency", JSON.stringify(baseline.currency));
+      localStorage.setItem("quickFilter_vaultKeys", JSON.stringify(baseline.vaultKeys));
       localStorage.removeItem("tier-list-custom-gear");
       const leagues = ["default", "normal", "early", "mid", "late", "ssf"];
-      leagues.forEach(league => {
+      leagues.forEach((league) => {
         const leagueKey = league === "default" ? "normal" : league;
         localStorage.removeItem(`tier-list-custom-currency-${leagueKey}`);
       });
     }
-    
+
     if (onSuccess) {
-      onSuccess(lang === "ko" ? "전체 설정이 초기화되었습니다." : "All settings have been reset.");
+      onSuccess(
+        lang === "ko"
+          ? "전체 설정이 초기화되었습니다."
+          : "All settings have been reset."
+      );
     }
   };
 
   const handleResetPage = (onSuccess) => {
     // 이 페이지만: 현재 페이지의 설정만 초기화
-    setGoldSettings(quickFilterDefaults.gold);
+    const presetId = getActivePresetId();
+    const baseline = getQuickFilterBaseline(presetId);
+    setGoldSettings(baseline.gold);
+    setJewelsSettings(baseline.jewels);
+    setUniquesSettings(baseline.uniques);
+    setCurrencySettings(baseline.currency);
+    setVaultKeysSettings(baseline.vaultKeys);
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "quickFilter_gold",
-        JSON.stringify(quickFilterDefaults.gold)
-      );
+      localStorage.setItem("quickFilter_gold", JSON.stringify(baseline.gold));
+      localStorage.setItem("quickFilter_jewels", JSON.stringify(baseline.jewels));
+      localStorage.setItem("quickFilter_uniques", JSON.stringify(baseline.uniques));
+      localStorage.setItem("quickFilter_currency", JSON.stringify(baseline.currency));
+      localStorage.setItem("quickFilter_vaultKeys", JSON.stringify(baseline.vaultKeys));
     }
-    
+
     if (onSuccess) {
-      onSuccess(lang === "ko" ? "이 페이지의 설정이 초기화되었습니다." : "This page's settings have been reset.");
+      onSuccess(
+        lang === "ko"
+          ? "이 페이지의 설정이 초기화되었습니다."
+          : "This page's settings have been reset."
+      );
     }
   };
 
@@ -771,7 +1084,18 @@ export default function QuickFiltersPage() {
       // TODO: 서버에 저장 (현재는 로컬스토리지에만 저장)
       const defaultKey = `quickFilter_default_${presetId}`;
       if (typeof window !== "undefined") {
-        localStorage.setItem(defaultKey, JSON.stringify(goldSettings));
+        // 프리셋 기본값은 "페이지 전체 설정(골드/주얼/유니크/화폐)" 단위로 저장
+        const payload = {
+          version: 2,
+          presetId,
+          savedAt: new Date().toISOString(),
+          gold: goldSettings,
+          jewels: jewelsSettings,
+          uniques: uniquesSettings,
+          currency: currencySettings,
+          vaultKeys: vaultKeysSettings,
+        };
+        localStorage.setItem(defaultKey, JSON.stringify(payload));
         alert(
           lang === "ko" ? "기본값으로 저장되었습니다!" : "Saved as default!"
         );
@@ -804,20 +1128,16 @@ export default function QuickFiltersPage() {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [
-    showClassDropdown,
-    showWeaponDropdown,
-    showArmourDropdown,
-  ]);
+  }, [showClassDropdown, showWeaponDropdown, showArmourDropdown]);
 
   // 직업 선택 섹션 렌더링 함수
   const renderClassSelectionSection = () => (
     <div className="quick-filter-section" style={{ marginTop: "0" }}>
       <div
-        className={`section-header ${isClassSelectionExpanded ? "section-header-expanded" : ""}`}
-        onClick={() =>
-          setIsClassSelectionExpanded(!isClassSelectionExpanded)
-        }
+        className={`section-header ${
+          isClassSelectionExpanded ? "section-header-expanded" : ""
+        }`}
+        onClick={() => setIsClassSelectionExpanded(!isClassSelectionExpanded)}
       >
         <label
           className="section-checkbox"
@@ -841,16 +1161,40 @@ export default function QuickFiltersPage() {
             opacity: levelingClassSelection.enabled ? 1 : 0.5,
           }}
         >
-          {lang === "ko" ? "직업 선택" : "Class Selection"}
+          {lang === "ko" ? "클래스 선택" : "Class Selection"}
         </h3>
         <span className="section-toggle-icon">
           {isClassSelectionExpanded ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           )}
         </span>
@@ -859,16 +1203,41 @@ export default function QuickFiltersPage() {
       {!levelingClassSelection.enabled && (
         <div className="leveling-disabled-message">
           {lang === "ko"
-            ? "직업 선택이 비활성화되었습니다."
+            ? "클래스 선택이 비활성화되었습니다."
             : "Class selection is disabled."}
         </div>
       )}
 
       {levelingClassSelection.enabled && isClassSelectionExpanded && (
-        <div className="section-content" style={{
-          opacity: levelingClassSelection.enabled ? 1 : 0.5,
-          filter: levelingClassSelection.enabled ? "none" : "grayscale(100%)",
-        }}>
+        <div
+          className="section-content"
+          style={{
+            opacity: levelingClassSelection.enabled ? 1 : 0.5,
+            filter: levelingClassSelection.enabled ? "none" : "grayscale(100%)",
+          }}
+        >
+          {/* 안내 텍스트 */}
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              color: "var(--muted)",
+              fontSize: "14px",
+              padding: "12px 16px 0 16px",
+              background: "#141414",
+            }}
+          >
+            <span style={{ fontSize: "16px" }}>💡</span>
+            <span>
+              {lang === "ko"
+                ? "클래스를 선택하지 않으면 모든 무기/방어구에 필터가 적용됩니다."
+                : "If no class is selected, the filter applies to all weapons/armour."}
+            </span>
+          </div>
+
           {/* 드롭다운 버튼들 - 한 줄로 배치 */}
           <div className="leveling-dropdowns-row">
             {/* 직업 드롭다운 */}
@@ -877,226 +1246,226 @@ export default function QuickFiltersPage() {
                 className="leveling-dropdown-wrapper leveling-class-dropdown-wrapper"
                 style={{ position: "relative" }}
               >
-              <button
-                className={`leveling-dropdown-button ${
-                  levelingClassSelection.class === "all"
-                    ? "selected"
-                    : ""
-                }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowWeaponDropdown(false);
-                  setShowArmourDropdown(false);
-                  setShowClassDropdown(!showClassDropdown);
-                }}
-              >
-                <span>
-                  {levelingClassSelection.class === "all"
-                    ? lang === "ko"
-                      ? "직업 선택"
-                      : "Select Class"
-                    : lang === "ko"
-                    ? {
-                        warrior: "워리어",
-                        mercenary: "머셔너리",
-                        ranger: "레인저",
-                        huntress: "헌트리스",
-                        witch: "위치",
-                        sorceress: "소서리스",
-                        monk: "몽크",
-                        druid: "드루이드",
-                      }[levelingClassSelection.class]
-                    : levelingClassSelection.class
-                        .charAt(0)
-                        .toUpperCase() +
-                      levelingClassSelection.class.slice(1)}
-                </span>
-                <span className="dropdown-icon">
-                  {showClassDropdown ? "▲" : "▼"}
-                </span>
-              </button>
-              {showClassDropdown && (
-                <div className="leveling-dropdown-menu">
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "all"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "all",
-                        weaponTypes: [],
-                        armourTypes: [],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "전체" : "All Classes"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "warrior"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations =
-                        classRecommendations.warrior;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "warrior",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "워리어" : "Warrior"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "mercenary"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations =
-                        classRecommendations.mercenary;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "mercenary",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "머셔너리" : "Mercenary"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "ranger"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations =
-                        classRecommendations.ranger;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "ranger",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "레인저" : "Ranger"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "huntress"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations =
-                        classRecommendations.huntress;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "huntress",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "헌트리스" : "Huntress"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "witch"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations =
-                        classRecommendations.witch;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "witch",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "위치" : "Witch"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "sorceress"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations =
-                        classRecommendations.sorceress;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "sorceress",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "소서리스" : "Sorceress"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "monk"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations = classRecommendations.monk;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "monk",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "몽크" : "Monk"}
-                  </button>
-                  <button
-                    className={`leveling-dropdown-item ${
-                      levelingClassSelection.class === "druid"
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      const recommendations =
-                        classRecommendations.druid;
-                      setLevelingClassSelection({
-                        ...levelingClassSelection,
-                        class: "druid",
-                        weaponTypes: [...recommendations.weapons],
-                        armourTypes: [...recommendations.armours],
-                      });
-                      setShowClassDropdown(false);
-                    }}
-                  >
-                    {lang === "ko" ? "드루이드" : "Druid"}
-                  </button>
-                </div>
-              )}
-            </div>
+                <button
+                  className={`leveling-dropdown-button ${
+                    levelingClassSelection.class === "all" ? "selected" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowWeaponDropdown(false);
+                    setShowArmourDropdown(false);
+                    setShowClassDropdown(!showClassDropdown);
+                  }}
+                >
+                  <span>
+                    {!levelingDropdownTouched.class
+                      ? lang === "ko"
+                      ? "클래스 선택"
+                        : "Select Class"
+                      : levelingClassSelection.class === "all"
+                      ? lang === "ko"
+                        ? "전체"
+                        : "All"
+                      : lang === "ko"
+                      ? {
+                          warrior: "워리어",
+                          mercenary: "머셔너리",
+                          ranger: "레인저",
+                          huntress: "헌트리스",
+                          witch: "위치",
+                          sorceress: "소서리스",
+                          monk: "몽크",
+                          druid: "드루이드",
+                        }[levelingClassSelection.class]
+                      : levelingClassSelection.class.charAt(0).toUpperCase() +
+                        levelingClassSelection.class.slice(1)}
+                  </span>
+                  <span className="dropdown-icon">
+                    {showClassDropdown ? "▲" : "▼"}
+                  </span>
+                </button>
+                {showClassDropdown && (
+                  <div className="leveling-dropdown-menu">
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "all" ? "selected" : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "all",
+                          weaponTypes: [],
+                          armourTypes: [],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "전체" : "All Classes"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "warrior"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.warrior;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "warrior",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "워리어" : "Warrior"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "mercenary"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.mercenary;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "mercenary",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "머셔너리" : "Mercenary"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "ranger"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.ranger;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "ranger",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "레인저" : "Ranger"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "huntress"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.huntress;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "huntress",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "헌트리스" : "Huntress"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "witch"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.witch;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "witch",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "위치" : "Witch"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "sorceress"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.sorceress;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "sorceress",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "소서리스" : "Sorceress"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "monk"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.monk;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "monk",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "몽크" : "Monk"}
+                    </button>
+                    <button
+                      className={`leveling-dropdown-item ${
+                        levelingClassSelection.class === "druid"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setLevelingDropdownTouched((prev) => ({ ...prev, class: true }));
+                        const recommendations = classRecommendations.druid;
+                        setLevelingClassSelection({
+                          ...levelingClassSelection,
+                          class: "druid",
+                          weaponTypes: [...recommendations.weapons],
+                          armourTypes: [...recommendations.armours],
+                        });
+                        setShowClassDropdown(false);
+                      }}
+                    >
+                      {lang === "ko" ? "드루이드" : "Druid"}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* 무기 종류 드롭다운 */}
@@ -1125,10 +1494,15 @@ export default function QuickFiltersPage() {
                   onMouseLeave={() => setHoveredDropdown(null)}
                 >
                   <span>
-                    {levelingClassSelection.weaponTypes.length === 0
+                    {!levelingDropdownTouched.weapon &&
+                    levelingClassSelection.weaponTypes.length === 0
                       ? lang === "ko"
                         ? "무기 종류"
                         : "Weapon Type"
+                      : levelingClassSelection.weaponTypes.length === 0
+                      ? lang === "ko"
+                        ? "전체"
+                        : "All"
                       : levelingClassSelection.weaponTypes.length === 1
                       ? lang === "ko"
                         ? {
@@ -1160,43 +1534,38 @@ export default function QuickFiltersPage() {
                 {hoveredDropdown === "weapon" &&
                   levelingClassSelection.weaponTypes.length > 0 && (
                     <div className="selected-items-popup">
-                      {levelingClassSelection.weaponTypes.map(
-                        (weaponId) => {
-                          const weaponNames = {
-                            spears: { ko: "창", en: "Spears" },
-                            talismans: { ko: "부적", en: "Talismans" },
-                            quarterstaves: {
-                              ko: "육척봉",
-                              en: "Quarterstaves",
-                            },
-                            sceptres: { ko: "셉터", en: "Sceptres" },
-                            wands: { ko: "마법봉", en: "Wands" },
-                            staves: { ko: "지팡이", en: "Staves" },
-                            bows: { ko: "활", en: "Bows" },
-                            quivers: { ko: "화살통", en: "Quivers" },
-                            crossbows: { ko: "쇠뇌", en: "Crossbows" },
-                            one_hand_maces: {
-                              ko: "한손 철퇴",
-                              en: "One Hand Maces",
-                            },
-                            two_hand_maces: {
-                              ko: "양손 철퇴",
-                              en: "Two Hand Maces",
-                            },
-                            foci: { ko: "집중구", en: "Foci" },
-                          };
-                          return (
-                            <div
-                              key={weaponId}
-                              className="selected-item-text"
-                            >
-                              {lang === "ko"
-                                ? weaponNames[weaponId]?.ko || weaponId
-                                : weaponNames[weaponId]?.en || weaponId}
-                            </div>
-                          );
-                        }
-                      )}
+                      {levelingClassSelection.weaponTypes.map((weaponId) => {
+                        const weaponNames = {
+                          spears: { ko: "창", en: "Spears" },
+                          talismans: { ko: "부적", en: "Talismans" },
+                          quarterstaves: {
+                            ko: "육척봉",
+                            en: "Quarterstaves",
+                          },
+                          sceptres: { ko: "셉터", en: "Sceptres" },
+                          wands: { ko: "마법봉", en: "Wands" },
+                          staves: { ko: "지팡이", en: "Staves" },
+                          bows: { ko: "활", en: "Bows" },
+                          quivers: { ko: "화살통", en: "Quivers" },
+                          crossbows: { ko: "쇠뇌", en: "Crossbows" },
+                          one_hand_maces: {
+                            ko: "한손 철퇴",
+                            en: "One Hand Maces",
+                          },
+                          two_hand_maces: {
+                            ko: "양손 철퇴",
+                            en: "Two Hand Maces",
+                          },
+                          foci: { ko: "집중구", en: "Foci" },
+                        };
+                        return (
+                          <div key={weaponId} className="selected-item-text">
+                            {lang === "ko"
+                              ? weaponNames[weaponId]?.ko || weaponId
+                              : weaponNames[weaponId]?.en || weaponId}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 {showWeaponDropdown && (
@@ -1209,6 +1578,7 @@ export default function QuickFiltersPage() {
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
+                        setLevelingDropdownTouched((prev) => ({ ...prev, weapon: true }));
                         setLevelingClassSelection({
                           ...levelingClassSelection,
                           weaponTypes: [],
@@ -1244,9 +1614,7 @@ export default function QuickFiltersPage() {
                       { id: "foci", ko: "집중구", en: "Foci" },
                     ].map((weapon) => {
                       const isSelected =
-                        levelingClassSelection.weaponTypes.includes(
-                          weapon.id
-                        );
+                        levelingClassSelection.weaponTypes.includes(weapon.id);
                       return (
                         <div
                           key={weapon.id}
@@ -1259,9 +1627,7 @@ export default function QuickFiltersPage() {
                               ...levelingClassSelection.weaponTypes,
                             ];
                             if (isSelected) {
-                              const index = currentTypes.indexOf(
-                                weapon.id
-                              );
+                              const index = currentTypes.indexOf(weapon.id);
                               currentTypes.splice(index, 1);
                             } else {
                               currentTypes.push(weapon.id);
@@ -1270,11 +1636,10 @@ export default function QuickFiltersPage() {
                               ...levelingClassSelection,
                               weaponTypes: currentTypes,
                             });
+                            setLevelingDropdownTouched((prev) => ({ ...prev, weapon: true }));
                           }}
                         >
-                          <span>
-                            {lang === "ko" ? weapon.ko : weapon.en}
-                          </span>
+                          <span>{lang === "ko" ? weapon.ko : weapon.en}</span>
                         </div>
                       );
                     })}
@@ -1309,10 +1674,15 @@ export default function QuickFiltersPage() {
                   onMouseLeave={() => setHoveredDropdown(null)}
                 >
                   <span>
-                    {levelingClassSelection.armourTypes.length === 0
+                    {!levelingDropdownTouched.armour &&
+                    levelingClassSelection.armourTypes.length === 0
                       ? lang === "ko"
                         ? "방어구 종류"
                         : "Armour Type"
+                      : levelingClassSelection.armourTypes.length === 0
+                      ? lang === "ko"
+                        ? "전체"
+                        : "All"
                       : levelingClassSelection.armourTypes.length === 1
                       ? lang === "ko"
                         ? {
@@ -1337,32 +1707,27 @@ export default function QuickFiltersPage() {
                 {hoveredDropdown === "armour" &&
                   levelingClassSelection.armourTypes.length > 0 && (
                     <div className="selected-items-popup">
-                      {levelingClassSelection.armourTypes.map(
-                        (armourId) => {
-                          const armourNames = {
-                            AR: { ko: "방어도", en: "AR" },
-                            "AR/ES": { ko: "방어/에쉴", en: "AR/ES" },
-                            "AR/EV": { ko: "방어/회피", en: "AR/EV" },
-                            "AR/EV/ES": {
-                              ko: "방어/회피/에쉴",
-                              en: "AR/EV/ES",
-                            },
-                            ES: { ko: "에쉴", en: "ES" },
-                            EV: { ko: "회피", en: "EV" },
-                            "EV/ES": { ko: "회피/에쉴", en: "EV/ES" },
-                          };
-                          return (
-                            <div
-                              key={armourId}
-                              className="selected-item-text"
-                            >
-                              {lang === "ko"
-                                ? armourNames[armourId]?.ko || armourId
-                                : armourNames[armourId]?.en || armourId}
-                            </div>
-                          );
-                        }
-                      )}
+                      {levelingClassSelection.armourTypes.map((armourId) => {
+                        const armourNames = {
+                          AR: { ko: "방어도", en: "AR" },
+                          "AR/ES": { ko: "방어/에쉴", en: "AR/ES" },
+                          "AR/EV": { ko: "방어/회피", en: "AR/EV" },
+                          "AR/EV/ES": {
+                            ko: "방어/회피/에쉴",
+                            en: "AR/EV/ES",
+                          },
+                          ES: { ko: "에쉴", en: "ES" },
+                          EV: { ko: "회피", en: "EV" },
+                          "EV/ES": { ko: "회피/에쉴", en: "EV/ES" },
+                        };
+                        return (
+                          <div key={armourId} className="selected-item-text">
+                            {lang === "ko"
+                              ? armourNames[armourId]?.ko || armourId
+                              : armourNames[armourId]?.en || armourId}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 {showArmourDropdown && (
@@ -1375,6 +1740,7 @@ export default function QuickFiltersPage() {
                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
+                        setLevelingDropdownTouched((prev) => ({ ...prev, armour: true }));
                         setLevelingClassSelection({
                           ...levelingClassSelection,
                           armourTypes: [],
@@ -1397,9 +1763,7 @@ export default function QuickFiltersPage() {
                       { id: "EV/ES", ko: "회피/에쉴", en: "EV/ES" },
                     ].map((armour) => {
                       const isSelected =
-                        levelingClassSelection.armourTypes.includes(
-                          armour.id
-                        );
+                        levelingClassSelection.armourTypes.includes(armour.id);
                       return (
                         <div
                           key={armour.id}
@@ -1412,9 +1776,7 @@ export default function QuickFiltersPage() {
                               ...levelingClassSelection.armourTypes,
                             ];
                             if (isSelected) {
-                              const index = currentTypes.indexOf(
-                                armour.id
-                              );
+                              const index = currentTypes.indexOf(armour.id);
                               currentTypes.splice(index, 1);
                             } else {
                               currentTypes.push(armour.id);
@@ -1423,11 +1785,10 @@ export default function QuickFiltersPage() {
                               ...levelingClassSelection,
                               armourTypes: currentTypes,
                             });
+                            setLevelingDropdownTouched((prev) => ({ ...prev, armour: true }));
                           }}
                         >
-                          <span>
-                            {lang === "ko" ? armour.ko : armour.en}
-                          </span>
+                          <span>{lang === "ko" ? armour.ko : armour.en}</span>
                         </div>
                       );
                     })}
@@ -1516,7 +1877,9 @@ export default function QuickFiltersPage() {
   const renderLeagueStartSection = () => (
     <div className="league-start-wrapper">
       <div
-        className={`section-header ${isLeagueStartExpanded ? "section-header-expanded" : ""}`}
+        className={`section-header ${
+          isLeagueStartExpanded ? "section-header-expanded" : ""
+        }`}
         onClick={() => setIsLeagueStartExpanded(!isLeagueStartExpanded)}
       >
         <label
@@ -1542,12 +1905,36 @@ export default function QuickFiltersPage() {
         </h3>
         <span className="section-toggle-icon">
           {isLeagueStartExpanded ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           )}
         </span>
@@ -1571,7 +1958,9 @@ export default function QuickFiltersPage() {
   const renderCurrencySection = () => (
     <div className="quick-filter-section" style={{ marginTop: "0" }}>
       <div
-        className={`section-header ${isCurrencyExpanded ? "section-header-expanded" : ""}`}
+        className={`section-header ${
+          isCurrencyExpanded ? "section-header-expanded" : ""
+        }`}
         onClick={() => setIsCurrencyExpanded(!isCurrencyExpanded)}
       >
         <label
@@ -1605,12 +1994,36 @@ export default function QuickFiltersPage() {
         </h3>
         <span className="section-toggle-icon">
           {isCurrencyExpanded ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           )}
         </span>
@@ -1643,9 +2056,13 @@ export default function QuickFiltersPage() {
                   fontSize: "14px",
                 }}
               >
-                {currencySettings.minTier === "S" 
-                  ? (lang === "ko" ? "S 티어만 표시" : "S tier only")
-                  : `${currencySettings.minTier} ${lang === "ko" ? "티어 이상 표시" : "tier or higher"}`}
+                {currencySettings.minTier === "S"
+                  ? lang === "ko"
+                    ? "S 티어만 표시"
+                    : "S tier only"
+                  : `${currencySettings.minTier} ${
+                      lang === "ko" ? "티어 이상 표시" : "tier or higher"
+                    }`}
               </div>
             </div>
             <div
@@ -1664,7 +2081,7 @@ export default function QuickFiltersPage() {
                 // 선택한 티어를 포함해서 왼쪽(높은 티어)이 활성화, 오른쪽(낮은 티어)이 비활성화
                 const isIncluded = currentOrder <= selectedOrder; // 선택된 티어 이하 (S~선택한 티어)
                 const isSelected = tier === currencySettings.minTier; // 현재 선택된 티어만
-                
+
                 const tierColors = {
                   S: "var(--tier-s)",
                   A: "var(--tier-a)",
@@ -1673,7 +2090,7 @@ export default function QuickFiltersPage() {
                   D: "var(--tier-d)",
                   E: "var(--tier-e)",
                 };
-                
+
                 // 활성화된 티어: 컬러 배경 + 컬러 테두리 + 밝게 표시
                 // 선택된 티어: 흰색 테두리
                 // 비활성화된 티어: 본래 컬러에 블랙 50% 오버레이 효과
@@ -1681,12 +2098,12 @@ export default function QuickFiltersPage() {
                 let borderColor;
                 let largeTextColor;
                 let smallTextColor;
-                
+
                 if (isIncluded) {
                   // 활성화된 티어: 본래 컬러
                   backgroundColor = tierColors[tier];
                   borderColor = isSelected ? "#ffffff" : tierColors[tier];
-                  
+
                   if (tier === "C" || tier === "D") {
                     largeTextColor = "#000000";
                     smallTextColor = "#000000";
@@ -1701,7 +2118,7 @@ export default function QuickFiltersPage() {
                   // 비활성화된 티어: 본래 컬러에 블랙 60% 오버레이 효과
                   backgroundColor = tierColors[tier];
                   borderColor = "rgba(0, 0, 0, 0.6)"; // 테두리도 어둡게
-                  
+
                   // 비활성화된 티어의 텍스트는 대비가 높은 색상으로 표시
                   if (tier === "C" || tier === "D") {
                     // C, D는 노란색/회색 배경이므로 검은색 텍스트
@@ -1717,12 +2134,13 @@ export default function QuickFiltersPage() {
                     smallTextColor = "var(--muted)";
                   }
                 }
-                const boxShadow = isIncluded && !isSelected 
-                  ? `0 0 8px ${tierColors[tier]}40` 
-                  : isSelected 
-                    ? `0 0 12px ${tierColors[tier]}60` 
+                const boxShadow =
+                  isIncluded && !isSelected
+                    ? `0 0 8px ${tierColors[tier]}40`
+                    : isSelected
+                    ? `0 0 12px ${tierColors[tier]}60`
                     : "none";
-                
+
                 return (
                   <button
                     key={tier}
@@ -1734,16 +2152,22 @@ export default function QuickFiltersPage() {
                       });
                     }}
                     disabled={!currencySettings.enabled}
-                    className={`currency-tier-button ${isIncluded ? "currency-tier-active" : "currency-tier-inactive"}`}
+                    className={`currency-tier-button ${
+                      isIncluded
+                        ? "currency-tier-active"
+                        : "currency-tier-inactive"
+                    }`}
                     data-included={isIncluded}
                     style={{
                       flex: "1",
                       minWidth: "0",
-                      aspectRatio: "1",
+                      height: "50px",
                       maxWidth: "120px",
                       border: `2px solid ${borderColor}`,
                       background: backgroundColor,
-                      cursor: currencySettings.enabled ? "pointer" : "not-allowed",
+                      cursor: currencySettings.enabled
+                        ? "pointer"
+                        : "not-allowed",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
@@ -1808,15 +2232,6 @@ export default function QuickFiltersPage() {
                     >
                       {tier}
                     </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: smallTextColor,
-                        opacity: isIncluded ? 1 : 0.7,
-                      }}
-                    >
-                      {tier} {lang === "ko" ? "티어" : "Tier"}
-                    </div>
                   </button>
                 );
               })}
@@ -1841,9 +2256,11 @@ export default function QuickFiltersPage() {
                   </>
                 ) : (
                   <>
-                    Only currencies of the selected tier or higher are displayed.
+                    Only currencies of the selected tier or higher are
+                    displayed.
                     <br />
-                    Example: If B tier is selected, S, A, B tier currencies are all displayed.
+                    Example: If B tier is selected, S, A, B tier currencies are
+                    all displayed.
                   </>
                 )}
               </span>
@@ -1858,7 +2275,9 @@ export default function QuickFiltersPage() {
   const renderUniquesSection = () => (
     <div className="quick-filter-section" style={{ marginTop: "0" }}>
       <div
-        className={`section-header ${isUniquesExpanded ? "section-header-expanded" : ""}`}
+        className={`section-header ${
+          isUniquesExpanded ? "section-header-expanded" : ""
+        }`}
         onClick={() => setIsUniquesExpanded(!isUniquesExpanded)}
       >
         <label
@@ -1892,38 +2311,423 @@ export default function QuickFiltersPage() {
         </h3>
         <span className="section-toggle-icon">
           {isUniquesExpanded ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           )}
         </span>
       </div>
       {isUniquesExpanded && (
-        <div className="section-content">
-          {/* 유니크 규칙들 */}
-          {uniquesSettings.rules.map((rule) => (
+        <div className="section-content" style={{ background: "#141414" }}>
+          {/* 유니크 티어 선택 */}
+          <div className="currency-tier-selection">
             <div
-              key={rule.id}
-              className="filter-rule-item"
               style={{
-                opacity: uniquesSettings.enabled ? 1 : 0.5,
-                filter: uniquesSettings.enabled ? "none" : "grayscale(100%)",
+                padding: "16px 32px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <label className="rule-checkbox">
-                <input
-                  type="checkbox"
-                  checked={rule.enabled}
-                  onChange={() => toggleUniquesRule(rule.id)}
-                />
-              </label>
-              <span className="rule-title">{rule.nameKo || rule.name}</span>
+              <div
+                style={{
+                  color: "var(--color-gray-300)",
+                  fontSize: "14px",
+                }}
+              >
+                {lang === "ko"
+                  ? "유니크는 몇 티어까지 보고 싶나요?"
+                  : "How many unique tiers do you want to see?"}
+              </div>
+              <div
+                style={{
+                  color: "var(--color-gray-300)",
+                  fontSize: "14px",
+                }}
+              >
+                {uniquesSettings.minTier === "S"
+                  ? lang === "ko"
+                    ? "S 티어만 표시"
+                    : "S tier only"
+                  : `${uniquesSettings.minTier} ${
+                      lang === "ko" ? "티어 이상 표시" : "tier or higher"
+                    }`}
+              </div>
             </div>
-          ))}
+            <div
+              style={{
+                padding: "0 32px 16px 32px",
+                display: "flex",
+                gap: "8px",
+                alignItems: "center",
+                flexWrap: "nowrap",
+              }}
+            >
+              {["S", "A", "B", "C", "D"].map((tier) => {
+                const tierOrder = { S: 1, A: 2, B: 3, C: 4, D: 5 };
+                const selectedOrder = tierOrder[uniquesSettings.minTier] || 5;
+                const currentOrder = tierOrder[tier] || 5;
+                // 선택한 티어를 포함해서 왼쪽(높은 티어)이 활성화, 오른쪽(낮은 티어)이 비활성화
+                const isIncluded = currentOrder <= selectedOrder; // 선택된 티어 이하 (S~선택한 티어)
+                const isSelected = tier === uniquesSettings.minTier; // 현재 선택된 티어만
+
+                const tierColors = {
+                  S: "var(--tier-s)",
+                  A: "var(--tier-a)",
+                  B: "var(--tier-b)",
+                  C: "var(--tier-c)",
+                  D: "var(--tier-d)",
+                };
+
+                let backgroundColor;
+                let borderColor;
+                let largeTextColor;
+                let smallTextColor;
+
+                if (isIncluded) {
+                  // 활성화된 티어: 본래 컬러
+                  backgroundColor = tierColors[tier];
+                  borderColor = isSelected ? "#ffffff" : tierColors[tier];
+
+                  if (tier === "C" || tier === "D") {
+                    largeTextColor = "#000000";
+                    smallTextColor = "#000000";
+                  } else {
+                    largeTextColor = "#ffffff";
+                    smallTextColor = "#ffffff";
+                  }
+                } else {
+                  // 비활성화된 티어: 본래 컬러에 블랙 60% 오버레이 효과
+                  backgroundColor = tierColors[tier];
+                  borderColor = "rgba(0, 0, 0, 0.6)"; // 테두리도 어둡게
+
+                  // 비활성화된 티어의 텍스트는 대비가 높은 색상으로 표시
+                  if (tier === "C" || tier === "D") {
+                    largeTextColor = "#000000";
+                    smallTextColor = "#000000";
+                  } else {
+                    largeTextColor = "#ffffff";
+                    smallTextColor = "var(--muted)";
+                  }
+                }
+
+                const boxShadow =
+                  isIncluded && !isSelected
+                    ? `0 0 8px ${tierColors[tier]}40`
+                    : isSelected
+                    ? `0 0 12px ${tierColors[tier]}60`
+                    : "none";
+
+                // D 티어 라벨 처리
+                const tierLabel =
+                  tier === "D"
+                    ? lang === "ko"
+                      ? "기타 유니크"
+                      : "Other Uniques"
+                    : `${tier} ${lang === "ko" ? "티어" : "Tier"}`;
+
+                return (
+                  <button
+                    key={tier}
+                    onClick={() => {
+                      if (!uniquesSettings.enabled) return;
+                      setUniquesSettings({
+                        ...uniquesSettings,
+                        minTier: tier,
+                      });
+                    }}
+                    disabled={!uniquesSettings.enabled}
+                    className={`currency-tier-button ${
+                      isIncluded
+                        ? "currency-tier-active"
+                        : "currency-tier-inactive"
+                    }`}
+                    data-included={isIncluded}
+                    style={{
+                      flex: "1",
+                      minWidth: "0",
+                      minWidth: "0",
+                      height: "50px", // 높이 50으로 변경
+                      maxWidth: "120px",
+                      border: `2px solid ${borderColor}`,
+                      background: backgroundColor,
+                      cursor: uniquesSettings.enabled
+                        ? "pointer"
+                        : "not-allowed",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0px", // 간격 제거
+                      position: "relative",
+                      transition: "all 0.2s",
+                      boxShadow: boxShadow,
+                      overflow: "hidden",
+                    }}
+                  >
+                    {!isIncluded && (
+                      <div
+                        className="currency-tier-overlay"
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          width: "100%",
+                          height: "100%",
+                          background: "rgba(0, 0, 0, 0.6)",
+                          pointerEvents: "none",
+                          zIndex: 3,
+                        }}
+                      />
+                    )}
+                    {isSelected && (
+                      <div
+                        className="currency-tier-checkbox"
+                        style={{
+                          position: "absolute",
+                          top: "-2px",
+                          right: "-2px",
+                          width: "18px",
+                          height: "18px",
+                          zIndex: 20,
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={true}
+                          readOnly
+                          style={{
+                            width: "18px",
+                            height: "18px",
+                            cursor: "default",
+                            margin: 0,
+                            padding: 0,
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div
+                      style={{
+                        fontSize: "24px",
+                        fontWeight: "700",
+                        color: largeTextColor,
+                        opacity: 1,
+                      }}
+                    >
+                      {tier}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            {/* 유니크 규칙 리스트 (2열 그리드) */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "8px",
+                padding: "0 32px 16px 32px",
+              }}
+            >
+              {uniquesSettings.rules.map((rule) => {
+                // 기타 유니크(D tier) 체크박스는 렌더링에서 제외
+                if (rule.id === "uniques_d_other") return null;
+
+                // 퀄리티 규칙 특수 UI
+                if (rule.id === "uniques_quality23") {
+                  const status = getRuleStatus(rule);
+                  return (
+                    <div
+                      key={rule.id}
+                      className="filter-rule-item"
+                      style={{
+                        opacity: uniquesSettings.enabled && rule.enabled ? 1 : 0.5,
+                        filter: uniquesSettings.enabled && rule.enabled
+                          ? "none"
+                          : "grayscale(100%)",
+                        gridColumn: "span 2",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between", // 양 끝 정렬
+                      }}
+                    >
+                      {/* 왼쪽 그룹: 체크박스 + 이름 + 상태 텍스트 */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <label className="rule-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={rule.enabled}
+                            onChange={() => toggleUniquesRule(rule.id)}
+                          />
+                        </label>
+                        
+                        {/* 텍스트 기반 정보 표시 */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            {/* 퀄리티 조건 표시 - 제목 없이 조건만 표시하여 "퀄리티 퀄리티" 중복 방지 */}
+                            <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                                {(() => {
+                                    // conditions.quality가 객체이거나 숫자일 수 있음
+                                    const qualityVal = typeof rule.conditions?.quality === 'object' 
+                                        ? rule.conditions.quality.value 
+                                        : (rule.conditions?.quality || 23); // 기본값 23
+                                        
+                                    return lang === "ko" 
+                                        ? `퀄리티 ${qualityVal} 이상` 
+                                        : `Quality ${qualityVal}+`;
+                                })()}
+                            </span>
+                             
+                             {/* 상태 텍스트 */}
+                             <span style={{ 
+                                  fontSize: "14px", 
+                                  color: status.color,
+                                  marginLeft: "8px",
+                                  fontWeight: status.fontWeight,
+                                  whiteSpace: "nowrap"
+                              }}>
+                                  {status.text}
+                              </span>
+                        </div>
+                      </div>
+
+                      {/* 오른쪽: 수정 버튼 */}
+                      <button
+                        className="rule-edit-button"
+                        onClick={() => {
+                            setEditingRuleId(rule.id);
+                            setEditingRuleSection("uniques");
+                            setStyleModalOpen(true);
+                        }}
+                        disabled={!uniquesSettings.enabled}
+                        style={{
+                          marginLeft: "auto", 
+                          opacity: uniquesSettings.enabled ? 1 : 0.5,
+                          cursor: uniquesSettings.enabled
+                            ? "pointer"
+                            : "not-allowed",
+                        }}
+                      >
+                        수정
+                      </button>
+                    </div>
+                  );
+                }
+                // 기본 체크박스 규칙
+                const status = getRuleStatus(rule);
+                return (
+                  <div
+                    key={rule.id}
+                    className="filter-rule-item"
+                    style={{
+                      opacity: uniquesSettings.enabled && rule.enabled ? 1 : 0.5,
+                      filter: uniquesSettings.enabled && rule.enabled
+                        ? "none"
+                        : "grayscale(100%)",
+                    }}
+                  >
+                    <label className="rule-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={rule.enabled}
+                        onChange={() => toggleUniquesRule(rule.id)}
+                      />
+                    </label>
+                    <span className="rule-title">
+                      {rule.nameKo || rule.name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        color: status.color,
+                        marginLeft: "8px",
+                        fontWeight: status.fontWeight,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {status.text}
+                    </span>
+                    <button
+                      className="rule-edit-button"
+                      onClick={() => {
+                        setEditingRuleId(rule.id);
+                        setEditingRuleSection("uniques");
+                        setStyleModalOpen(true);
+                      }}
+                      style={{
+                        opacity: uniquesSettings.enabled ? 1 : 0.5,
+                        cursor: uniquesSettings.enabled
+                          ? "pointer"
+                          : "not-allowed",
+                      }}
+                    >
+                      수정
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            {/* 설명 텍스트 */}
+            <div
+              style={{
+                padding: "0 32px 16px 32px",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "8px",
+                color: "var(--muted)",
+                fontSize: "14px",
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>💡</span>
+              <span style={{ lineHeight: "1.6" }}>
+                {lang === "ko" ? (
+                  <>
+                    선택한 티어 이상의 유니크 아이템만 표시됩니다.
+                    <br />
+                    소켓 유니크는 기본 소켓보다 더 많은 소켓으로 드롭되는
+                    유니크입니다.
+                  </>
+                ) : (
+                  <>
+                    Only unique items of the selected tier or higher are
+                    displayed.
+                    <br />
+                    Socket Uniques are unique items that drop with more sockets
+                    than the default socket.
+                  </>
+                )}
+              </span>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -1933,7 +2737,9 @@ export default function QuickFiltersPage() {
   const renderGoldSection = () => (
     <div className="quick-filter-section" style={{ marginTop: "0" }}>
       <div
-        className={`section-header ${isGoldExpanded ? "section-header-expanded" : ""}`}
+        className={`section-header ${
+          isGoldExpanded ? "section-header-expanded" : ""
+        }`}
         onClick={() => setIsGoldExpanded(!isGoldExpanded)}
       >
         <label
@@ -1967,12 +2773,36 @@ export default function QuickFiltersPage() {
         </h3>
         <span className="section-toggle-icon">
           {isGoldExpanded ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           )}
         </span>
@@ -1980,43 +2810,518 @@ export default function QuickFiltersPage() {
       {isGoldExpanded && (
         <div className="section-content">
           {/* 골드 규칙들 */}
-          {goldSettings.rules.map((rule) => (
-            <div
-              key={rule.id}
-              className="filter-rule-item"
-              style={{
-                opacity: goldSettings.enabled ? 1 : 0.5,
-                filter: goldSettings.enabled ? "none" : "grayscale(100%)",
-              }}
-            >
-              <label className="rule-checkbox">
-                <input
-                  type="checkbox"
-                  checked={rule.enabled}
-                  onChange={() => toggleGoldRule(rule.id)}
-                />
-              </label>
-              <span className="rule-title">{rule.nameKo || rule.name}</span>
-              <button
-                className="rule-edit-button"
-                onClick={() => {
-                  setEditingRuleId(rule.id);
-                  setEditingRuleSection("gold");
-                  setStyleModalOpen(true);
-                }}
+          {goldSettings.rules.map((rule) => {
+            // 지역 레벨 표시: conditions.areaLevel이 있을 때만
+            const showAreaLevel =
+              rule.conditions && rule.conditions.areaLevel;
+
+            // 골드 수량 표시: conditions.stackSize가 있을 때만
+            const showStackSize =
+              rule.conditions && rule.conditions.stackSize;
+            
+            const status = getRuleStatus(rule);
+
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
                 style={{
-                  opacity: goldSettings.enabled ? 1 : 0.5,
-                  cursor: goldSettings.enabled ? "pointer" : "not-allowed",
+                  opacity: goldSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter: goldSettings.enabled && rule.enabled ? "none" : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
                 }}
               >
-                수정
-              </button>
-            </div>
-          ))}
+                <label className="rule-checkbox" style={{ marginRight: "10px" }}>
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleGoldRule(rule.id)}
+                  />
+                </label>
+
+                {/* 텍스트 기반 정보 표시 */}
+                <div style={{ display: "flex", alignItems: "center", flex: 1, gap: "8px", overflow: "hidden" }}>
+                    
+                  {/* 지역 레벨 텍스트 */}
+                  {showAreaLevel && (
+                     <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                        {(() => {
+                            const level = rule.conditions.areaLevel.value;
+                            const operator = rule.conditions.areaLevel.operator || ">=";
+                            
+                            // 연산자에 따른 텍스트 매핑
+                            const operatorText = {
+                                ">=": { ko: "이상", en: "+" },
+                                ">": { ko: "초과", en: ">" },
+                                "<=": { ko: "이하", en: "<=" },
+                                "<": { ko: "미만", en: "<" },
+                                "==": { ko: "", en: "" }, // 같음은 별도 표기 없음
+                                "=": { ko: "", en: "" }
+                            };
+                            
+                            const opKo = operatorText[operator]?.ko ?? "이상";
+                            const opEn = operatorText[operator]?.en ?? "+";
+
+                            if (level >= 65) {
+                                const tier = level - 64;
+                                return lang === "ko" 
+                                    ? `경로석 ${tier} 티어 ${opKo}` 
+                                    : `Waystone Tier ${tier}${opEn}`;
+                            }
+                            return lang === "ko" 
+                                ? `지역레벨 ${level} ${opKo}` 
+                                : `Area Level ${level}${opEn}`;
+                        })()}
+                      </span>
+                  )}
+
+                  {/* 구분자 (둘 다 있을 때만) */}
+                  {showAreaLevel && showStackSize && (
+                     <span style={{ color: "var(--border)", margin: "0 4px" }}>|</span>
+                  )}
+
+                  {/* 골드 수량 텍스트 */}
+                  {showStackSize && (
+                      <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                        {(() => {
+                            const stackValue = rule.conditions.stackSize.value;
+                            const operator = rule.conditions.stackSize.operator || ">=";
+                            
+                            // 연산자에 따른 텍스트 매핑
+                            const operatorText = {
+                                ">=": { ko: "이상", en: "+" },
+                                ">": { ko: "초과", en: ">" },
+                                "<=": { ko: "이하", en: "<=" },
+                                "<": { ko: "미만", en: "<" },
+                                "==": { ko: "", en: "" },
+                                "=": { ko: "", en: "" }
+                            };
+                            
+                            const opKo = operatorText[operator]?.ko ?? "이상";
+                            const opEn = operatorText[operator]?.en ?? "+";
+
+                            return lang === "ko" 
+                                ? `골드 ${stackValue} ${opKo}` 
+                                : `Gold ${stackValue}${opEn}`;
+                        })()}
+                      </span>
+                  )}
+                  
+                  {/* 조건이 없는 기본 규칙인 경우 */}
+                  {!showAreaLevel && !showStackSize && (
+                       <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                        {rule.nameKo || rule.name}
+                      </span>
+                  )}
+
+                  {/* 상태 텍스트 (강조/표시/숨김) */}
+                  <span style={{ 
+                      fontSize: "14px", 
+                      color: status.color,
+                      marginLeft: "8px",
+                      fontWeight: status.fontWeight,
+                      whiteSpace: "nowrap"
+                  }}>
+                      {status.text}
+                  </span>
+                </div>
+
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("gold");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: goldSettings.enabled ? 1 : 0.5,
+                    cursor: goldSettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto"
+                  }}
+                >
+                  수정
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
+
+  // 주얼 섹션 렌더링 함수
+  const renderJewelsSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${
+          isJewelsExpanded ? "section-header-expanded" : ""
+        }`}
+        onClick={() => setIsJewelsExpanded(!isJewelsExpanded)}
+      >
+        <label
+          className="section-checkbox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={jewelsSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              const newEnabled = e.target.checked;
+              setJewelsSettings({
+                ...jewelsSettings,
+                enabled: newEnabled,
+                rules: jewelsSettings.rules.map((rule) => ({
+                  ...rule,
+                  enabled: newEnabled ? true : false,
+                })),
+              });
+            }}
+          />
+        </label>
+        <h3
+          className="section-title"
+          style={{
+            opacity: jewelsSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "주얼" : "Jewels"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isJewelsExpanded ? (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isJewelsExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          {jewelsSettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: jewelsSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter: jewelsSettings.enabled && rule.enabled ? "none" : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <label className="rule-checkbox" style={{ marginRight: "10px" }}>
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleJewelsRule(rule.id)}
+                  />
+                </label>
+
+                <div style={{ display: "flex", alignItems: "center", flex: 1, gap: "8px", overflow: "hidden" }}>
+                  <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                    {rule.nameKo || rule.name}
+                  </span>
+
+                  <span style={{ 
+                    fontSize: "14px", 
+                    color: status.color,
+                    marginLeft: "8px",
+                    fontWeight: status.fontWeight,
+                    whiteSpace: "nowrap"
+                  }}>
+                    {status.text}
+                  </span>
+                </div>
+
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("jewels");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: jewelsSettings.enabled ? 1 : 0.5,
+                    cursor: jewelsSettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto"
+                  }}
+                >
+                  수정
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  // 금고실 열쇠 섹션 렌더링 함수
+  const renderVaultKeysSection = () => {
+    const tierColors = {
+      S: "var(--tier-s)",
+      A: "var(--tier-a)",
+      B: "var(--tier-b)",
+      C: "var(--tier-c)",
+      D: "var(--tier-d)",
+    };
+    const tierOrder = ["S", "A", "B", "C", "D"];
+
+    return (
+      <div className="quick-filter-section" style={{ marginTop: "0" }}>
+        <div
+          className={`section-header ${
+            isVaultKeysExpanded ? "section-header-expanded" : ""
+          }`}
+          onClick={() => setIsVaultKeysExpanded(!isVaultKeysExpanded)}
+        >
+          <label
+            className="section-checkbox"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              checked={vaultKeysSettings.enabled}
+              onChange={(e) => {
+                e.stopPropagation();
+                setVaultKeysSettings({
+                  ...vaultKeysSettings,
+                  enabled: e.target.checked,
+                });
+              }}
+            />
+          </label>
+          <h3
+            className="section-title"
+            style={{
+              opacity: vaultKeysSettings.enabled ? 1 : 0.5,
+            }}
+          >
+            {lang === "ko" ? "금고실 열쇠" : "Vault Keys"}
+          </h3>
+          <span className="section-toggle-icon">
+            {isVaultKeysExpanded ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </span>
+        </div>
+        {isVaultKeysExpanded && (
+          <div className="section-content" style={{ background: "#141414" }}>
+            {/* 티어 선택 버튼들 */}
+            <div className="currency-tier-selection">
+              <div style={{ 
+                padding: "16px 32px",
+                display: "flex", 
+                justifyContent: "space-between", 
+                alignItems: "center",
+              }}>
+                <span style={{ color: "var(--color-gray-300)", fontSize: "14px" }}>
+                  {lang === "ko" ? "금고실 열쇠는 몇 티어까지 보고 싶나요?" : "How many vault key tiers do you want to see?"}
+                </span>
+                <span style={{ color: "var(--color-gray-300)", fontSize: "14px" }}>
+                  {vaultKeysSettings.minTier === "S"
+                    ? lang === "ko" ? "S 티어만 표시" : "S tier only"
+                    : `${vaultKeysSettings.minTier} ${lang === "ko" ? "티어 이상 표시" : "tier or higher"}`}
+                </span>
+              </div>
+              <div style={{ 
+                padding: "0 32px 16px 32px",
+                display: "flex", 
+                gap: "8px", 
+                alignItems: "center",
+                flexWrap: "nowrap"
+              }}>
+                {tierOrder.map((tier) => {
+                  const tierIndex = tierOrder.indexOf(tier);
+                  const minTierIndex = tierOrder.indexOf(vaultKeysSettings.minTier || "D");
+                  const isIncluded = tierIndex <= minTierIndex;
+                  const isSelected = tier === (vaultKeysSettings.minTier || "D");
+                  
+                  let backgroundColor;
+                  let borderColor;
+                  let largeTextColor;
+                  
+                  if (isIncluded) {
+                    backgroundColor = tierColors[tier];
+                    borderColor = isSelected ? "#ffffff" : tierColors[tier];
+                    if (tier === "C" || tier === "D") {
+                      largeTextColor = "#000000";
+                    } else {
+                      largeTextColor = "#ffffff";
+                    }
+                  } else {
+                    backgroundColor = tierColors[tier];
+                    borderColor = "rgba(0, 0, 0, 0.6)";
+                    if (tier === "C" || tier === "D") {
+                      largeTextColor = "#000000";
+                    } else {
+                      largeTextColor = "#ffffff";
+                    }
+                  }
+                  
+                  const boxShadow = isIncluded && !isSelected
+                    ? `0 0 8px ${tierColors[tier]}40`
+                    : isSelected
+                    ? `0 0 12px ${tierColors[tier]}60`
+                    : "none";
+                  
+                  return (
+                    <button
+                      key={tier}
+                      onClick={() => {
+                        if (!vaultKeysSettings.enabled) return;
+                        setVaultKeysSettings({
+                          ...vaultKeysSettings,
+                          minTier: tier,
+                        });
+                      }}
+                      disabled={!vaultKeysSettings.enabled}
+                      className={`currency-tier-button ${
+                        isIncluded ? "currency-tier-active" : "currency-tier-inactive"
+                      }`}
+                      data-included={isIncluded}
+                      style={{
+                        flex: "1",
+                        minWidth: "0",
+                        maxWidth: "120px",
+                        height: "50px",
+                        border: `2px solid ${borderColor}`,
+                        background: backgroundColor,
+                        cursor: vaultKeysSettings.enabled ? "pointer" : "not-allowed",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "4px",
+                        position: "relative",
+                        transition: "all 0.2s",
+                        boxShadow: boxShadow,
+                        overflow: "hidden",
+                      }}
+                    >
+                      {!isIncluded && (
+                        <div
+                          className="currency-tier-overlay"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: "rgba(0, 0, 0, 0.6)",
+                            pointerEvents: "none",
+                            zIndex: 3,
+                          }}
+                        />
+                      )}
+                      {isSelected && (
+                        <div
+                          className="currency-tier-checkbox"
+                          style={{
+                            position: "absolute",
+                            top: "-2px",
+                            right: "-2px",
+                            width: "18px",
+                            height: "18px",
+                            zIndex: 20,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={true}
+                            readOnly
+                            style={{
+                              width: "18px",
+                              height: "18px",
+                              cursor: "default",
+                              margin: 0,
+                              padding: 0,
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div style={{
+                        fontSize: "24px",
+                        fontWeight: "700",
+                        color: largeTextColor,
+                        opacity: 1,
+                      }}>
+                        {tier}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              
+              {/* 아이콘 정보 안내 */}
+              <div style={{
+                padding: "0 32px 16px 32px",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "8px",
+                color: "var(--muted)",
+                fontSize: "14px",
+              }}>
+                <span style={{ fontSize: "16px" }}>💡</span>
+                <span style={{ lineHeight: "1.6" }}>
+                  {lang === "ko" ? (
+                    <>
+                      선택한 티어 이상의 금고실 열쇠만 표시됩니다.
+                      <br />
+                      자세한 아이템 목록과 아이콘은 <strong>화폐 티어 리스트</strong> 페이지에서 확인할 수 있습니다.
+                    </>
+                  ) : (
+                    <>
+                      Only vault keys of the selected tier or higher are displayed.
+                      <br />
+                      Detailed item list and icons can be found in the <strong>Currency Tier List</strong> page.
+                    </>
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <main className="container">
@@ -2041,79 +3346,39 @@ export default function QuickFiltersPage() {
                   return <div key={section.id}>{renderCurrencySection()}</div>;
                 } else if (section.id === "uniques") {
                   return <div key={section.id}>{renderUniquesSection()}</div>;
+                } else if (section.id === "jewels") {
+                  return <div key={section.id}>{renderJewelsSection()}</div>;
                 }
                 return null;
               })}
             </div>
 
-            {/* 오른쪽 열: MY EQUIPMENT */}
+            {/* 오른쪽 열 */}
             <div className="quick-filters-column">
-              <div className="column-header">
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    cursor: "pointer",
-                    flex: 1,
-                  }}
-                >
-                  <h2 className="column-title">
-                    {lang === "ko" ? "내 장비" : "MY EQUIPMENT"}
-                  </h2>
-                </div>
-              </div>
-
-              {/* 여기에 장비 관련 섹션들이 추가될 예정 */}
-              <div className="quick-filter-section">
-                <div className="section-header">
-                  <label
-                    className="section-checkbox"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input type="checkbox" defaultChecked />
-                  </label>
-                  <h3 className="section-title">MY WEAPONS</h3>
-                  <span className="section-toggle-icon">▼</span>
-                </div>
-                <div className="section-content">
-                  <button className="add-item-button">Add Weapon Type</button>
-                </div>
-              </div>
-
-              <div className="quick-filter-section">
-                <div className="section-header">
-                  <label
-                    className="section-checkbox"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input type="checkbox" defaultChecked />
-                  </label>
-                  <h3 className="section-title">MY ARMOUR</h3>
-                  <span className="section-toggle-icon">▼</span>
-                </div>
-                <div className="section-content">
-                  <button className="add-item-button">Add Armour Type</button>
-                </div>
-              </div>
-
-              <div className="quick-filter-section">
-                <div className="section-header">
-                  <label
-                    className="section-checkbox"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input type="checkbox" defaultChecked />
-                  </label>
-                  <h3 className="section-title">MY JEWELLERY</h3>
-                  <span className="section-toggle-icon">▼</span>
-                </div>
-                <div className="section-content">
-                  <button className="add-item-button">
-                    Add Jewellery Type
-                  </button>
-                </div>
-              </div>
+              {rightColumnSections.map((section) => {
+                if (section.id === "jewels") {
+                  return <div key={section.id}>{renderJewelsSection()}</div>;
+                }
+                if (section.id === "gold") {
+                  return <div key={section.id}>{renderGoldSection()}</div>;
+                }
+                if (section.id === "currency") {
+                  return <div key={section.id}>{renderCurrencySection()}</div>;
+                }
+                if (section.id === "uniques") {
+                  return <div key={section.id}>{renderUniquesSection()}</div>;
+                }
+                if (section.id === "class-selection") {
+                  return <div key={section.id}>{renderClassSelectionSection()}</div>;
+                }
+                if (section.id === "league-start") {
+                  return <div key={section.id}>{renderLeagueStartSection()}</div>;
+                }
+                if (section.id === "vaultKeys") {
+                  return <div key={section.id}>{renderVaultKeysSection()}</div>;
+                }
+                return null;
+              })}
             </div>
           </div>
         </div>
@@ -2131,11 +3396,7 @@ export default function QuickFiltersPage() {
           const saved = localStorage.getItem("quickFilter_gold");
           if (saved) {
             setGoldSettings(JSON.parse(saved));
-            alert(
-              lang === "ko"
-                ? "설정을 불러왔습니다!"
-                : "Settings loaded!"
-            );
+            alert(lang === "ko" ? "설정을 불러왔습니다!" : "Settings loaded!");
           } else {
             alert(
               lang === "ko"
@@ -2151,10 +3412,33 @@ export default function QuickFiltersPage() {
         editingRuleId &&
         editingRuleSection &&
         (() => {
-          const editingRule =
-            editingRuleSection === "gold"
-              ? goldSettings.rules.find((r) => r.id === editingRuleId)
-              : currencySettings.rules.find((r) => r.id === editingRuleId);
+          // 금고실 열쇠는 티어 기반 구조이므로 별도 처리
+          let editingRule = null;
+          if (editingRuleSection === "vaultKeys") {
+            const tierMatch = editingRuleId?.match(/^vaultKeys_([SABCD])$/);
+            if (tierMatch) {
+              const tier = tierMatch[1];
+              const tierData = vaultKeysSettings.tiers?.[tier] || {};
+              editingRule = {
+                id: editingRuleId,
+                name: `Vault Keys ${tier} Tier`,
+                nameKo: `금고실 열쇠 ${tier} 티어`,
+                type: "show",
+                styles: tierData.styles || {},
+                conditions: {},
+                enabled: tierData.enabled !== false,
+              };
+            }
+          } else {
+            editingRule =
+              editingRuleSection === "gold"
+                ? goldSettings.rules.find((r) => r.id === editingRuleId)
+                : editingRuleSection === "currency"
+                ? currencySettings.rules.find((r) => r.id === editingRuleId)
+                : editingRuleSection === "jewels"
+                ? jewelsSettings.rules.find((r) => r.id === editingRuleId)
+                : uniquesSettings.rules.find((r) => r.id === editingRuleId);
+          }
           if (!editingRule) return null;
 
           // styles를 JSON.stringify로 직렬화하여 변경 감지
@@ -2162,7 +3446,7 @@ export default function QuickFiltersPage() {
 
           return (
             <StyleSettingsModal
-              key={`${editingRuleId}-${stylesKey}`} // editingRuleId와 styles를 함께 key로 사용
+              key={editingRuleId} // stylesKey 제거: 스타일 변경 시 모달이 리마운트되어 콜백이 중단되는 문제 방지
               isOpen={styleModalOpen}
               onClose={() => {
                 setStyleModalOpen(false);
@@ -2171,78 +3455,261 @@ export default function QuickFiltersPage() {
               }}
               styles={editingRule.styles || {}}
               onChange={(newStyles) => {
-                // 스타일 전체를 한 번에 업데이트
-                if (editingRuleSection === "gold") {
-                  const updatedSettings = {
-                    ...goldSettings,
-                    rules: goldSettings.rules.map((rule) =>
-                      rule.id === editingRuleId
+                // 함수형 업데이트 패턴 사용: stale closure 방지
+                // editingRuleId와 editingRuleSection은 이 시점에 유효함 (IIFE 내부)
+                const ruleId = editingRuleId; // 현재 값 캡처
+                const section = editingRuleSection; // 현재 값 캡처
+                
+                if (section === "vaultKeys") {
+                  // 금고실 열쇠는 티어 기반 구조
+                  const tierMatch = ruleId?.match(/^vaultKeys_([SABCD])$/);
+                  if (tierMatch) {
+                    const tier = tierMatch[1];
+                    setVaultKeysSettings(prev => ({
+                      ...prev,
+                      tiers: {
+                        ...prev.tiers,
+                        [tier]: {
+                          ...prev.tiers[tier],
+                          styles: newStyles,
+                        },
+                      },
+                    }));
+                  }
+                } else if (section === "gold") {
+                  setGoldSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
                         ? { ...rule, styles: newStyles }
                         : rule
                     ),
-                  };
-                  setGoldSettings(updatedSettings);
-                } else if (editingRuleSection === "currency") {
-                  const updatedSettings = {
-                    ...currencySettings,
-                    rules: currencySettings.rules.map((rule) =>
-                      rule.id === editingRuleId
+                  }));
+                } else if (section === "currency") {
+                  setCurrencySettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
                         ? { ...rule, styles: newStyles }
                         : rule
                     ),
-                  };
-                  setCurrencySettings(updatedSettings);
+                  }));
+                } else if (section === "uniques") {
+                  setUniquesSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, styles: newStyles }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "jewels") {
+                  setJewelsSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, styles: newStyles }
+                        : rule
+                    ),
+                  }));
                 }
               }}
-              itemName={editingRuleSection === "gold" ? "Gold" : "Currency"}
-              baseType={editingRuleSection === "gold" ? "Gold" : "Currency"}
+              itemName={
+                editingRuleSection === "gold"
+                  ? "Gold"
+                  : editingRuleSection === "currency"
+                  ? "Currency"
+                  : editingRuleSection === "jewels"
+                  ? "Jewels"
+                  : editingRuleSection === "vaultKeys"
+                  ? "Vault Keys"
+                  : "Unique"
+              }
+              baseType={
+                editingRuleSection === "gold"
+                  ? "Gold"
+                  : editingRuleSection === "currency"
+                  ? "Currency"
+                  : editingRuleSection === "jewels"
+                  ? "Jewels"
+                  : editingRuleSection === "vaultKeys"
+                  ? "Vault Keys"
+                  : "Unique"
+              }
               title={editingRule.nameKo || editingRule.name}
               onTitleChange={(newTitle) => {
-                if (editingRuleSection === "gold") {
-                  const updatedSettings = {
-                    ...goldSettings,
-                    rules: goldSettings.rules.map((rule) =>
-                      rule.id === editingRuleId
+                // 함수형 업데이트 패턴 사용: stale closure 방지
+                const ruleId = editingRuleId;
+                const section = editingRuleSection;
+                
+                if (section === "gold") {
+                  setGoldSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
                         ? { ...rule, nameKo: newTitle, name: newTitle }
                         : rule
                     ),
-                  };
-                  setGoldSettings(updatedSettings);
-                } else if (editingRuleSection === "currency") {
-                  const updatedSettings = {
-                    ...currencySettings,
-                    rules: currencySettings.rules.map((rule) =>
-                      rule.id === editingRuleId
+                  }));
+                } else if (section === "currency") {
+                  setCurrencySettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
                         ? { ...rule, nameKo: newTitle, name: newTitle }
                         : rule
                     ),
-                  };
-                  setCurrencySettings(updatedSettings);
+                  }));
+                } else if (section === "uniques") {
+                  setUniquesSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, nameKo: newTitle, name: newTitle }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "jewels") {
+                  setJewelsSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, nameKo: newTitle, name: newTitle }
+                        : rule
+                    ),
+                  }));
                 }
               }}
               conditions={editingRule.conditions || {}}
               onConditionsChange={(newConditions) => {
-                // 조건 전체를 한 번에 업데이트
-                if (editingRuleSection === "gold") {
-                  const updatedSettings = {
-                    ...goldSettings,
-                    rules: goldSettings.rules.map((rule) =>
-                      rule.id === editingRuleId
+                // 함수형 업데이트 패턴 사용: stale closure 방지
+                const ruleId = editingRuleId;
+                const section = editingRuleSection;
+                
+                if (section === "gold") {
+                  setGoldSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
                         ? { ...rule, conditions: newConditions }
                         : rule
                     ),
-                  };
-                  setGoldSettings(updatedSettings);
-                } else if (editingRuleSection === "currency") {
-                  const updatedSettings = {
-                    ...currencySettings,
-                    rules: currencySettings.rules.map((rule) =>
-                      rule.id === editingRuleId
+                  }));
+                } else if (section === "currency") {
+                  setCurrencySettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
                         ? { ...rule, conditions: newConditions }
                         : rule
                     ),
-                  };
-                  setCurrencySettings(updatedSettings);
+                  }));
+                } else if (section === "uniques") {
+                  setUniquesSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, conditions: newConditions }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "jewels") {
+                  setJewelsSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, conditions: newConditions }
+                        : rule
+                    ),
+                  }));
+                }
+              }}
+              enabled={editingRule.enabled !== false}
+              onEnabledChange={(newEnabled) => {
+                // 함수형 업데이트 패턴 사용: stale closure 방지
+                const ruleId = editingRuleId;
+                const section = editingRuleSection;
+                
+                if (section === "gold") {
+                  setGoldSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "currency") {
+                  setCurrencySettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "uniques") {
+                  setUniquesSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "jewels") {
+                  setJewelsSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                }
+              }}
+              ruleType={editingRule.type || "show"}
+              onRuleTypeChange={(newType) => {
+                // 함수형 업데이트 패턴 사용: stale closure 방지
+                const ruleId = editingRuleId;
+                const section = editingRuleSection;
+                
+                if (section === "gold") {
+                  setGoldSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, type: newType }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "currency") {
+                  setCurrencySettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, type: newType }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "uniques") {
+                  setUniquesSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, type: newType }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "jewels") {
+                  setJewelsSettings(prev => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, type: newType }
+                        : rule
+                    ),
+                  }));
                 }
               }}
               additionalRules={[]}
@@ -2338,7 +3805,6 @@ export default function QuickFiltersPage() {
           gap: 0;
         }
 
-
         .leveling-disabled-message {
           padding: 16px;
           text-align: center;
@@ -2353,7 +3819,6 @@ export default function QuickFiltersPage() {
           flex-direction: column !important;
           gap: 12px !important;
         }
-
 
         .leveling-class-dropdown-wrapper {
           width: 100% !important;
@@ -2540,8 +4005,8 @@ export default function QuickFiltersPage() {
         .leveling-dropdown-item.selected,
         div.leveling-dropdown-item.selected,
         button.leveling-dropdown-item.selected {
-          background: #3E63DD !important;
-          background-color: #3E63DD !important;
+          background: #3e63dd !important;
+          background-color: #3e63dd !important;
           color: #ffffff !important;
           color: rgb(255, 255, 255) !important;
         }
@@ -2687,8 +4152,8 @@ export default function QuickFiltersPage() {
 
         .leveling-dropdown-item-multi.selected,
         div.leveling-dropdown-item-multi.selected {
-          background: #3E63DD !important;
-          background-color: #3E63DD !important;
+          background: #3e63dd !important;
+          background-color: #3e63dd !important;
           color: #ffffff !important;
           color: rgb(255, 255, 255) !important;
           font-weight: 400 !important;
@@ -2707,7 +4172,7 @@ export default function QuickFiltersPage() {
           right: 0 !important;
           margin-top: 4px !important;
           padding: 6px 10px !important;
-          background: #3E63DD !important;
+          background: #3e63dd !important;
           border: 1px solid var(--border) !important;
           border-radius: 0 !important;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
@@ -3118,7 +4583,6 @@ export default function QuickFiltersPage() {
           position: relative;
           z-index: 1;
         }
-
       `}</style>
     </main>
   );

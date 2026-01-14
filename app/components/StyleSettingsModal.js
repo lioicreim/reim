@@ -67,7 +67,9 @@ export default function StyleSettingsModal({
   conditions = {},
   onConditionsChange,
   ruleType = "show",
-  onRuleTypeChange = null
+  onRuleTypeChange = null,
+  enabled = true,
+  onEnabledChange = null
 }) {
   // 인게임 기본값 상수
   const DEFAULT_TEXT_COLOR = { r: 171, g: 159, b: 130, a: 255 }; // #ab9f82
@@ -87,6 +89,11 @@ export default function StyleSettingsModal({
     2: "custom_sound/3_currency_b.mp3", // B, C 모두 slot 2
   };
   
+  /* -------------------------------
+   * quality input ref
+   * ------------------------------- */
+  const qualityInputRef = useRef(null);
+
   const [localStyles, setLocalStyles] = useState(() => {
     // styles가 null 값을 덮어씌우는 것을 방지하기 위해 기본값 보장
     return {
@@ -106,12 +113,13 @@ export default function StyleSettingsModal({
       soundPlatform: null,
       soundType: "default",
       ...styles,
-      // null 값이 덮어씌워지지 않도록 기본값 보장
-      textColor: styles.textColor || DEFAULT_TEXT_COLOR,
+      // null 값이 덮어씌워지지 않도록 기본값 보장 (체크 해제 상태 유지) - ?? 사용
+      textColor: styles.textColor ?? DEFAULT_TEXT_COLOR,
       borderColor: styles.borderColor ?? null,
+      backgroundColor: styles.backgroundColor ?? { r: 0, g: 0, b: 0, a: 255 },
       // soundType과 soundPlatform 설정
       soundPlatform: styles.soundPlatform ?? (styles.customSound ? "PC" : null),
-      soundType: styles.soundPlatform === "PS5" ? "default" : (styles.customSound ? "custom" : "default")
+      soundType: styles.soundPlatform === "PS5" ? "default" : (styles.channel ? "default" : (styles.soundType || (styles.customSound ? "custom" : "default")))
     };
   });
 
@@ -125,6 +133,11 @@ export default function StyleSettingsModal({
   
   // 초기 스타일 저장 (모달 열 때의 값)
   const [initialStyles, setInitialStyles] = useState(null);
+  const [initialTitle, setInitialTitle] = useState("");
+  const [initialConditionsSnapshot, setInitialConditionsSnapshot] = useState({});
+  const [initialRulesSnapshot, setInitialRulesSnapshot] = useState([]);
+  const [initialRuleTypeSnapshot, setInitialRuleTypeSnapshot] = useState("show");
+  const [initialEnabledSnapshot, setInitialEnabledSnapshot] = useState(true);
   
   // 붙여넣기 프리뷰 상태
   const [pastePreview, setPastePreview] = useState(null);
@@ -171,9 +184,10 @@ export default function StyleSettingsModal({
       // 초기 스타일 저장 (모달 열 때의 값)
       const initial = {
         fontSize: styles.fontSize ?? 30,
-        textColor: styles.textColor || DEFAULT_TEXT_COLOR,
+        // null 값(체크 해제)을 보존하기 위해 ?? 사용. undefined일 때만 기본값 적용.
+        textColor: styles.textColor ?? DEFAULT_TEXT_COLOR,
         borderColor: styles.borderColor ?? null,
-        backgroundColor: styles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 },
+        backgroundColor: styles.backgroundColor ?? { r: 0, g: 0, b: 0, a: 255 },
         playEffect: styles.playEffect ?? null,
         minimapIcon: styles.minimapIcon || {
           size: null,
@@ -184,11 +198,16 @@ export default function StyleSettingsModal({
         ps5Sound: styles.ps5Sound ?? null,
         ps5SoundVolume: styles.ps5SoundVolume ?? 300,
         soundPlatform: styles.soundPlatform ?? (styles.customSound ? "PC" : null),
-        soundType: styles.soundPlatform === "PS5" ? "default" : (styles.customSound ? "custom" : "default"),
+        soundType: styles.soundPlatform === "PS5" ? "default" : (styles.soundType || (styles.customSound ? "custom" : "default")),
         ruleType: ruleType || "show",
         ...styles
       };
       setInitialStyles(initial);
+      setInitialTitle(title || "");
+      setInitialConditionsSnapshot(conditions || {});
+      setInitialRulesSnapshot(additionalRules || []);
+      setInitialRuleTypeSnapshot(ruleType || "show");
+      setInitialEnabledSnapshot(enabled);
       
       // localStyles 업데이트
       setLocalStyles(initial);
@@ -208,11 +227,10 @@ export default function StyleSettingsModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const handleStyleChange = (key, value) => {
-    const newStyles = { ...localStyles, [key]: value };
-    setLocalStyles(newStyles);
+    // 함수형 업데이트 패턴 사용: 이전 상태를 기반으로 새 상태 생성
+    // 이렇게 하면 빠른 연속 변경 시 stale closure 문제 방지
+    setLocalStyles(prev => ({ ...prev, [key]: value }));
   };
 
   const handleTitleChange = (newTitle) => {
@@ -220,12 +238,25 @@ export default function StyleSettingsModal({
   };
 
   const handleConditionChange = (conditionKey, field, value) => {
-    const newConditions = { ...localConditions };
-    if (!newConditions[conditionKey]) {
-      newConditions[conditionKey] = {};
-    }
-    newConditions[conditionKey][field] = value;
-    setLocalConditions(newConditions);
+    // 함수형 업데이트 패턴 사용
+    setLocalConditions(prev => {
+      const newConditions = { ...prev };
+      if (!newConditions[conditionKey]) {
+        newConditions[conditionKey] = {};
+      }
+      // 객체 깊은 복사를 위해 spread 연산자 사용
+      if (typeof newConditions[conditionKey] === 'object') {
+        newConditions[conditionKey] = { ...newConditions[conditionKey] };
+      }
+      newConditions[conditionKey][field] = value;
+      
+      // 즉시 부모에게 변경사항 전파 (실시간 프리뷰/리스트 반영을 위해)
+      if (onConditionsChange) {
+        onConditionsChange(newConditions);
+      }
+      
+      return newConditions;
+    });
   };
 
   const handleApply = () => {
@@ -249,8 +280,11 @@ export default function StyleSettingsModal({
   };
 
   const handleMinimapIconChange = (key, value) => {
-    const newMinimapIcon = { ...localStyles.minimapIcon, [key]: value };
-    handleStyleChange("minimapIcon", newMinimapIcon);
+    // 함수형 업데이트 패턴 사용
+    setLocalStyles(prev => ({
+      ...prev,
+      minimapIcon: { ...prev.minimapIcon, [key]: value }
+    }));
   };
 
   // 복사 기능
@@ -339,41 +373,39 @@ export default function StyleSettingsModal({
     }
   };
 
-  // 초기화 기능
+  // 초기화 기능 (기본값으로 복원)
   const handleReset = () => {
-    if (!initialStyles) return;
-    
-    setLocalStyles({
-      fontSize: initialStyles.fontSize ?? 30,
-      textColor: initialStyles.textColor || DEFAULT_TEXT_COLOR,
-      borderColor: initialStyles.borderColor ?? null,
-      backgroundColor: initialStyles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 },
-      playEffect: initialStyles.playEffect ?? null,
-      minimapIcon: initialStyles.minimapIcon || {
-        size: null,
-        color: null,
-        shape: null
-      },
-      customSound: initialStyles.customSound ?? null,
-      ps5Sound: initialStyles.ps5Sound ?? null,
-      ps5SoundVolume: initialStyles.ps5SoundVolume ?? 300,
-      soundPlatform: initialStyles.soundPlatform ?? (initialStyles.customSound ? "PC" : null),
-      soundType: initialStyles.soundPlatform === "PS5" ? "default" : (initialStyles.soundType || (initialStyles.customSound ? "custom" : "default")),
-    });
-    
-    if (initialStyles.ruleType) {
-      setLocalRuleType(initialStyles.ruleType);
-    }
-    if (onTitleChange && title !== undefined) {
-      setLocalTitle(title || "");
-    }
-    if (onConditionsChange) {
-      setLocalConditions(conditions || {});
-    }
-    if (onRulesChange) {
-      setLocalRules(additionalRules || []);
-    }
+    // "처음 입력된 필터값(=모달 오픈 시점 스냅샷)"으로 되돌리기
+    const nextStyles = initialStyles || {
+      fontSize: 30,
+      textColor: DEFAULT_TEXT_COLOR,
+      borderColor: null,
+      backgroundColor: { r: 0, g: 0, b: 0, a: 255 },
+      playEffect: null,
+      minimapIcon: { size: null, color: null, shape: null },
+      customSound: null,
+      ps5Sound: null,
+      ps5SoundVolume: 300,
+      soundPlatform: null,
+      soundType: "default",
+      ruleType: "show"
+    };
+
+    setLocalStyles(nextStyles);
+    setLocalTitle(initialTitle || "");
+    setLocalConditions(initialConditionsSnapshot || {});
+    setLocalRules(initialRulesSnapshot || []);
+    setLocalRuleType(initialRuleTypeSnapshot || "show");
+    setAreaLevelInputMode(false);
+
+    // 이 모달에서 일부 값은 실시간으로 부모 상태에 반영되므로(조건/추가규칙/활성/타입),
+    // 초기화 시에도 부모에 스냅샷을 다시 동기화한다.
+    if (onConditionsChange) onConditionsChange(initialConditionsSnapshot || {});
+    if (onRulesChange) onRulesChange(initialRulesSnapshot || []);
+    if (onRuleTypeChange) onRuleTypeChange(initialRuleTypeSnapshot || "show");
+    if (onEnabledChange) onEnabledChange(!!initialEnabledSnapshot);
   };
+
 
   // 사용 가능한 추가 규칙 목록
   const getAvailableRules = () => {
@@ -504,6 +536,129 @@ export default function StyleSettingsModal({
     { value: "UpsideDownHouse", label: "역방향 집", labelEn: "UpsideDownHouse" }
   ];
 
+  /* -------------------------------
+   * sound options 정의 (추가됨)
+   * ------------------------------- */
+  const pcSoundOptions = [
+    { value: null, label: "없음", labelEn: "None" },
+    { value: "custom_sound/1_currency_s.mp3", label: "사운드 1 (S)", labelEn: "Sound 1 (S)" },
+    { value: "custom_sound/2_currency_a.mp3", label: "사운드 2 (A)", labelEn: "Sound 2 (A)" },
+    { value: "custom_sound/3_currency_b.mp3", label: "사운드 3 (B)", labelEn: "Sound 3 (B)" },
+    { value: "custom_sound/4_currency_c.mp3", label: "사운드 4 (C)", labelEn: "Sound 4 (C)" },
+    // 필요 시 추가
+  ];
+
+  const ps5SoundOptions = [
+    { value: null, label: "없음", labelEn: "None" },
+    // 0~16 (일부 값 예시)
+    { value: 1, label: "슬롯 1", labelEn: "Slot 1" },
+    { value: 2, label: "슬롯 2", labelEn: "Slot 2" },
+    { value: 3, label: "슬롯 3", labelEn: "Slot 3" },
+    { value: 4, label: "슬롯 4", labelEn: "Slot 4" },
+    { value: 5, label: "슬롯 5", labelEn: "Slot 5" },
+    { value: 10, label: "슬롯 10", labelEn: "Slot 10" },
+    { value: 16, label: "슬롯 16", labelEn: "Slot 16" }
+  ];
+
+  // 퀄리티 입력 필드 스크롤 방지 (비수동 리스너) -- 기존 코드 유지
+  useEffect(() => {
+    const input = qualityInputRef.current;
+    if (input) {
+      const handleWheel = (e) => {
+        if (document.activeElement === input) {
+          e.preventDefault();
+          
+          // 수동 값 변경 (스크롤은 막고 값은 변경)
+          const delta = e.deltaY < 0 ? 1 : -1;
+          
+          setLocalConditions(prev => {
+            const newConditions = { ...prev };
+            // 현재 값 가져오기
+            let currentVal = 0;
+            if (typeof prev.quality === 'object') {
+              currentVal = prev.quality?.value || prev.quality?.min || 0;
+            } else {
+              currentVal = prev.quality || 0;
+            }
+            
+            const newVal = Math.max(0, currentVal + delta);
+            
+            if (typeof newConditions.quality === 'object') {
+               newConditions.quality = { ...newConditions.quality, min: newVal, value: newVal };
+            } else {
+               newConditions.quality = newVal;
+            }
+            return newConditions;
+          });
+        }
+      };
+      // passive: false로 설정
+      input.addEventListener("wheel", handleWheel, { passive: false });
+      return () => {
+        input.removeEventListener("wheel", handleWheel);
+      };
+    }
+  }, [localConditions.quality]);
+
+  // 골드 입력 필드 스크롤 방지용 refs
+  const goldInputRefs = useRef({ areaLevel: null, stackSize: null });
+
+  // 골드 입력 필드 스크롤 방지 Effect
+  useEffect(() => {
+    const handleGoldInputWheel = (e, key) => {
+        const input = goldInputRefs.current[key];
+        // 마우스 오버 상태에서도 동작하도록 activeElement 체크 제거
+        if (input) {
+            e.preventDefault(); // 브라우저 스크롤 방지
+            
+            // 휠 방향에 따라 값 증감 (deltaY < 0 이면 위로 스크롤 -> 값 증가)
+            const delta = e.deltaY < 0 ? 1 : -1;
+            
+            // 현재 값 가져오기
+            const currentConditions = localConditions[key];
+            let currentVal = 0;
+            
+            if (currentConditions && typeof currentConditions.value === 'number') {
+                currentVal = currentConditions.value;
+            } else if (key === 'areaLevel') {
+                 // 지역 레벨 기본값 (없을 경우)
+                 currentVal = 65; 
+            }
+
+            // 새 값 계산 (최소값 0, 지역레벨은 1)
+            const minVal = key === 'areaLevel' ? 1 : 0;
+            const newVal = Math.max(minVal, currentVal + delta);
+            
+            // 값 변경 핸들러 호출
+            // handleConditionChange는 컴포넌트 스코프의 함수 사용
+            // localConditions가 의존성에 있으므로 최신 상태 반영됨
+            handleConditionChange(key, "value", newVal);
+        }
+    };
+
+    const areaLevelInput = goldInputRefs.current.areaLevel;
+    const stackSizeInput = goldInputRefs.current.stackSize;
+
+    const areaHandler = (e) => handleGoldInputWheel(e, "areaLevel");
+    const stackHandler = (e) => handleGoldInputWheel(e, "stackSize");
+
+    if (areaLevelInput) {
+        areaLevelInput.addEventListener("wheel", areaHandler, { passive: false });
+    }
+    if (stackSizeInput) {
+        stackSizeInput.addEventListener("wheel", stackHandler, { passive: false });
+    }
+
+    return () => {
+        if (areaLevelInput) areaLevelInput.removeEventListener("wheel", areaHandler);
+        if (stackSizeInput) stackSizeInput.removeEventListener("wheel", stackHandler);
+    };
+  }, [localConditions, areaLevelInputMode]); // 리렌더링 될 때마다 이벤트 리스너 다시 부착
+
+  // Hook 호출 순서를 보장하기 위해(ESLint rules-of-hooks),
+  // 조기 return은 모든 Hook 선언 이후에 배치
+  if (!isOpen) return null;
+
   return (
     <div className="style-settings-modal">
       <div className="style-settings-overlay" onClick={onClose}></div>
@@ -511,35 +666,6 @@ export default function StyleSettingsModal({
       <div className="style-settings-content" ref={modalContentRef}>
         {/* 프리뷰 영역 (여백 없음) */}
         <div className="style-preview-panel">
-          {/* 체크박스와 제목을 프리뷰 위에 오버레이 (왼쪽 위) */}
-          <div className="style-preview-overlay-title">
-            <input
-              type="checkbox"
-              id="rule-type-checkbox"
-              className="color-checkbox"
-              checked={localRuleType === "show"}
-              onChange={(e) => {
-                const newRuleType = e.target.checked ? "show" : "hide";
-                setLocalRuleType(newRuleType);
-                if (onRuleTypeChange) {
-                  onRuleTypeChange(newRuleType);
-                }
-              }}
-            />
-            {title !== undefined && onTitleChange ? (
-              <input
-                type="text"
-                className="style-title-input"
-                value={localTitle}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder="규칙 제목"
-              />
-            ) : (
-              <h2 className={localRuleType === "hide" ? "title-disabled" : ""}>
-                {localRuleType === "show" ? "Show" : "Hide"}
-              </h2>
-            )}
-          </div>
           {/* 닫기 버튼을 프리뷰 위에 오버레이 (오른쪽 위) */}
           <button className="close-button preview-close-button" onClick={onClose}>×</button>
           <ItemPreviewBox
@@ -555,6 +681,55 @@ export default function StyleSettingsModal({
 
         {/* 아래 영역 (여백 유지) */}
         <div className="style-settings-body">
+          {/* 상단: 규칙 모드(비활성/표시/숨김) + 제목 (프리뷰 아래로 이동) */}
+          <div className="style-top-controls">
+            {(onRuleTypeChange || onEnabledChange) && (
+              <div className="rule-mode-row">
+                <select
+                  className="style-select rule-mode-select"
+                  value={onEnabledChange && !enabled ? "disabled" : localRuleType}
+                  onChange={(e) => {
+                    const val = e.target.value;
+
+                    if (val === "disabled") {
+                      // 체크리스트 미체크 상태(=필터 적용 안 함)
+                      if (onEnabledChange) onEnabledChange(false);
+                      return;
+                    }
+
+                    // 표시/숨김 선택 시 체크리스트는 자동 체크되어야 함
+                    if (onEnabledChange) onEnabledChange(true);
+
+                    // Show/Hide 타입 반영
+                    setLocalRuleType(val);
+                    if (onRuleTypeChange) onRuleTypeChange(val);
+                  }}
+                >
+                  {onEnabledChange && (
+                    <option value="disabled">{lang === "ko" ? "비활성" : "Disabled"}</option>
+                  )}
+                  <option value="show">{lang === "ko" ? "표시" : "Show"}</option>
+                  <option value="hide">{lang === "ko" ? "숨김" : "Hide"}</option>
+                </select>
+              </div>
+            )}
+
+            {title !== undefined && onTitleChange ? (
+              <input
+                type="text"
+                className="style-title-input"
+                value={localTitle}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="규칙 제목"
+                disabled={!enabled}
+              />
+            ) : (
+              <span style={{ fontWeight: 700, fontSize: "16px", color: enabled ? "var(--text)" : "var(--muted)" }}>
+                {lang === "ko" ? "스타일 설정" : "Style Settings"}
+              </span>
+            )}
+          </div>
+
           {/* 공통 기본 규칙 (프리뷰 아래) */}
           <div className="style-settings-panel">
             {/* 폰트 / 테두리 / 배경 (한 줄) */}
@@ -580,6 +755,7 @@ export default function StyleSettingsModal({
                   <ColorPicker
                     color={localStyles.textColor || DEFAULT_TEXT_COLOR}
                     onChange={(color) => handleStyleChange("textColor", color)}
+                    onPreview={(color) => handleStyleChange("textColor", color)}
                     showCheckbox={false}
                     checked={localStyles.textColor !== null}
                     modalRef={modalContentRef}
@@ -627,6 +803,7 @@ export default function StyleSettingsModal({
                     <ColorPicker
                       color={localStyles.borderColor || DEFAULT_BORDER_COLOR}
                       onChange={(color) => handleStyleChange("borderColor", color)}
+                      onPreview={(color) => handleStyleChange("borderColor", color)}
                       showCheckbox={false}
                       checked={localStyles.borderColor !== null}
                       modalRef={modalContentRef}
@@ -652,6 +829,7 @@ export default function StyleSettingsModal({
                     <ColorPicker
                       color={localStyles.backgroundColor || { r: 0, g: 0, b: 0, a: 255 }}
                       onChange={(color) => handleStyleChange("backgroundColor", color)}
+                      onPreview={(color) => handleStyleChange("backgroundColor", color)}
                       showCheckbox={false}
                       checked={localStyles.backgroundColor !== null}
                       modalRef={modalContentRef}
@@ -757,13 +935,26 @@ export default function StyleSettingsModal({
                   className="style-select minimap-inline-select"
                   value={localStyles.playEffect || ""}
                   onChange={(e) => handleStyleChange("playEffect", e.target.value || null)}
+                  style={{
+                    color: localStyles.playEffect ? colorValueMap[localStyles.playEffect] || "var(--text)" : "var(--text)"
+                  }}
                   disabled={localStyles.playEffect === null}
                 >
-                  {playEffectOptions.map((option) => (
-                    <option key={option.value || "none"} value={option.value || ""}>
-                      {lang === "ko" ? option.label : option.labelEn}
-                    </option>
-                  ))}
+                  {playEffectOptions.map((option) => {
+                    const colorValue = option.value ? colorValueMap[option.value] : null;
+                    return (
+                        <option 
+                            key={option.value || "none"} 
+                            value={option.value || ""}
+                            style={{
+                                color: colorValue || "var(--text)",
+                                backgroundColor: "var(--panel2)"
+                            }}
+                        >
+                        {lang === "ko" ? option.label : option.labelEn}
+                        </option>
+                    );
+                  })}
                 </select>
               </div>
             </div>
@@ -918,135 +1109,350 @@ export default function StyleSettingsModal({
                 {localStyles.soundType === "default" && (
                   <>
                     <select
-                      className="style-select sound-slot-select"
-                      value={localStyles.ps5Sound || ""}
-                      onChange={(e) => handleStyleChange("ps5Sound", e.target.value ? parseInt(e.target.value) : null)}
-                      disabled={!localStyles.ps5Sound && !localStyles.customSound}
+                      className="style-select sound-select"
+                      value={localStyles.soundType === "default"
+                        ? (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound ? "" : (localStyles.ps5Sound ? "" : (localStyles.customSound || ""))))
+                        : (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound || ""))}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (!value) return; // "없음" 선택 시 처리 안함 (체크박스로만 해제)
+
+                        const isPC = localStyles.soundPlatform === "PC";
+
+                        if (isPC) {
+                          handleStyleChange("customSound", value);
+                          handleStyleChange("ps5Sound", null);
+                        } else {
+                          handleStyleChange("ps5Sound", parseInt(value));
+                          handleStyleChange("customSound", null);
+                        }
+                      }}
+                      disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
                     >
-                      <option value="">{lang === "ko" ? "슬롯" : "Slot"}</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(slot => (
-                        <option key={slot} value={slot}>{slot}</option>
+                      {(localStyles.soundPlatform === "PS5" ? ps5SoundOptions : pcSoundOptions).map((option) => (
+                        <option key={option.value || "none"} value={option.value || ""}>
+                          {lang === "ko" ? option.label : option.labelEn}
+                        </option>
                       ))}
                     </select>
                     <select
-                      className="style-select sound-volume-select"
-                      value={localStyles.ps5SoundVolume || 300}
-                      onChange={(e) => handleStyleChange("ps5SoundVolume", parseInt(e.target.value))}
-                      disabled={!localStyles.ps5Sound && !localStyles.customSound}
-                    >
-                      <option value={100}>100</option>
-                      <option value={200}>200</option>
-                      <option value={300}>300</option>
-                    </select>
+                       className="style-select sound-volume-select" // 볼륨 조절 (PS5 전용 등)
+                       style={{ display: localStyles.soundPlatform === "PS5" ? "block" : "none" }}
+                       value={localStyles.ps5SoundVolume || 300}
+                       onChange={(e) => handleStyleChange("ps5SoundVolume", parseInt(e.target.value))}
+                       disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
+                     >
+                       <option value="300">300 (최대)</option>
+                       <option value="250">250</option>
+                       <option value="200">200</option>
+                       <option value="150">150</option>
+                       <option value="100">100</option>
+                       <option value="50">50</option>
+                     </select>
                   </>
                 )}
               </div>
             </div>
+
+            {/* 퀄리티 조건 설정 (별도 그룹으로 이동) */}
+            {(localConditions.quality !== undefined || title === "퀄리티") && (
+              <div className="style-setting-group">
+                <div className="quality-condition-ui" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <input
+                    type="checkbox"
+                    id="quality-checkbox"
+                    className="color-checkbox"
+                    checked={localConditions.quality !== undefined && localConditions.quality !== null}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        handleConditionChange("quality", "value", 23);
+                        handleConditionChange("quality", "min", 23);
+                      } else {
+                        const newConditions = { ...localConditions };
+                        delete newConditions.quality;
+                        setLocalConditions(newConditions);
+                      }
+                    }}
+                  />
+                  <label htmlFor="quality-checkbox" className="style-setting-label-inline">
+                      <span>{lang === "ko" ? "퀄리티" : "Quality"}</span>
+                  </label>
+                  <input
+                    ref={qualityInputRef}
+                    type="number"
+                    className="font-size-input"
+                    style={{ width: "60px" }}
+                    value={localConditions.quality?.min || localConditions.quality?.value || localConditions.quality || 0}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 0;
+                      const newConditions = { ...localConditions };
+                      if (typeof newConditions.quality === 'object') {
+                          newConditions.quality = { ...newConditions.quality, min: val, value: val };
+                      } else {
+                          newConditions.quality = val;
+                      }
+                      setLocalConditions(newConditions);
+                    }}
+                    disabled={localConditions.quality === undefined || localConditions.quality === null}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 공통이 아닌 규칙 (맨 아래) */}
-          {baseType === "Gold" && (conditions !== undefined && onConditionsChange) && (
-            <div className="style-setting-group condition-settings-group">
-              <label className="style-setting-label">
-                <span>조건 설정</span>
-              </label>
               
-              {/* StackSize 조건 */}
-              {localConditions.stackSize && (
-                <div className="condition-row-with-slider">
-                  <div className="condition-label-wrapper">
-                    <span className="condition-label">골드</span>
-                    <select
-                      className="condition-operator"
-                      value={localConditions.stackSize.operator || ">="}
-                      onChange={(e) => handleConditionChange("stackSize", "operator", e.target.value)}
-                    >
-                      <option value=">=">≥</option>
-                      <option value="<=">≤</option>
-                      <option value=">">&gt;</option>
-                      <option value="<">&lt;</option>
-                      <option value="==">==</option>
-                    </select>
-                  </div>
-                  <div className="condition-slider-wrapper">
-                    <OperatorSlider
-                      value={localConditions.stackSize.value || 0}
-                      onChange={(newValue) => handleConditionChange("stackSize", "value", newValue)}
-                      operator={localConditions.stackSize.operator || ">="}
-                      min={0}
-                      max={10000}
-                      step={10}
-                    />
-                  </div>
-                </div>
-              )}
+              {/* 조건 설정 섹션 (가로 분리선 + 텍스트) */}
+              {(isGear || baseType === "Gold") && (
+                <div className="condition-settings-group">
+                   <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "16px 0 12px 0" }}>
+                      <div style={{ flex: 1, height: "1px", background: "var(--border)" }}></div>
+                      <span style={{ fontSize: "12px", color: "var(--muted)", fontWeight: "500" }}>
+                        {lang === "ko" ? "조건 설정" : "Condition Settings"}
+                      </span>
+                      <div style={{ flex: 1, height: "1px", background: "var(--border)" }}></div>
+                   </div>
 
-                  {/* AreaLevel 조건 */}
-                  {localConditions.areaLevel && (() => {
-                    const areaLevel = localConditions.areaLevel.value || 0;
-                    const pathTier = areaLevelToPathTier(areaLevel);
-                    const isPathTier = pathTier !== null && !areaLevelInputMode;
-                    
+                  {(() => {
+                    // Gold 타입이면 항상 전용 UI 표시
+                    if (baseType === "Gold") {
+                        const areaLevelCondition = localConditions.areaLevel;
+                        const stackSizeCondition = localConditions.stackSize;
+                        
+                        // 조건이 없어도 UI 값을 표시하기 위한 임시 변수
+                        // 조건이 있으면 그 값을, 없으면 기본값(65)이나 마지막 선택값을 사용
+                        // 여기서는 조건이 없으면 0으로 처리되지만, UI상 1티어(65)처럼 보이게 할지 결정 필요
+                        // 다만, disabled 상태이므로 값은 크게 중요하지 않을 수 있음. 
+                        const displayLevel = areaLevelCondition?.value || 65; 
+                        
+                        // 경로석 티어 계산 (65~80)
+                        const currentPathTier = displayLevel >= 65 && displayLevel <= 80 
+                            ? displayLevel - 64 
+                            : null;
+                        
+                        const isCustomInput = displayLevel > 0 && (displayLevel < 65 || displayLevel > 80);
+
+                        return (
+                             <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "8px" }}>
+                                {/* 왼쪽: 지역 레벨 설정 */}
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={!!areaLevelCondition}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                // 조건 추가 (기본값: >= 65 (1티어))
+                                                // 중요: 조건이 변경되었음을 확실히 알리기 위해 새로운 객체 생성
+                                                const newConditions = { 
+                                                    ...localConditions,
+                                                    areaLevel: { operator: ">=", value: 65 } 
+                                                };
+                                                setLocalConditions(newConditions);
+                                                if (onConditionsChange) {
+                                                    onConditionsChange(newConditions);
+                                                }
+                                            } else {
+                                                // 조건 삭제
+                                                const newConditions = { ...localConditions };
+                                                delete newConditions.areaLevel;
+                                                setLocalConditions(newConditions);
+                                                if (onConditionsChange) {
+                                                    onConditionsChange(newConditions);
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    <span 
+                                        className="style-setting-label" 
+                                        style={{ 
+                                            minWidth: "auto",
+                                            opacity: !!areaLevelCondition ? 1 : 0.5,
+                                            color: !!areaLevelCondition ? "var(--text-main)" : "var(--text-muted)"
+                                        }}
+                                    >
+                                        {lang === "ko" ? "지역 레벨" : "Area Level"}
+                                    </span>
+                                    
+                                    <div style={{ 
+                                        display: "flex", 
+                                        gap: "6px", 
+                                        opacity: !!areaLevelCondition ? 1 : 0.5,
+                                        pointerEvents: !!areaLevelCondition ? "auto" : "none"
+                                    }}>
+                                        <select
+                                            className="condition-operator"
+                                            value={areaLevelCondition?.operator || ">="}
+                                            onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
+                                            style={{ width: "50px", minWidth: "50px" }}
+                                            disabled={!areaLevelCondition}
+                                        >
+                                            <option value=">=">≥</option>
+                                            <option value="<=">≤</option>
+                                            <option value=">">&gt;</option>
+                                            <option value="<">&lt;</option>
+                                            <option value="==">==</option>
+                                        </select>
+                                        
+                                        {/* 경로석 티어 드롭다운 또는 직접 입력 인풋 */}
+                                        {areaLevelInputMode ? (
+                                             <input
+                                                ref={(el) => {
+                                                    // 스크롤 방지 로직 적용
+                                                    if (el) {
+                                                        const handleWheel = (e) => {
+                                                            if (document.activeElement === el) {
+                                                                e.preventDefault();
+                                                                // 필요한 경우 여기서 값 변경 로직 추가 가능
+                                                            }
+                                                        };
+                                                        el.addEventListener("wheel", handleWheel, { passive: false });
+                                                        // 클린업 함수는 useEffect에서 처리하거나, 여기서 매번 리스너를 추가하지 않도록 주의해야 함.
+                                                        // 리액트 ref 콜백 패턴상 이 방식은 리렌더링마다 리스너가 중복될 수 있음.
+                                                        // 따라서 별도 useEffect로 처리하는 것이 안전함. 여기서 ref만 할당.
+                                                        goldInputRefs.current.areaLevel = el;
+                                                    }
+                                                }}
+                                                type="number"
+                                                className="condition-value"
+                                                value={displayLevel || ""}
+                                                onChange={(e) => handleConditionChange("areaLevel", "value", parseInt(e.target.value) || 0)}
+                                                style={{ width: "80px" }}
+                                                placeholder="Level"
+                                                disabled={!areaLevelCondition}
+                                            />
+                                        ) : (
+                                            <select
+                                                className="condition-value"
+                                                value={isCustomInput ? "custom" : (currentPathTier || "custom")}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    if (val === "custom") {
+                                                        setAreaLevelInputMode(true);
+                                                    } else {
+                                                        const tier = parseInt(val);
+                                                        handleConditionChange("areaLevel", "value", 64 + tier);
+                                                    }
+                                                }}
+                                                style={{ width: "200px" }} 
+                                                disabled={!areaLevelCondition}
+                                            >
+                                                <option value="custom">{lang === "ko" ? "직접 입력" : "Custom Input"}</option>
+                                                {Array.from({ length: 16 }, (_, i) => i + 1).map(tier => (
+                                                    <option key={tier} value={tier}>
+                                                        {lang === "ko" ? `경로석 ${tier}티어 (${64+tier})` : `Waystone T${tier} (${64+tier})`}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
+                                    </div>
+                                </div>
+                                
+                                {/* 구분선 */}
+                                <div style={{ width: "1px", height: "24px", background: "var(--border)" }}></div>
+
+                                {/* 오른쪽: 골드 설정 (항상 표시 / 조건 없으면 빈 값) */}
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                     <span className="style-setting-label" style={{ minWidth: "auto" }}>
+                                        {lang === "ko" ? "골드" : "Gold"}
+                                    </span>
+                                    <select
+                                        className="condition-operator"
+                                        value={stackSizeCondition?.operator || ">="}
+                                        onChange={(e) => handleConditionChange("stackSize", "operator", e.target.value)}
+                                        style={{ width: "50px", minWidth: "50px" }}
+                                    >
+                                        <option value=">=">≥</option>
+                                        <option value="<=">≤</option>
+                                        <option value=">">&gt;</option>
+                                        <option value="<">&lt;</option>
+                                        <option value="==">==</option>
+                                    </select>
+                                    <input
+                                        ref={(el) => {
+                                             if (el) goldInputRefs.current.stackSize = el;
+                                        }}
+                                        type="number"
+                                        className="condition-value"
+                                        value={stackSizeCondition?.value || ""}
+                                        onChange={(e) => handleConditionChange("stackSize", "value", parseInt(e.target.value) || 0)}
+                                        style={{ width: "80px" }}
+                                        placeholder="Amount"
+                                    />
+                                </div>
+                             </div>
+                        );
+                    }
+
+                    // 기본 렌더링 (골드 아닐 때만 렌더링하도록 조건 추가)
                     return (
-                      <div className="condition-row-with-slider">
-                        <div className="condition-label-wrapper">
-                          <span className="condition-label">지역 레벨</span>
-                          <select
-                            className="condition-operator"
-                            value={localConditions.areaLevel.operator || ">="}
-                            onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
-                          >
-                            <option value=">=">≥</option>
-                            <option value="<=">≤</option>
-                            <option value=">">&gt;</option>
-                            <option value="<">&lt;</option>
-                            <option value="==">==</option>
-                          </select>
-                        </div>
-                        <div className="condition-slider-wrapper">
-                          {isPathTier ? (
-                            <button
-                              type="button"
-                              className="path-tier-display"
-                              onClick={() => setAreaLevelInputMode(true)}
-                              style={{ 
-                                color: "var(--game-primary)", 
-                                fontSize: "12px",
-                                padding: "5px 8px",
-                                background: "var(--panel2)",
-                                border: "1px solid var(--border)",
-                                borderRadius: "2px",
-                                width: "100px",
-                                height: "32px",
-                                textAlign: "center",
-                                display: "inline-block",
-                                cursor: "pointer",
-                                fontFamily: "inherit",
-                                boxSizing: "border-box"
-                              }}
-                            >
-                              T{pathTier} 경로석
-                            </button>
-                          ) : (
-                            <OperatorSlider
-                              value={areaLevel}
-                              onChange={(newValue) => {
-                                handleConditionChange("areaLevel", "value", newValue);
-                                setAreaLevelInputMode(false);
-                              }}
-                              operator={localConditions.areaLevel.operator || ">="}
-                              min={1}
-                              max={100}
-                              step={1}
-                            />
+                        <>
+                          {/* StackSize: 골드가 아닐 때만 표시 (골드는 위에서 처리) */}
+                          {localConditions.stackSize && baseType !== "Gold" && (
+                            <div className="condition-row-inline">
+                                <span className="style-setting-label">
+                                    {lang === "ko" ? "스택 수량" : "Stack Size"}
+                                </span>
+                                <select
+                                  className="condition-operator-compact"
+                                  value={localConditions.stackSize.operator || ">="}
+                                  onChange={(e) => handleConditionChange("stackSize", "operator", e.target.value)}
+                                >
+                                  <option value=">=">≥</option>
+                                  <option value="<=">≤</option>
+                                  <option value=">">&gt;</option>
+                                  <option value="<">&lt;</option>
+                                  <option value="==">==</option>
+                                </select>
+                              <div className="condition-slider-wrapper-inline">
+                                <OperatorSlider
+                                  value={localConditions.stackSize.value || 0}
+                                  onChange={(newValue) => handleConditionChange("stackSize", "value", newValue)}
+                                  operator={localConditions.stackSize.operator || ">="}
+                                  min={0}
+                                  max={10000}
+                                  step={10}
+                                  label="" 
+                                />
+                              </div>
+                            </div>
                           )}
-                        </div>
-                      </div>
+
+                          {/* AreaLevel: 골드가 아닐 때만 표시 (골드는 위에서 처리) */}
+                          {areaLevelCondition && baseType !== "Gold" && (
+                              <div className="condition-row-with-slider">
+                                <div className="condition-label-wrapper">
+                                  <span className="style-setting-label">지역 레벨</span>
+                                  <select
+                                    className="condition-operator"
+                                    value={localConditions.areaLevel?.operator || ">="}
+                                    onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
+                                  >
+                                    <option value=">=">≥</option>
+                                    <option value="<=">≤</option>
+                                    <option value=">">&gt;</option>
+                                    <option value="<">&lt;</option>
+                                    <option value="==">==</option>
+                                  </select>
+                                </div>
+                                <div className="condition-slider-wrapper">
+                                    <OperatorSlider
+                                      value={localConditions.areaLevel?.value || 1}
+                                      onChange={(newValue) => {
+                                        handleConditionChange("areaLevel", "value", newValue);
+                                      }}
+                                      operator={localConditions.areaLevel?.operator || ">="}
+                                      min={1}
+                                      max={100}
+                                      step={1}
+                                    />
+                                </div>
+                              </div>
+                          )}
+                        </>
                     );
                   })()}
                 </div>
               )}
-
               {/* 추가 규칙 (기본코드 + 추가 코드 순서) */}
               {canAddRules && localRules.length > 0 && (
                 <div className="style-setting-group">
@@ -1155,8 +1561,8 @@ export default function StyleSettingsModal({
                   </div>
                 </div>
               )}
-          </div>
 
+        </div>
         {/* 하단 버튼 영역 (규칙 추가 + 복사/붙여넣기 + 초기화 + 적용) */}
         <div className="style-settings-footer">
           {canAddRules && (
@@ -1380,22 +1786,28 @@ export default function StyleSettingsModal({
         }
 
         .rule-add-button {
-          padding: 8px 16px;
+          padding: 8px 20px;
           background: var(--game-primary);
           border: none;
           color: var(--poe2-secondary, #ffffff);
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
           cursor: pointer;
           transition: opacity 0.2s;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
           height: 36px;
           box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
         }
 
         .rule-add-button:hover {
           opacity: 0.9;
         }
+
+
 
         .rule-dropdown {
           position: absolute;
@@ -1575,18 +1987,6 @@ export default function StyleSettingsModal({
           transform-origin: center;
         }
 
-        .style-preview-overlay-title {
-          position: absolute;
-          top: 8px;
-          left: 8px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          z-index: 10;
-          background: transparent;
-          padding: 0;
-        }
-
         .preview-close-button {
           position: absolute;
           top: 8px;
@@ -1594,19 +1994,31 @@ export default function StyleSettingsModal({
           z-index: 10;
         }
 
-        .style-preview-overlay-title h2 {
-          font-size: 16px;
-          font-weight: 700;
-          margin: 0;
-          color: var(--text);
+        .style-top-controls {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 12px;
         }
 
-        .style-preview-overlay-title h2.title-disabled {
-          color: var(--muted, #999);
+        .rule-mode-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .rule-mode-select {
+          height: 34px;
+          padding: 0 8px;
+          font-size: 14px;
+          font-weight: 600;
+          min-width: 120px;
         }
 
         .style-title-input {
-          min-width: 150px;
+          flex: 1;
+          min-width: 100px;
           padding: 6px 10px;
           background: var(--panel2);
           border: 1px solid var(--border);
@@ -2119,6 +2531,69 @@ export default function StyleSettingsModal({
 
         .paste-preview-content {
           padding: 16px;
+        }
+
+        .condition-separator {
+          display: flex;
+          align-items: center;
+          text-align: center;
+          color: var(--muted);
+          font-size: 12px;
+          margin: 16px 0 12px 0;
+          width: 100%;
+        }
+
+        .condition-separator::before,
+        .condition-separator::after {
+          content: '';
+          flex: 1;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .condition-separator span {
+          padding: 0 10px;
+          font-weight: 500;
+        }
+
+        .condition-row-inline {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+        }
+
+        .condition-label-text {
+          font-size: 14px;
+          color: var(--text);
+          font-weight: 500;
+          white-space: nowrap;
+          min-width: 40px;
+        }
+
+        .condition-operator-compact {
+          padding: 5px 8px;
+          background: var(--panel2);
+          border: 1px solid var(--border);
+          color: var(--text);
+          font-size: 14px;
+          width: 60px;
+          height: 32px;
+          outline: none;
+          transition: border-color 0.2s;
+          box-sizing: border-box;
+          text-align: center;
+          flex-shrink: 0;
+        }
+        
+        .condition-operator-compact:focus {
+           border-color: var(--game-primary);
+        }
+
+        .condition-slider-wrapper-inline {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          min-width: 0; 
         }
 
         @media (max-width: 900px) {

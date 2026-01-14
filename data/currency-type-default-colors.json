@@ -858,108 +858,33 @@
   "lineage_gems": {
     "S": {
       "fontSize": 45,
-      "textColor": {
-        "r": 255,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "borderColor": {
-        "r": 255,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "backgroundColor": {
-        "r": 255,
-        "g": 255,
-        "b": 255,
-        "a": 255
-      }
+      "textColor": { "r": 255, "g": 0, "b": 0, "a": 255 },
+      "borderColor": { "r": 255, "g": 0, "b": 0, "a": 255 },
+      "backgroundColor": { "r": 255, "g": 255, "b": 255, "a": 255 }
     },
     "A": {
       "fontSize": 45,
-      "textColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "borderColor": {
-        "r": 255,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "backgroundColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      }
+      "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+      "borderColor": { "r": 255, "g": 0, "b": 0, "a": 255 },
+      "backgroundColor": { "r": 240, "g": 35, "b": 120, "a": 255 }
     },
     "B": {
       "fontSize": 42,
-      "textColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "borderColor": {
-        "r": 255,
-        "g": 190,
-        "b": 0,
-        "a": 255
-      },
-      "backgroundColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      }
+      "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+      "borderColor": { "r": 255, "g": 190, "b": 0, "a": 255 },
+      "backgroundColor": { "r": 240, "g": 90, "b": 35, "a": 255 }
     },
     "C": {
       "fontSize": 40,
-      "textColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "borderColor": {
-        "r": 255,
-        "g": 255,
-        "b": 255,
-        "a": 255
-      },
-      "backgroundColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      }
+      "textColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
+      "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+      "backgroundColor": { "r": 249, "g": 150, "b": 25, "a": 255 }
     },
     "D": {
       "fontSize": 38,
-      "textColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "borderColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      },
-      "backgroundColor": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
-        "a": 255
-      }
+      "textColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
+      "borderColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
+      "backgroundColor": { "r": 210, "g": 178, "b": 135, "a": 255 }
     },
     "E": null
   },
@@ -1167,7 +1092,7 @@
     "D": null,
     "E": null
   },
-  "idosl": {
+  "idols": {
     "S": null,
     "A": null,
     "B": null,
