@@ -1,20 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
-  // 경로에 공백이나 특수문자가 있어도 정상 작동하도록 설정
-  webpack: (config, { isServer }) => {
-    // 경로 처리 개선
+  // 🔴 핵심: 정적 export 활성화
+  output: "export",
+
+  // next/image 사용 시 정적 export에서 필요
+  images: {
+    unoptimized: true,
+  },
+
+  // 기존 네 설정 유지
+  webpack: (config) => {
     config.watchOptions = {
       ...config.watchOptions,
-      ignored: ['**/node_modules/**', '**/.next/**'],
+      ignored: ["**/node_modules/**", "**/.next/**"],
     };
     return config;
   },
-  // 파일 시스템 감시 개선
-  experimental: {
-    // 파일 변경 감지 개선
-  },
-  // Turbopack 설정 (Next.js 16에서 기본 활성화)
+
+  experimental: {},
   turbopack: {},
 };
 

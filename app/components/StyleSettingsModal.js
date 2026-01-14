@@ -1094,62 +1094,68 @@ export default function StyleSettingsModal({
                   <option value="default">{lang === "ko" ? "기본" : "Normal"}</option>
                   <option value="custom">{lang === "ko" ? "커스텀" : "Custom"}</option>
                 </select>
-                {/* 커스텀 모드: 입력 필드 표시 */}
+
+                {/* 볼륨 드롭다운: 이제 모든 사운드 모드에서 표시 */}
+                <select
+                  className="style-select sound-volume-select"
+                  value={localStyles.ps5SoundVolume || 300}
+                  onChange={(e) => handleStyleChange("ps5SoundVolume", parseInt(e.target.value))}
+                  disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
+                >
+                  <option value="300">300 ({lang === "ko" ? "최대" : "Max"})</option>
+                  <option value="250">250</option>
+                  <option value="200">200</option>
+                  <option value="150">150</option>
+                  <option value="100">100</option>
+                  <option value="50">50</option>
+                </select>
+
+                {/* 커스텀 모드: 입력 필드 + 파일 버튼 표시 */}
                 {localStyles.soundType === "custom" && (
-                  <input
-                    type="text"
-                    className="style-input sound-input"
-                    placeholder={lang === "ko" ? "사운드 파일 경로 (예: custom_sound/1_currency_s.mp3)" : "Sound file path (e.g. custom_sound/1_currency_s.mp3)"}
-                    value={localStyles.customSound || ""}
-                    onChange={(e) => handleStyleChange("customSound", e.target.value || null)}
-                    disabled={!localStyles.customSound && !localStyles.ps5Sound}
-                  />
+                  <div className="custom-sound-input-wrapper">
+                    <input
+                      type="text"
+                      className="style-input sound-input"
+                      placeholder={lang === "ko" ? "사운드 파일 경로 (예: custom_sound/1_currency_s.mp3)" : "Sound file path (e.g. custom_sound/1_currency_s.mp3)"}
+                      value={localStyles.customSound || ""}
+                      onChange={(e) => handleStyleChange("customSound", e.target.value || null)}
+                      disabled={!localStyles.customSound && !localStyles.ps5Sound}
+                    />
+                    <button className="sound-file-button">
+                      {lang === "ko" ? "파일" : "File"}
+                    </button>
+                  </div>
                 )}
-                {/* 기본 모드: slot과 volume 드롭다운 표시 (기본 드롭다운 바로 오른쪽) */}
+
+                {/* 기본 모드: 슬롯 드롭다운 표시 */}
                 {localStyles.soundType === "default" && (
-                  <>
-                    <select
-                      className="style-select sound-select"
-                      value={localStyles.soundType === "default"
-                        ? (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound ? "" : (localStyles.ps5Sound ? "" : (localStyles.customSound || ""))))
-                        : (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound || ""))}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (!value) return; // "없음" 선택 시 처리 안함 (체크박스로만 해제)
+                  <select
+                    className="style-select sound-select"
+                    value={localStyles.soundType === "default"
+                      ? (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound ? "" : (localStyles.ps5Sound ? "" : (localStyles.customSound || ""))))
+                      : (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound || ""))}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (!value) return;
 
-                        const isPC = localStyles.soundPlatform === "PC";
+                      const isPC = localStyles.soundPlatform === "PC";
 
-                        if (isPC) {
-                          handleStyleChange("customSound", value);
-                          handleStyleChange("ps5Sound", null);
-                        } else {
-                          handleStyleChange("ps5Sound", parseInt(value));
-                          handleStyleChange("customSound", null);
-                        }
-                      }}
-                      disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
-                    >
-                      {(localStyles.soundPlatform === "PS5" ? ps5SoundOptions : pcSoundOptions).map((option) => (
-                        <option key={option.value || "none"} value={option.value || ""}>
-                          {lang === "ko" ? option.label : option.labelEn}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                       className="style-select sound-volume-select" // 볼륨 조절 (PS5 전용 등)
-                       style={{ display: localStyles.soundPlatform === "PS5" ? "block" : "none" }}
-                       value={localStyles.ps5SoundVolume || 300}
-                       onChange={(e) => handleStyleChange("ps5SoundVolume", parseInt(e.target.value))}
-                       disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
-                     >
-                       <option value="300">300 (최대)</option>
-                       <option value="250">250</option>
-                       <option value="200">200</option>
-                       <option value="150">150</option>
-                       <option value="100">100</option>
-                       <option value="50">50</option>
-                     </select>
-                  </>
+                      if (isPC) {
+                        handleStyleChange("customSound", value);
+                        handleStyleChange("ps5Sound", null);
+                      } else {
+                        handleStyleChange("ps5Sound", parseInt(value));
+                        handleStyleChange("customSound", null);
+                      }
+                    }}
+                    disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
+                  >
+                    {(localStyles.soundPlatform === "PS5" ? ps5SoundOptions : pcSoundOptions).map((option) => (
+                      <option key={option.value || "none"} value={option.value || ""}>
+                        {lang === "ko" ? option.label : option.labelEn}
+                      </option>
+                    ))}
+                  </select>
                 )}
               </div>
             </div>
@@ -2338,12 +2344,45 @@ export default function StyleSettingsModal({
 
         .sound-input {
           flex: 1;
-          min-width: 200px;
+          min-width: 0;
+        }
+
+        .custom-sound-input-wrapper {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 0;
+          background: var(--panel2);
+          border: 1px solid var(--border);
+          box-sizing: border-box;
+          height: 32px;
+        }
+
+        .custom-sound-input-wrapper .sound-input {
+          border: none;
+          background: transparent;
+        }
+
+        .sound-file-button {
+          height: 100%;
+          padding: 0 12px;
+          background: var(--game-primary);
+          border: none;
+          color: #fff;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: opacity 0.2s;
+        }
+
+        .sound-file-button:hover {
+          opacity: 0.9;
         }
 
         .sound-slot-select,
         .sound-volume-select {
-          min-width: 80px;
+          min-width: 85px;
           width: auto;
         }
 
