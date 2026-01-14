@@ -1835,3 +1835,59 @@ div.leveling-dropdown-item-multi.selected,
   text-align: center;
   margin: 0;
 }
+
+/* 사이트 푸터 스타일 (v10) */
+.site-footer {
+  width: 100%;
+  background: #0a0a0a;
+  border-top: 1px solid var(--border);
+  padding: 24px 48px;
+  margin-top: auto;
+}
+
+.footer-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+  flex: 1;
+}
+
+.footer-left {
+  text-align: left;
+}
+
+.footer-center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.footer-copyright,
+.footer-slogan,
+.footer-email,
+.footer-link {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-email:hover,
+.footer-link:hover {
+  color: var(--text);
+}

@@ -4,6 +4,7 @@ import GameBanner from "./components/GameBanner";
 import GameSubNav from "./components/GameSubNav";
 import ItemFilterNav from "./components/ItemFilterNav";
 import GameThemeProvider from "./components/GameThemeProvider";
+import Footer from "./components/Footer";
 import "./globals.css";
 
 export const metadata = {
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
             <div className="page-content-wrapper">
               {children}
             </div>
+            <Footer />
           </div>
 
           {/* 우측 애드센스 */}
