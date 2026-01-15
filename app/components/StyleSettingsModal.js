@@ -69,7 +69,10 @@ export default function StyleSettingsModal({
   ruleType = "show",
   onRuleTypeChange = null,
   enabled = true,
-  onEnabledChange = null
+  onEnabledChange = null,
+  presetDefaults = null, // 프리셋 기본값 (초기화 버튼용)
+  itemClass = null, // 아이템 클래스 (예: "Uncut Skill Gems", "Uncut Spirit Gems", "Uncut Support Gems")
+  hideConditions = false // 조건 설정 UI 숨김 여부 (gold_default 등)
 }) {
   // 인게임 기본값 상수
   const DEFAULT_TEXT_COLOR = { r: 171, g: 159, b: 130, a: 255 }; // #ab9f82
@@ -213,7 +216,10 @@ export default function StyleSettingsModal({
       setLocalStyles(initial);
       setLocalRules(additionalRules || []);
       setLocalTitle(title || "");
-      setLocalConditions(conditions || {});
+      // conditions 초기화: 전달된 conditions가 있으면 그대로 사용 (삭제된 속성 부활 방지)
+      // conditions가 비어있지 않으면 사용자가 수정한 것이므로 그대로 사용
+      const hasUserConditions = conditions && Object.keys(conditions).length > 0;
+      setLocalConditions(hasUserConditions ? conditions : (presetDefaults?.conditions || {}));
       setLocalRuleType(ruleType || "show");
     }
     
@@ -250,14 +256,16 @@ export default function StyleSettingsModal({
       }
       newConditions[conditionKey][field] = value;
       
-      // 즉시 부모에게 변경사항 전파 (실시간 프리뷰/리스트 반영을 위해)
-      if (onConditionsChange) {
-        onConditionsChange(newConditions);
-      }
-      
       return newConditions;
     });
   };
+
+  // localConditions 변경 시 부모에게 알림 (렌더링 사이클 이후)
+  useEffect(() => {
+    if (isOpen && onConditionsChange) {
+      onConditionsChange(localConditions);
+    }
+  }, [localConditions, isOpen]);
 
   const handleApply = () => {
     // 모든 변경사항을 부모 컴포넌트에 전달 (적용 버튼 클릭 시에만)
@@ -276,6 +284,37 @@ export default function StyleSettingsModal({
     if (onRuleTypeChange) {
       onRuleTypeChange(localRuleType);
     }
+    onClose();
+  };
+
+  // 창 닫기 (적용 없이) - 모달 열 때의 초기값으로 복원
+  const handleClose = () => {
+    // 모달이 열릴 때 저장해둔 초기값으로 복원
+    setLocalStyles(initialStyles || {
+      fontSize: 30,
+      textColor: DEFAULT_TEXT_COLOR,
+      borderColor: null,
+      backgroundColor: { r: 0, g: 0, b: 0, a: 255 },
+      playEffect: null,
+      minimapIcon: { size: null, color: null, shape: null },
+      customSound: null,
+      ps5Sound: null,
+      ps5SoundVolume: 300,
+      soundPlatform: null,
+      soundType: "default"
+    });
+    setLocalTitle(initialTitle || "");
+    setLocalConditions(initialConditionsSnapshot || {});
+    setLocalRules(initialRulesSnapshot || []);
+    setLocalRuleType(initialRuleTypeSnapshot || "show");
+    setAreaLevelInputMode(false);
+
+    // 부모 상태도 초기값으로 복원 (실시간 반영되는 값들)
+    if (onConditionsChange) onConditionsChange(initialConditionsSnapshot || {});
+    if (onRulesChange) onRulesChange(initialRulesSnapshot || []);
+    if (onRuleTypeChange) onRuleTypeChange(initialRuleTypeSnapshot || "show");
+    if (onEnabledChange) onEnabledChange(!!initialEnabledSnapshot);
+
     onClose();
   };
 
@@ -373,10 +412,10 @@ export default function StyleSettingsModal({
     }
   };
 
-  // 초기화 기능 (기본값으로 복원)
+  // 초기화 기능 (프리셋 기본값으로 복원)
   const handleReset = () => {
-    // "처음 입력된 필터값(=모달 오픈 시점 스냅샷)"으로 되돌리기
-    const nextStyles = initialStyles || {
+    // 프리셋 기본값이 있으면 그 값으로 초기화, 없으면 인게임 기본값 사용
+    const defaultValues = {
       fontSize: 30,
       textColor: DEFAULT_TEXT_COLOR,
       borderColor: null,
@@ -391,28 +430,47 @@ export default function StyleSettingsModal({
       ruleType: "show"
     };
 
-    setLocalStyles(nextStyles);
-    setLocalTitle(initialTitle || "");
-    setLocalConditions(initialConditionsSnapshot || {});
-    setLocalRules(initialRulesSnapshot || []);
-    setLocalRuleType(initialRuleTypeSnapshot || "show");
+    // presetDefaults가 있으면 프리셋 기본값 사용
+    const nextStyles = presetDefaults?.styles || defaultValues;
+    // 현재 언어에 맞는 제목 선택
+    const nextTitle = lang === "ko" 
+      ? (presetDefaults?.nameKo || presetDefaults?.name || "")
+      : (presetDefaults?.name || presetDefaults?.nameKo || "");
+    const nextConditions = presetDefaults?.conditions || {};
+    const nextRuleType = presetDefaults?.type || "show";
+    const nextEnabled = presetDefaults?.enabled !== undefined ? presetDefaults.enabled : true;
+
+    setLocalStyles({
+      ...defaultValues,
+      ...nextStyles,
+      // null 값 보존
+      textColor: nextStyles.textColor ?? DEFAULT_TEXT_COLOR,
+      borderColor: nextStyles.borderColor ?? null,
+      backgroundColor: nextStyles.backgroundColor ?? { r: 0, g: 0, b: 0, a: 255 },
+      soundPlatform: nextStyles.soundPlatform ?? (nextStyles.customSound ? "PC" : null),
+      soundType: nextStyles.customSound ? "custom" : "default"
+    });
+    setLocalTitle(nextTitle);
+    setLocalConditions(nextConditions);
+    setLocalRules([]); // 추가 규칙은 기본값에서 초기화
+    setLocalRuleType(nextRuleType);
     setAreaLevelInputMode(false);
 
-    // 이 모달에서 일부 값은 실시간으로 부모 상태에 반영되므로(조건/추가규칙/활성/타입),
-    // 초기화 시에도 부모에 스냅샷을 다시 동기화한다.
-    if (onConditionsChange) onConditionsChange(initialConditionsSnapshot || {});
-    if (onRulesChange) onRulesChange(initialRulesSnapshot || []);
-    if (onRuleTypeChange) onRuleTypeChange(initialRuleTypeSnapshot || "show");
-    if (onEnabledChange) onEnabledChange(!!initialEnabledSnapshot);
+    // 부모 상태에 동기화
+    if (onConditionsChange) onConditionsChange(nextConditions);
+    if (onRulesChange) onRulesChange([]);
+    if (onRuleTypeChange) onRuleTypeChange(nextRuleType);
+    if (onEnabledChange) onEnabledChange(nextEnabled);
   };
 
 
   // 사용 가능한 추가 규칙 목록
   const getAvailableRules = () => {
-    // 골드인 경우
-    if (baseType === "Gold") {
-      // StackSize와 AreaLevel 둘 다 추가 가능
-      return ["StackSize", "AreaLevel"]
+    // 기타 섹션인 경우 (주문 감정서, 찬스 아이템 등)
+    if (baseType === "Others") {
+      // Others 섹션에서 추가 가능한 규칙들
+      const othersAvailableRules = ["Corrupted", "Rarity", "StackSize"];
+      return othersAvailableRules
         .map(code => filterConditions.conditions[code])
         .filter(Boolean);
     }
@@ -426,8 +484,11 @@ export default function StyleSettingsModal({
     return [];
   };
 
-  // 규칙 추가 기능 활성화 여부
-  const canAddRules = isGear || baseType === "Gold";
+  // 규칙 추가 기능 활성화 여부 (모든 스타일 모달에서 공통 노출)
+  const canAddRules = true;
+  const isScrollOfWisdom =
+    baseType === "Others" &&
+    localConditions?.baseType?.value === "Scroll of Wisdom";
 
   // 규칙 추가
   const handleAddRule = (conditionCode) => {
@@ -661,13 +722,13 @@ export default function StyleSettingsModal({
 
   return (
     <div className="style-settings-modal">
-      <div className="style-settings-overlay" onClick={onClose}></div>
+      <div className="style-settings-overlay" onClick={handleClose}></div>
       <div className="style-settings-content-wrapper">
       <div className="style-settings-content" ref={modalContentRef}>
         {/* 프리뷰 영역 (여백 없음) */}
         <div className="style-preview-panel">
           {/* 닫기 버튼을 프리뷰 위에 오버레이 (오른쪽 위) */}
-          <button className="close-button preview-close-button" onClick={onClose}>×</button>
+          <button className="close-button preview-close-button" onClick={handleClose}>×</button>
           <ItemPreviewBox
             itemName={itemName}
             styles={{
@@ -1209,7 +1270,225 @@ export default function StyleSettingsModal({
           {/* 공통이 아닌 규칙 (맨 아래) */}
               
               {/* 조건 설정 섹션 (가로 분리선 + 텍스트) */}
-              {(isGear || baseType === "Gold") && (
+              {/* 미가공 젬 클래스 확인 */}
+              {(() => {
+                const uncutGemClasses = ["Uncut Skill Gems", "Uncut Spirit Gems", "Uncut Support Gems"];
+                const isUncutGem = itemClass && (
+                  uncutGemClasses.includes(itemClass) ||
+                  (Array.isArray(itemClass) && itemClass.some(c => uncutGemClasses.includes(c)))
+                );
+                return isUncutGem;
+              })() && (
+                <div className="condition-settings-group">
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "16px 0 12px 0" }}>
+                    <div style={{ flex: 1, height: "1px", background: "var(--border)" }}></div>
+                    <span style={{ fontSize: "12px", color: "var(--muted)", fontWeight: "500" }}>
+                      {lang === "ko" ? "젬 레벨 조건" : "Gem Level Condition"}
+                    </span>
+                    <div style={{ flex: 1, height: "1px", background: "var(--border)" }}></div>
+                  </div>
+
+                  {(() => {
+                    // 클래스별 최대 레벨 결정
+                    const uncutGemClasses = ["Uncut Skill Gems", "Uncut Spirit Gems", "Uncut Support Gems"];
+                    const isSupportGemOnly = itemClass === "Uncut Support Gems";
+                    const isMultipleClasses = Array.isArray(itemClass) && itemClass.length > 1;
+                    const maxLevel = (isSupportGemOnly && !isMultipleClasses) ? 5 : 20;
+                    
+                    const gemLevelCondition = localConditions.gemLevel;
+                    const hasGemLevel = !!gemLevelCondition;
+                    
+                    // 범위 모드 확인 (minLevel, maxLevel 둘 다 있는 경우)
+                    const isRangeMode = gemLevelCondition?.minLevel !== undefined && gemLevelCondition?.maxLevel !== undefined;
+                    
+                    return (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <input
+                            type="checkbox"
+                            checked={hasGemLevel}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                // 기본값: >= 1
+                                const newConditions = {
+                                  ...localConditions,
+                                  gemLevel: { operator: ">=", value: 1 }
+                                };
+                                setLocalConditions(newConditions);
+                                if (onConditionsChange) onConditionsChange(newConditions);
+                              } else {
+                                const newConditions = { ...localConditions };
+                                delete newConditions.gemLevel;
+                                setLocalConditions(newConditions);
+                                if (onConditionsChange) onConditionsChange(newConditions);
+                              }
+                            }}
+                          />
+                          <span 
+                            className="style-setting-label"
+                            style={{ 
+                              minWidth: "auto",
+                              opacity: hasGemLevel ? 1 : 0.5
+                            }}
+                          >
+                            {lang === "ko" ? "젬 레벨" : "Gem Level"}
+                          </span>
+                          
+                          <div style={{ 
+                            display: "flex", 
+                            alignItems: "center",
+                            gap: "6px",
+                            opacity: hasGemLevel ? 1 : 0.5,
+                            pointerEvents: hasGemLevel ? "auto" : "none"
+                          }}>
+                            {/* 범위 모드 토글 */}
+                            <label style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", color: "var(--muted)" }}>
+                              <input
+                                type="checkbox"
+                                checked={isRangeMode}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    // 범위 모드로 전환
+                                    const currentValue = gemLevelCondition?.value || 1;
+                                    const newConditions = {
+                                      ...localConditions,
+                                      gemLevel: { minLevel: currentValue, maxLevel: maxLevel }
+                                    };
+                                    setLocalConditions(newConditions);
+                                    if (onConditionsChange) onConditionsChange(newConditions);
+                                  } else {
+                                    // 단일 값 모드로 전환
+                                    const currentMin = gemLevelCondition?.minLevel || 1;
+                                    const newConditions = {
+                                      ...localConditions,
+                                      gemLevel: { operator: ">=", value: currentMin }
+                                    };
+                                    setLocalConditions(newConditions);
+                                    if (onConditionsChange) onConditionsChange(newConditions);
+                                  }
+                                }}
+                                disabled={!hasGemLevel}
+                              />
+                              {lang === "ko" ? "범위" : "Range"}
+                            </label>
+
+                            {isRangeMode ? (
+                              // 범위 모드 UI
+                              <>
+                                <select
+                                  className="style-select"
+                                  style={{ width: "60px", minWidth: "60px" }}
+                                  value={gemLevelCondition?.minLevel || 1}
+                                  onChange={(e) => {
+                                    const newMin = parseInt(e.target.value);
+                                    const currentMax = gemLevelCondition?.maxLevel || maxLevel;
+                                    const newConditions = {
+                                      ...localConditions,
+                                      gemLevel: { 
+                                        minLevel: newMin, 
+                                        maxLevel: Math.max(newMin, currentMax)
+                                      }
+                                    };
+                                    setLocalConditions(newConditions);
+                                    if (onConditionsChange) onConditionsChange(newConditions);
+                                  }}
+                                  disabled={!hasGemLevel}
+                                >
+                                  {Array.from({ length: maxLevel }, (_, i) => i + 1).map(level => (
+                                    <option key={level} value={level}>{level}</option>
+                                  ))}
+                                </select>
+                                <span style={{ color: "var(--muted)" }}>~</span>
+                                <select
+                                  className="style-select"
+                                  style={{ width: "60px", minWidth: "60px" }}
+                                  value={gemLevelCondition?.maxLevel || maxLevel}
+                                  onChange={(e) => {
+                                    const newMax = parseInt(e.target.value);
+                                    const currentMin = gemLevelCondition?.minLevel || 1;
+                                    const newConditions = {
+                                      ...localConditions,
+                                      gemLevel: { 
+                                        minLevel: Math.min(currentMin, newMax), 
+                                        maxLevel: newMax
+                                      }
+                                    };
+                                    setLocalConditions(newConditions);
+                                    if (onConditionsChange) onConditionsChange(newConditions);
+                                  }}
+                                  disabled={!hasGemLevel}
+                                >
+                                  {Array.from({ length: maxLevel }, (_, i) => i + 1).map(level => (
+                                    <option key={level} value={level}>{level}</option>
+                                  ))}
+                                </select>
+                                <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+                                  {lang === "ko" ? "레벨" : "Level"}
+                                </span>
+                              </>
+                            ) : (
+                              // 단일 값 모드 UI
+                              <>
+                                <select
+                                  className="condition-operator"
+                                  style={{ width: "50px", minWidth: "50px" }}
+                                  value={gemLevelCondition?.operator || ">="}
+                                  onChange={(e) => {
+                                    const newConditions = {
+                                      ...localConditions,
+                                      gemLevel: { ...gemLevelCondition, operator: e.target.value }
+                                    };
+                                    setLocalConditions(newConditions);
+                                    if (onConditionsChange) onConditionsChange(newConditions);
+                                  }}
+                                  disabled={!hasGemLevel}
+                                >
+                                  <option value=">=">≥</option>
+                                  <option value="<=">≤</option>
+                                  <option value=">">&gt;</option>
+                                  <option value="<">&lt;</option>
+                                  <option value="==">==</option>
+                                </select>
+                                <select
+                                  className="style-select"
+                                  style={{ width: "60px", minWidth: "60px" }}
+                                  value={gemLevelCondition?.value || 1}
+                                  onChange={(e) => {
+                                    const newConditions = {
+                                      ...localConditions,
+                                      gemLevel: { ...gemLevelCondition, value: parseInt(e.target.value) }
+                                    };
+                                    setLocalConditions(newConditions);
+                                    if (onConditionsChange) onConditionsChange(newConditions);
+                                  }}
+                                  disabled={!hasGemLevel}
+                                >
+                                  {Array.from({ length: maxLevel }, (_, i) => i + 1).map(level => (
+                                    <option key={level} value={level}>{level}</option>
+                                  ))}
+                                </select>
+                                <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+                                  {lang === "ko" ? "레벨" : "Level"}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* 안내 텍스트 */}
+                        <div style={{ fontSize: "11px", color: "var(--muted)", paddingLeft: "24px" }}>
+                          💡 {isSupportGemOnly 
+                            ? (lang === "ko" ? "보조 젬은 1~5 레벨만 존재합니다." : "Support gems only have levels 1-5.")
+                            : (lang === "ko" ? "스킬/정신력 젬은 1~20 레벨이 존재합니다." : "Skill/Spirit gems have levels 1-20.")}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* 기존 조건 설정 섹션 (가로 분리선 + 텍스트) */}
+              {(isGear || baseType === "Gold" || isScrollOfWisdom || baseType === "Others") && (
                 <div className="condition-settings-group">
                    <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "16px 0 12px 0" }}>
                       <div style={{ flex: 1, height: "1px", background: "var(--border)" }}></div>
@@ -1220,10 +1499,122 @@ export default function StyleSettingsModal({
                    </div>
 
                   {(() => {
-                    // Gold 타입이면 항상 전용 UI 표시
-                    if (baseType === "Gold") {
-                        const areaLevelCondition = localConditions.areaLevel;
-                        const stackSizeCondition = localConditions.stackSize;
+                    const areaLevelCondition = localConditions.areaLevel;
+                    const stackSizeCondition = localConditions.stackSize;
+
+                    if (isScrollOfWisdom) {
+                      const displayLevel = areaLevelCondition?.value || 65;
+                      const currentPathTier =
+                        displayLevel >= 65 && displayLevel <= 80
+                          ? displayLevel - 64
+                          : null;
+                      const isCustomInput =
+                        displayLevel > 0 && (displayLevel < 65 || displayLevel > 80);
+
+                      return (
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                          <input
+                            type="checkbox"
+                            checked={!!areaLevelCondition}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                const newConditions = {
+                                  ...localConditions,
+                                  areaLevel: { operator: ">=", value: 65 },
+                                };
+                                setLocalConditions(newConditions);
+                                if (onConditionsChange) {
+                                  onConditionsChange(newConditions);
+                                }
+                              } else {
+                                const newConditions = { ...localConditions };
+                                delete newConditions.areaLevel;
+                                setLocalConditions(newConditions);
+                                if (onConditionsChange) {
+                                  onConditionsChange(newConditions);
+                                }
+                              }
+                            }}
+                          />
+                          <span
+                            className="style-setting-label"
+                            style={{
+                              minWidth: "auto",
+                              opacity: !!areaLevelCondition ? 1 : 0.5,
+                              color: !!areaLevelCondition ? "var(--text-main)" : "var(--text-muted)",
+                            }}
+                          >
+                            {lang === "ko" ? "지역 레벨" : "Area Level"}
+                          </span>
+                          <select
+                            className="condition-operator"
+                            value={areaLevelCondition?.operator || ">="}
+                            onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
+                            style={{ width: "50px", minWidth: "50px" }}
+                            disabled={!areaLevelCondition}
+                          >
+                            <option value=">=">≥</option>
+                            <option value="<=">≤</option>
+                            <option value=">">&gt;</option>
+                            <option value="<">&lt;</option>
+                            <option value="==">==</option>
+                          </select>
+                          {areaLevelInputMode ? (
+                            <input
+                              ref={(el) => {
+                                if (el) {
+                                  const handleWheel = (e) => {
+                                    if (document.activeElement === el) {
+                                      e.preventDefault();
+                                    }
+                                  };
+                                  el.addEventListener("wheel", handleWheel, { passive: false });
+                                  goldInputRefs.current.areaLevel = el;
+                                }
+                              }}
+                              type="number"
+                              className="condition-value"
+                              value={displayLevel || ""}
+                              onChange={(e) =>
+                                handleConditionChange("areaLevel", "value", parseInt(e.target.value) || 0)
+                              }
+                              style={{ width: "80px" }}
+                              placeholder="Level"
+                              disabled={!areaLevelCondition}
+                            />
+                          ) : (
+                            <select
+                              className="condition-value"
+                              value={isCustomInput ? "custom" : (currentPathTier || "custom")}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "custom") {
+                                  setAreaLevelInputMode(true);
+                                } else {
+                                  const tier = parseInt(val);
+                                  handleConditionChange("areaLevel", "value", 64 + tier);
+                                }
+                              }}
+                              style={{ width: "200px" }}
+                              disabled={!areaLevelCondition}
+                            >
+                              <option value="custom">{lang === "ko" ? "직접 입력" : "Custom Input"}</option>
+                              {Array.from({ length: 16 }, (_, i) => i + 1).map((tier) => (
+                                <option key={tier} value={tier}>
+                                  {lang === "ko"
+                                    ? `경로석 ${tier}티어 (${64 + tier})`
+                                    : `Waystone T${tier} (${64 + tier})`}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                      );
+                    }
+
+
+                    // Gold 타입이면 전용 UI 표시 (hideConditions가 false일 때만)
+                    if (baseType === "Gold" && !hideConditions) {
                         
                         // 조건이 없어도 UI 값을 표시하기 위한 임시 변수
                         // 조건이 있으면 그 값을, 없으면 기본값(65)이나 마지막 선택값을 사용
@@ -1392,7 +1783,6 @@ export default function StyleSettingsModal({
                     // 기본 렌더링 (골드 아닐 때만 렌더링하도록 조건 추가)
                     return (
                         <>
-                          {/* StackSize: 골드가 아닐 때만 표시 (골드는 위에서 처리) */}
                           {localConditions.stackSize && baseType !== "Gold" && (
                             <div className="condition-row-inline">
                                 <span className="style-setting-label">
@@ -1409,17 +1799,28 @@ export default function StyleSettingsModal({
                                   <option value="<">&lt;</option>
                                   <option value="==">==</option>
                                 </select>
-                              <div className="condition-slider-wrapper-inline">
-                                <OperatorSlider
-                                  value={localConditions.stackSize.value || 0}
-                                  onChange={(newValue) => handleConditionChange("stackSize", "value", newValue)}
-                                  operator={localConditions.stackSize.operator || ">="}
-                                  min={0}
-                                  max={10000}
-                                  step={10}
-                                  label="" 
-                                />
-                              </div>
+                                
+                                {baseType === "Currency" ? (
+                                    <input
+                                      type="number"
+                                      className="condition-value"
+                                      value={localConditions.stackSize.value || 0}
+                                      onChange={(e) => handleConditionChange("stackSize", "value", parseInt(e.target.value) || 0)}
+                                      style={{ width: "80px", marginLeft: "8px" }}
+                                    />
+                                ) : (
+                                  <div className="condition-slider-wrapper-inline">
+                                    <OperatorSlider
+                                      value={localConditions.stackSize.value || 0}
+                                      onChange={(newValue) => handleConditionChange("stackSize", "value", newValue)}
+                                      operator={localConditions.stackSize.operator || ">="}
+                                      min={0}
+                                      max={10000}
+                                      step={10}
+                                      label="" 
+                                    />
+                                  </div>
+                                )}
                             </div>
                           )}
 
@@ -1453,6 +1854,242 @@ export default function StyleSettingsModal({
                                     />
                                 </div>
                               </div>
+                          )}
+
+                          {/* Corrupted/Rarity 조건: 한 줄에 배치 */}
+                          {(localConditions.corrupted !== undefined || localConditions.rarity !== undefined) && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
+                              {/* Corrupted 조건 */}
+                              {localConditions.corrupted !== undefined && (
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={localConditions.corrupted?.enabled !== false}
+                                    onChange={(e) => {
+                                      setLocalConditions(prev => ({
+                                        ...prev,
+                                        corrupted: { 
+                                          ...prev.corrupted,
+                                          enabled: e.target.checked 
+                                        }
+                                      }));
+                                    }}
+                                  />
+                                  <span className="style-setting-label" style={{ minWidth: "auto", opacity: localConditions.corrupted?.enabled === false ? 0.5 : 1 }}>
+                                    {lang === "ko" ? "타락" : "Corrupted"}
+                                  </span>
+                                  <select
+                                    className="condition-operator"
+                                    value="=="
+                                    disabled
+                                    style={{ width: "50px", minWidth: "50px", opacity: localConditions.corrupted?.enabled === false ? 0.5 : 1 }}
+                                  >
+                                    <option value="==">==</option>
+                                  </select>
+                                  <select
+                                    className="condition-value"
+                                    value={localConditions.corrupted?.value === true ? "True" : "False"}
+                                    onChange={(e) => {
+                                      const newValue = e.target.value === "True";
+                                      setLocalConditions(prev => ({
+                                        ...prev,
+                                        corrupted: { ...prev.corrupted, value: newValue }
+                                      }));
+                                    }}
+                                    disabled={localConditions.corrupted?.enabled === false}
+                                    style={{ width: "80px", opacity: localConditions.corrupted?.enabled === false ? 0.5 : 1 }}
+                                  >
+                                    <option value="False">False</option>
+                                    <option value="True">True</option>
+                                  </select>
+                                </div>
+                              )}
+                              
+                              {/* Rarity 조건 */}
+                              {localConditions.rarity !== undefined && (
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={localConditions.rarity?.enabled !== false}
+                                    onChange={(e) => {
+                                      setLocalConditions(prev => ({
+                                        ...prev,
+                                        rarity: { 
+                                          ...prev.rarity,
+                                          enabled: e.target.checked 
+                                        }
+                                      }));
+                                    }}
+                                  />
+                                  <span className="style-setting-label" style={{ minWidth: "auto", opacity: localConditions.rarity?.enabled === false ? 0.5 : 1 }}>
+                                    {lang === "ko" ? "희귀도" : "Rarity"}
+                                  </span>
+                                  <select
+                                    className="condition-operator"
+                                    value={localConditions.rarity?.operator || "=="}
+                                    onChange={(e) => {
+                                      setLocalConditions(prev => ({
+                                        ...prev,
+                                        rarity: { ...prev.rarity, operator: e.target.value }
+                                      }));
+                                    }}
+                                    disabled={localConditions.rarity?.enabled === false}
+                                    style={{ width: "50px", minWidth: "50px", opacity: localConditions.rarity?.enabled === false ? 0.5 : 1 }}
+                                  >
+                                    <option value="==">==</option>
+                                    <option value=">=">≥</option>
+                                    <option value="<=">≤</option>
+                                  </select>
+                                  <select
+                                    className="condition-value"
+                                    value={localConditions.rarity?.value || "Normal"}
+                                    onChange={(e) => {
+                                      setLocalConditions(prev => ({
+                                        ...prev,
+                                        rarity: { ...prev.rarity, value: e.target.value }
+                                      }));
+                                    }}
+                                    disabled={localConditions.rarity?.enabled === false}
+                                    style={{ 
+                                      width: "100px", 
+                                      opacity: localConditions.rarity?.enabled === false ? 0.5 : 1,
+                                      color: localConditions.rarity?.enabled === false 
+                                        ? undefined 
+                                        : (localConditions.rarity?.value === "Normal" ? "#FFFFFF" 
+                                          : localConditions.rarity?.value === "Magic" ? "#8888FF" 
+                                          : localConditions.rarity?.value === "Rare" ? "#FFFF77" 
+                                          : "#AF6025")
+                                    }}
+                                  >
+                                    <option value="Normal" style={{ color: "#FFFFFF" }}>{lang === "ko" ? "일반" : "Normal"}</option>
+                                    <option value="Magic" style={{ color: "#8888FF" }}>{lang === "ko" ? "마법" : "Magic"}</option>
+                                    <option value="Rare" style={{ color: "#FFFF77" }}>{lang === "ko" ? "희귀" : "Rare"}</option>
+                                    <option value="Unique" style={{ color: "#AF6025" }}>{lang === "ko" ? "유니크" : "Unique"}</option>
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* BaseTypes 입력란: chance_base 등 baseTypes 배열이 있는 경우 */}
+                          {localConditions.baseTypes && Array.isArray(localConditions.baseTypes) && (
+                            <div className="condition-row-full-width" style={{ marginTop: "12px" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                                <span className="style-setting-label">
+                                  {lang === "ko" ? "아이템 목록" : "Item List"}
+                                </span>
+                                <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+                                  {lang === "ko" 
+                                    ? "(한글 또는 영어로 입력)" 
+                                    : "(Enter in Korean or English)"}
+                                </span>
+                              </div>
+                              
+                              {/* 현재 등록된 아이템 목록 */}
+                              <div style={{ 
+                                display: "flex", 
+                                flexWrap: "wrap", 
+                                gap: "6px", 
+                                marginBottom: "8px",
+                                minHeight: "32px",
+                                padding: "8px",
+                                background: "rgba(0,0,0,0.2)",
+                                borderRadius: "4px"
+                              }}>
+                                {localConditions.baseTypes.map((item, index) => (
+                                  <div 
+                                    key={index}
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "4px",
+                                      padding: "4px 8px",
+                                      background: "rgba(255,255,255,0.1)",
+                                      borderRadius: "4px",
+                                      fontSize: "13px"
+                                    }}
+                                  >
+                                    <span>{item}</span>
+                                    <button
+                                      onClick={() => {
+                                        setLocalConditions(prev => ({
+                                          ...prev,
+                                          baseTypes: prev.baseTypes.filter((_, i) => i !== index)
+                                        }));
+                                      }}
+                                      style={{
+                                        background: "none",
+                                        border: "none",
+                                        color: "var(--muted)",
+                                        cursor: "pointer",
+                                        padding: "0 2px",
+                                        fontSize: "14px"
+                                      }}
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                ))}
+                                {localConditions.baseTypes.length === 0 && (
+                                  <span style={{ color: "var(--muted)", fontSize: "12px" }}>
+                                    {lang === "ko" ? "아이템이 없습니다" : "No items"}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* 새 아이템 입력란 */}
+                              <div style={{ display: "flex", gap: "8px" }}>
+                                <input
+                                  type="text"
+                                  placeholder={lang === "ko" ? "아이템 이름 입력..." : "Enter item name..."}
+                                  id="baseTypes-input"
+                                  style={{
+                                    flex: 1,
+                                    padding: "8px 12px",
+                                    background: "rgba(0,0,0,0.3)",
+                                    border: "1px solid rgba(255,255,255,0.2)",
+                                    borderRadius: "4px",
+                                    color: "var(--text-main)",
+                                    fontSize: "13px"
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" && e.target.value.trim()) {
+                                      const newItem = e.target.value.trim();
+                                      setLocalConditions(prev => ({
+                                        ...prev,
+                                        baseTypes: [...(prev.baseTypes || []), newItem]
+                                      }));
+                                      e.target.value = "";
+                                    }
+                                  }}
+                                />
+                                <button
+                                  onClick={() => {
+                                    const input = document.getElementById("baseTypes-input");
+                                    if (input && input.value.trim()) {
+                                      const newItem = input.value.trim();
+                                      setLocalConditions(prev => ({
+                                        ...prev,
+                                        baseTypes: [...(prev.baseTypes || []), newItem]
+                                      }));
+                                      input.value = "";
+                                    }
+                                  }}
+                                  style={{
+                                    padding: "8px 16px",
+                                    background: "var(--poe2-primary)",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    color: "#000",
+                                    cursor: "pointer",
+                                    fontWeight: "600",
+                                    fontSize: "13px"
+                                  }}
+                                >
+                                  {lang === "ko" ? "추가" : "Add"}
+                                </button>
+                              </div>
+                            </div>
                           )}
                         </>
                     );
@@ -1571,12 +2208,13 @@ export default function StyleSettingsModal({
         </div>
         {/* 하단 버튼 영역 (규칙 추가 + 복사/붙여넣기 + 초기화 + 적용) */}
         <div className="style-settings-footer">
+          {/* 규칙 추가 버튼: 추가 가능 규칙 여부와 관계없이 항상 표시, 없으면 비활성화 */}
           {canAddRules && (
             <div className="rule-add-button-container">
             {showRuleDropdown ? (
               <div className="rule-dropdown">
                 <div className="rule-dropdown-header">
-                  <span>규칙 추가</span>
+                  <span>{lang === "ko" ? "규칙 추가" : "Add Rule"}</span>
                   <button 
                     className="rule-dropdown-close"
                     onClick={() => setShowRuleDropdown(false)}
@@ -1610,17 +2248,21 @@ export default function StyleSettingsModal({
                     !localRules.some(rule => rule.code === condition.code)
                   ).length === 0 && (
                     <div className="rule-dropdown-empty">
-                      추가 가능한 규칙이 없습니다
+                      {lang === "ko" ? "추가 가능한 규칙이 없습니다" : "No rules available to add"}
                     </div>
                   )}
                 </div>
               </div>
             ) : (
               <button 
-                className="rule-add-button"
+                className={`rule-add-button ${getAvailableRules().filter(c => !localRules.some(r => r.code === c.code)).length === 0 ? 'disabled' : ''}`}
                 onClick={() => setShowRuleDropdown(true)}
+                disabled={getAvailableRules().filter(c => !localRules.some(r => r.code === c.code)).length === 0}
+                title={getAvailableRules().filter(c => !localRules.some(r => r.code === c.code)).length === 0 
+                  ? (lang === "ko" ? "추가 가능한 규칙이 없습니다" : "No rules available") 
+                  : ""}
               >
-                + 규칙 추가
+                + {lang === "ko" ? "규칙 추가" : "Add Rule"}
               </button>
             )}
             </div>

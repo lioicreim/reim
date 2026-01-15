@@ -119,18 +119,8 @@ export default function CustomRulesPage() {
           }
         }}
         onLoadFromFile={() => alert(lang === "ko" ? "파일 불러오기 기능은 준비 중입니다." : "File load feature coming soon.")}
-        onSaveAsDefault={(presetId) => {
-          if (
-            confirm(
-              lang === "ko"
-                ? `현재 설정을 기본값으로 저장하시겠습니까?`
-                : `Save current settings as default?`
-            )
-          ) {
-            // TODO: 실제 저장 로직 구현
-            alert(lang === "ko" ? "기본값으로 저장되었습니다!" : "Saved as default!");
-          }
-        }}
+        showSaveAsDefaultDropdown={false}
+        showSaveAsLeagueDefault={false}
       />
 
       <style jsx>{`

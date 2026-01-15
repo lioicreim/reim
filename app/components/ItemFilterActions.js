@@ -35,6 +35,31 @@ export default function ItemFilterActions({
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const TEMP_SNAPSHOT_KEY = "poe2_temp_preset_v1";
+  const TEMP_SNAPSHOT_VERSION = 1;
+  const SNAPSHOT_PREFIXES = [
+    "quickFilter_",
+    "tier-list-",
+    "poe2_",
+    "currency-type-tier-styles-",
+  ];
+  const SNAPSHOT_SINGLE_KEYS = [
+    "lang",
+    "currency-type-colors",
+    "game-colors",
+    "saved_filters",
+    "tier-list-excluded-items",
+  ];
+
+  const showSuccess = (message) => {
+    if (onShowSuccess) {
+      onShowSuccess(message);
+      return;
+    }
+    setSuccessMessage(message);
+    setSuccessModalOpen(true);
+  };
+
   // 저장된 필터 목록 불러오기
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -155,6 +180,89 @@ export default function ItemFilterActions({
     }
   };
 
+  const handleTempSave = () => {
+    if (typeof window === "undefined") return;
+    try {
+      const snapshot = {
+        version: TEMP_SNAPSHOT_VERSION,
+        savedAt: new Date().toISOString(),
+        keys: {},
+      };
+
+      // prefix 기반 수집
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k === TEMP_SNAPSHOT_KEY) continue;
+        const isAllowedPrefix = SNAPSHOT_PREFIXES.some((p) => k.startsWith(p));
+        if (!isAllowedPrefix) continue;
+        snapshot.keys[k] = localStorage.getItem(k);
+      }
+
+      // 단일 키 수집
+      SNAPSHOT_SINGLE_KEYS.forEach((k) => {
+        const v = localStorage.getItem(k);
+        if (v !== null && v !== undefined) snapshot.keys[k] = v;
+      });
+
+      localStorage.setItem(TEMP_SNAPSHOT_KEY, JSON.stringify(snapshot));
+      showSuccess(
+        lang === "ko"
+          ? "임시저장이 완료되었습니다. (이 브라우저에 1개 저장)"
+          : "Temp save completed. (Saved 1 snapshot in this browser)"
+      );
+    } catch (e) {
+      console.error("Temp save failed:", e);
+      alert(lang === "ko" ? "임시저장에 실패했습니다." : "Temp save failed.");
+    }
+  };
+
+  const handleTempLoad = () => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(TEMP_SNAPSHOT_KEY);
+      if (!raw) {
+        alert(
+          lang === "ko"
+            ? "저장된 임시저장이 없습니다."
+            : "No temp snapshot found."
+        );
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      const keys = parsed?.keys || {};
+
+      // allowlist 범위의 기존 키를 먼저 정리(스냅샷 복원 시 잔여값 방지)
+      const toRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k === TEMP_SNAPSHOT_KEY) continue;
+        const isAllowedPrefix = SNAPSHOT_PREFIXES.some((p) => k.startsWith(p));
+        const isSingle = SNAPSHOT_SINGLE_KEYS.includes(k);
+        if (isAllowedPrefix || isSingle) toRemove.push(k);
+      }
+      toRemove.forEach((k) => localStorage.removeItem(k));
+
+      // 스냅샷 키 복원
+      Object.keys(keys).forEach((k) => {
+        const v = keys[k];
+        if (v === null || v === undefined) return;
+        localStorage.setItem(k, v);
+      });
+
+      showSuccess(
+        lang === "ko"
+          ? "임시저장을 불러왔습니다. 페이지를 새로고침합니다."
+          : "Temp snapshot loaded. Reloading..."
+      );
+      setTimeout(() => window.location.reload(), 150);
+    } catch (e) {
+      console.error("Temp load failed:", e);
+      alert(lang === "ko" ? "임시저장 불러오기에 실패했습니다." : "Failed to load temp snapshot.");
+    }
+  };
+
   const handleResetAll = () => {
     setShowResetDropdown(false);
     setConfirmType("all");
@@ -211,6 +319,9 @@ export default function ItemFilterActions({
             </button>
             {showLoadDropdown && (
               <div className="action-dropdown">
+                <button className="dropdown-item" onClick={handleTempLoad}>
+                  {lang === "ko" ? "임시저장 불러오기" : "Load Temp Snapshot"}
+                </button>
                 <button
                   className="dropdown-item"
                   onClick={handleLoadFromStorage}
@@ -299,6 +410,15 @@ export default function ItemFilterActions({
             onClick={onCopy}
           >
             {lang === "ko" ? "복사하기" : "Copy"}
+          </button>
+
+          {/* 임시저장 (로컬 1개 스냅샷) */}
+          <button
+            className="action-button action-button-secondary"
+            onClick={handleTempSave}
+            title={lang === "ko" ? "현재 설정을 임시저장합니다(로컬 1개)" : "Save current settings as a single local snapshot"}
+          >
+            {lang === "ko" ? "임시저장" : "Temp Save"}
           </button>
         </div>
 

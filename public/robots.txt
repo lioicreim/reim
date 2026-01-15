@@ -1,0 +1,32 @@
+# robots.txt for reim.kr
+
+# 모든 검색 엔진 크롤러 허용
+User-agent: *
+Allow: /
+
+# 사이트맵 위치
+Sitemap: https://reim.kr/sitemap.xml
+
+# 크롤링 제외 경로 (필요시 추가)
+# Disallow: /api/
+# Disallow: /admin/
+
+# 크롤 속도 조절 (선택사항)
+# Crawl-delay: 1
+
+# 주요 검색 엔진별 설정
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+# 악성 봇 차단 (선택사항)
+# User-agent: BadBot
+# Disallow: /

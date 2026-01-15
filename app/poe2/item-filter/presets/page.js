@@ -411,7 +411,8 @@ export default function PresetsPage() {
         onCopy={handleCopy}
         onResetAll={handleResetAll}
         onResetPage={handleResetPage}
-        onSaveAsDefault={handleSaveAsDefault}
+        showSaveAsDefaultDropdown={false}
+        showSaveAsLeagueDefault={false}
       />
 
       <style jsx>{`

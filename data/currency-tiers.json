@@ -140,6 +140,8 @@
       "Blacksmith's Whetstone",
       "Greater Orb of Augmentation",
       "Greater Orb of Transmutation",
+      "Greater Rebirth Rune",
+      "Greater Stone Rune",
       "Orb of Augmentation",
       "Orb of Transmutation",
       "Paquate's Pact",
@@ -156,7 +158,8 @@
       "Omen of Sinistral Necromancy",
       "Omen of Dextral Necromancy",
       "Omen of the Liege",
-      "Twilight Reliquary Key"
+      "Twilight Reliquary Key",
+      "Petition Splinter"
     ],
     "E": [
       "Artificer's Shard",
@@ -303,6 +306,8 @@
       "Blacksmith's Whetstone",
       "Greater Orb of Augmentation",
       "Greater Orb of Transmutation",
+      "Greater Rebirth Rune",
+      "Greater Stone Rune",
       "Lesser Jeweller's Orb",
       "Orb of Augmentation",
       "Orb of Transmutation",
@@ -321,7 +326,8 @@
       "Omen of Sinistral Necromancy",
       "Omen of Dextral Necromancy",
       "Omen of the Liege",
-      "Twilight Reliquary Key"
+      "Twilight Reliquary Key",
+      "Petition Splinter"
     ],
     "E": [
       "Artificer's Shard",
@@ -470,6 +476,8 @@
       "Blacksmith's Whetstone",
       "Greater Orb of Augmentation",
       "Greater Orb of Transmutation",
+      "Greater Rebirth Rune",
+      "Greater Stone Rune",
       "Orb of Augmentation",
       "Orb of Transmutation",
       "Paquate's Pact",
@@ -486,7 +494,8 @@
       "Omen of Sinistral Necromancy",
       "Omen of Dextral Necromancy",
       "Omen of the Liege",
-      "Twilight Reliquary Key"
+      "Twilight Reliquary Key",
+      "Petition Splinter"
     ],
     "E": [
       "Artificer's Shard",
@@ -635,6 +644,8 @@
       "Blacksmith's Whetstone",
       "Greater Orb of Augmentation",
       "Greater Orb of Transmutation",
+      "Greater Rebirth Rune",
+      "Greater Stone Rune",
       "Orb of Augmentation",
       "Orb of Transmutation",
       "Paquate's Pact",
@@ -651,7 +662,8 @@
       "Omen of Sinistral Necromancy",
       "Omen of Dextral Necromancy",
       "Omen of the Liege",
-      "Twilight Reliquary Key"
+      "Twilight Reliquary Key",
+      "Petition Splinter"
     ],
     "E": [
       "Artificer's Shard",
@@ -1001,9 +1013,11 @@
       "Lesser Stone Rune",
       "Lesser Vision Rune",
       "Greater Iron Rune",
+      "Greater Rebirth Rune",
       "Greater Robust Rune",
       "Greater Resolve Rune",
       "Greater Rune of Nobility",
+      "Greater Stone Rune",
       "Farrul's Rune of Grace",
       "Saqawal's Rune of Erosion",
       "Lady Hestra's Rune of Winter",
@@ -1059,7 +1073,8 @@
       "Omen of Sinistral Necromancy",
       "Omen of Dextral Necromancy",
       "Omen of the Liege",
-      "Twilight Reliquary Key"
+      "Twilight Reliquary Key",
+      "Petition Splinter"
     ],
     "E": [
       "Artificer's Shard",

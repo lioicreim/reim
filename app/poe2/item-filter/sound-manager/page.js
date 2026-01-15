@@ -237,6 +237,8 @@ export default function SoundManagerPage() {
       <ItemFilterActions
         lang={lang}
         onDownload={() => {}} 
+        showSaveAsDefaultDropdown={false}
+        showSaveAsLeagueDefault={false}
         onResetAll={(onSuccess) => {
           if (confirm(lang === "ko" ? "모든 설정을 초기화하시겠습니까?" : "Reset all settings?")) {
             localStorage.removeItem("poe2_sound_option");

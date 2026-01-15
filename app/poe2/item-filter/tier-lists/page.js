@@ -368,13 +368,8 @@ export default function TierListPage() {
     return getUniquesItemDefaultTier(baseType);
   };
 
-  // 장비 아이템의 실제 티어 가져오기 (커스텀 티어 우선) - 먼저 정의
-  const getGearItemTier = (itemName) => {
-    // 커스텀 티어가 있으면 사용
-    if (customGearTiers[itemName]) {
-      return customGearTiers[itemName];
-    }
-    // 기본 티어 찾기
+  // 장비 아이템의 기본 티어 가져오기
+  const getGearItemDefaultTier = (itemName) => {
     const item = bases[itemName];
     if (!item) return null;
     const numTier = item.tier || 4;
@@ -386,6 +381,26 @@ export default function TierListPage() {
     return "D";
   };
 
+  // 장비 아이템의 실제 티어 가져오기 (커스텀 티어 우선) - 먼저 정의
+  const getGearItemTier = (itemName) => {
+    // 커스텀 티어가 있으면 사용
+    if (customGearTiers[itemName]) {
+      return customGearTiers[itemName];
+    }
+    // 기본 티어 찾기
+    return getGearItemDefaultTier(itemName);
+  };
+
+  // 모드 아이템의 기본 티어 가져오기
+  const getModsItemDefaultTier = (modId) => {
+    for (const t of ["S", "A", "B", "C"]) {
+      if (modsTiersData[t] && modsTiersData[t].includes(modId)) {
+        return t;
+      }
+    }
+    return "D";
+  };
+
   // 모드 아이템의 실제 티어 가져오기 (커스텀 티어 우선)
   const getModsItemTier = (modId) => {
     // 커스텀 티어가 있으면 사용
@@ -393,12 +408,7 @@ export default function TierListPage() {
       return customModsTiers[modId];
     }
     // 기본 티어 찾기
-    for (const t of ["S", "A", "B", "C"]) {
-      if (modsTiersData[t] && modsTiersData[t].some(m => m.id === modId)) {
-        return t;
-      }
-    }
-    return "D";
+    return getModsItemDefaultTier(modId);
   };
 
   // 모든 아이템을 티어별로 그룹화 (커스텀 티어 반영)
@@ -1110,18 +1120,34 @@ export default function TierListPage() {
   const getCurrencyItemTier = useCallback((itemName) => {
     // selectedLeague를 그대로 사용 (default 키가 존재함)
     const leagueKey = selectedLeague;
+    // 기본 티어 찾기 (커스텀 티어 제외)
+    const getCurrencyItemDefaultTier = (itemName) => {
+      for (const t of ["S", "A", "B", "C", "D", "E"]) {
+        if (currencyTiers[leagueKey]?.[t]?.includes(itemName)) {
+          return t;
+        }
+      }
+      return null;
+    };
+    
     // 커스텀 티어가 있으면 사용
     if (customCurrencyTiers[itemName]) {
       return customCurrencyTiers[itemName];
     }
     // 기본 티어 찾기
-    for (const tier of ["S", "A", "B", "C", "D", "E"]) {
-      if (currencyTiers[leagueKey]?.[tier]?.includes(itemName)) {
-        return tier;
+    return getCurrencyItemDefaultTier(itemName);
+  }, [selectedLeague, customCurrencyTiers]);
+
+  // 화폐 아이템의 기본 티어 가져오기 (외부용)
+  const getCurrencyItemDefaultTierValue = useCallback((itemName) => {
+    const leagueKey = selectedLeague;
+    for (const t of ["S", "A", "B", "C", "D", "E"]) {
+      if (currencyTiers[leagueKey]?.[t]?.includes(itemName)) {
+        return t;
       }
     }
     return null;
-  }, [selectedLeague, customCurrencyTiers]);
+  }, [selectedLeague]);
 
   // 티어의 첫 번째 아이템 이름 가져오기 - useCallback으로 메모이제이션하여 무한 루프 방지
   const getFirstItemNameInTier = useCallback((tier, currencyTypeId) => {
@@ -1216,10 +1242,17 @@ export default function TierListPage() {
   const moveCurrencyItem = (itemName, fromTier, toTier) => {
     if (fromTier === toTier) return;
     
-    // selectedLeague를 그대로 사용 (default 키가 존재함)
+    // selectedLeague를 그대로 사용 (default 키!존재함)
     const leagueKey = selectedLeague;
+    const defaultTier = getCurrencyItemDefaultTierValue(itemName);
     const newCustomTiers = { ...customCurrencyTiers };
-    newCustomTiers[itemName] = toTier;
+    
+    if (toTier === defaultTier) {
+      delete newCustomTiers[itemName];
+    } else {
+      newCustomTiers[itemName] = toTier;
+    }
+    
     setCustomCurrencyTiers(newCustomTiers);
     
     // 로컬스토리지에 저장
@@ -1231,8 +1264,15 @@ export default function TierListPage() {
   const moveGearItem = (itemName, fromTier, toTier) => {
     if (fromTier === toTier) return;
     
+    const defaultTier = getGearItemDefaultTier(itemName);
     const newCustomTiers = { ...customGearTiers };
-    newCustomTiers[itemName] = toTier;
+    
+    if (toTier === defaultTier) {
+      delete newCustomTiers[itemName];
+    } else {
+      newCustomTiers[itemName] = toTier;
+    }
+    
     setCustomGearTiers(newCustomTiers);
     
     // 로컬스토리지에 저장
@@ -1266,8 +1306,15 @@ export default function TierListPage() {
   const moveModsItem = (modId, fromTier, toTier) => {
     if (fromTier === toTier) return;
     
+    const defaultTier = getModsItemDefaultTier(modId);
     const newCustomTiers = { ...customModsTiers };
-    newCustomTiers[modId] = toTier;
+    
+    if (toTier === defaultTier) {
+      delete newCustomTiers[modId];
+    } else {
+      newCustomTiers[modId] = toTier;
+    }
+    
     setCustomModsTiers(newCustomTiers);
     
     // 로컬스토리지에 저장
@@ -1314,6 +1361,7 @@ export default function TierListPage() {
     setCustomCurrencyTiers({});
     setCustomGearTiers({});
     setCustomUniquesTiers({});
+    setCustomModsTiers({});
     
     // 다른 페이지의 설정도 초기화
     if (typeof window !== "undefined") {
@@ -1326,6 +1374,7 @@ export default function TierListPage() {
       });
       localStorage.removeItem("tier-list-custom-gear");
       localStorage.removeItem("tier-list-custom-uniques");
+      localStorage.removeItem("tier-list-custom-mods");
     }
     
     if (onSuccess) {
@@ -1349,6 +1398,10 @@ export default function TierListPage() {
       const uniquesKey = "tier-list-custom-uniques";
       localStorage.removeItem(uniquesKey);
       setCustomUniquesTiers({});
+    } else if (selectedCategory === "mods") {
+      const modsKey = "tier-list-custom-mods";
+      localStorage.removeItem(modsKey);
+      setCustomModsTiers({});
     }
     
     if (onSuccess) {
@@ -2714,12 +2767,13 @@ export default function TierListPage() {
                                 <div className="tier-class-name">{categoryName}</div>
                                 {uniqueCategoryItems.map((itemName, index) => {
                                   const actualTier = getCurrencyItemTier(itemName);
+                                  const isCustomTier = !!customCurrencyTiers[itemName];
                                   const resolvedItemName = itemDefinitions[itemName] ? itemName : (itemDefinitions[`Greater ${itemName}`] ? `Greater ${itemName}` : itemName);
                                   const itemDef = itemDefinitions[resolvedItemName];
                                   return (
                                     <div
                                       key={`${categoryId}-${itemName}-${index}`}
-                                      className="tier-item"
+                                      className={`tier-item ${isCustomTier ? "tier-item-custom" : ""}`}
                                       draggable
                                       onDragStart={(e) => handleDragStart(e, itemName, actualTier)}
                                       onDragOver={handleDragOver}
@@ -2790,13 +2844,14 @@ export default function TierListPage() {
                           .filter(itemName => !excludedItems["currency"]?.includes(itemName))
                           .map((itemName) => {
                           const actualTier = getCurrencyItemTier(itemName);
+                          const isCustomTier = !!customCurrencyTiers[itemName];
                           const isSelected = selectedItems.has(itemName);
                           const resolvedItemName = itemDefinitions[itemName] ? itemName : (itemDefinitions[`Greater ${itemName}`] ? `Greater ${itemName}` : itemName);
                           const itemDef = itemDefinitions[resolvedItemName];
                           return (
                             <div
                               key={itemName}
-                              className={`tier-item ${isSelected ? "tier-item-selected" : ""}`}
+                              className={`tier-item ${isSelected ? "tier-item-selected" : ""} ${isCustomTier ? "tier-item-custom" : ""}`}
                               draggable={selectedItems.size === 0}
                               onDragStart={(e) => {
                                 if (selectedItems.size === 0) {
@@ -3303,6 +3358,7 @@ export default function TierListPage() {
                               )}
                               {classItems.map((item) => {
                                 const actualTier = getGearItemTier(item.name);
+                                const isCustomTier = !!customGearTiers[item.name];
                                 const getTierTextColor = (tier) => {
                                   if (tier === "S") return "#000000";
                                   if (tier === "A" || tier === "B") return "#ffffff";
@@ -3312,7 +3368,7 @@ export default function TierListPage() {
                                 return (
                                   <div
                                     key={item.name}
-                                    className="tier-item"
+                                    className={`tier-item ${isCustomTier ? "tier-item-custom" : ""}`}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, item.name, actualTier)}
                                     onContextMenu={(e) => handleContextMenu(e, item.name, "gear-bases")}
@@ -3397,6 +3453,7 @@ export default function TierListPage() {
                                       )}
                                       {classItems.map((item) => {
                                         const actualTier = getGearItemTier(item.name);
+                                        const isCustomTier = !!customGearTiers[item.name];
                                         const getTierTextColor = (tier) => {
                                           if (tier === "S") return "#000000";
                                           if (tier === "A" || tier === "B") return "#ffffff";
@@ -3406,7 +3463,7 @@ export default function TierListPage() {
                                         return (
                                           <div
                                             key={item.name}
-                                            className="tier-item"
+                                            className={`tier-item ${isCustomTier ? "tier-item-custom" : ""}`}
                                             draggable={selectedItems.size === 0}
                                             onDragStart={(e) => {
                                               if (selectedItems.size === 0) {
@@ -3747,6 +3804,8 @@ export default function TierListPage() {
         onResetAll={handleResetAll}
         onResetPage={handleResetPage}
         onLoadFromFile={handleImport}
+        showSaveAsDefaultDropdown={false}
+        showSaveAsLeagueDefault={false}
         onSaveAsDefault={(presetId) => {
           const presetName = presetsData.presets.find(p => p.id === presetId)?.nameKo || presetId;
           setConfirmModal({
@@ -3774,7 +3833,6 @@ export default function TierListPage() {
           });
         }}
         leagueOptions={leagueFilters}
-        showSaveAsLeagueDefault={true}
       />
 
       <style jsx>{`

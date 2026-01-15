@@ -77,11 +77,11 @@ export default function ItemFilterNav() {
   // 각 탭별 설명 텍스트 정의
   const descriptions = {
     presets: "게임 진행 상황에 맞는 프리셋을 선택하여 필터를 시작하세요",
-    "quick-filters": "아이템 필터 규칙을 직관적으로 선택하여 나만의 최적화된 필터를 만드세요",
-    "tier-category-currency": "화폐 아이템을 S~E 티어로 분류하여 시각적으로 확인하세요",
-    "tier-category-uniques": "유니크 아이템을 S~C 티어로 분류하여 시각적으로 확인하세요",
-    "tier-category-gear-bases": "장비 베이스를 S~E 티어로 분류하여 시각적으로 확인하세요",
-    "tier-category-mods": "모드를 S~E 티어로 분류하여 시각적으로 확인하세요",
+    "quick-filters": "입맛에 맞게 직관적으로 선택하여 나만의 필터를 만들고 다운로드하세요",
+    "tier-category-currency": "화폐 아이템을 드래그해서 티어를 변경할 수 있습니다",
+    "tier-category-uniques": "유니크 아이템을 드래그해서 티어를 변경할 수 있습니다",
+    "tier-category-gear-bases": "장비 베이스를 드래그해서 티어를 변경할 수 있습니다",
+    "tier-category-mods": "모드를 드래그해서 티어를 변경할 수 있습니다",
     "custom-rules": "고급 사용자를 위한 커스텀 규칙을 직접 작성하세요",
     "sound-manager": "아이템별 사운드 효과를 세밀하게 설정하세요",
     preview: "생성된 필터 코드를 미리보기하고 테스트하세요",
@@ -98,7 +98,8 @@ export default function ItemFilterNav() {
     <>
       <nav className="item-filter-nav">
         <div className="item-filter-nav-container">
-          {allTabs.map((tab) => (
+          {/* 설정 탭은 메뉴에서 숨김 (URL 직접 접근은 가능) */}
+          {allTabs.filter((tab) => tab.id !== "settings").map((tab) => (
             <Link
               key={tab.id}
               href={tab.path}
