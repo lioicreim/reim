@@ -357,6 +357,75 @@
           "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
           "playAlertSound": { "id": 2, "volume": 200 }
         }
+      }
+    ]
+  },
+  "base_items_socket_quality": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "gear_exceptional_socketed2",
+        "enabled": true,
+        "name": "1>2 Socket Items",
+        "nameKo": "1 소켓 > 2 소켓 아이템",
+        "type": "show",
+        "conditions": {
+          "itemTier": {
+            "value": "T1"
+          },
+          "rarity": {
+            "operator": "==",
+            "value": "Normal"
+          },
+          "levelType": {
+            "value": "MIN_ILVL"
+          },
+          "sockets": {
+            "operator": ">=",
+            "value": 2
+          },
+          "class": {
+            "operator": "==",
+            "value": ["Foci", "One Hand Maces", "Sceptres", "Spears", "Wands"]
+          }
+        },
+        "styles": {
+          "playEffect": "Red",
+          "minimapIcon": { "size": 1, "color": "Red", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_exceptional_socketed3",
+        "enabled": true,
+        "name": "2>3 Socket Items",
+        "nameKo": "2 소켓 > 3 소켓 아이템",
+        "type": "show",
+        "conditions": {
+          "itemTier": {
+            "value": "T1"
+          },
+          "rarity": {
+            "operator": "==",
+            "value": "Normal"
+          },
+          "levelType": {
+            "value": "MIN_ILVL"
+          },
+          "sockets": {
+            "operator": ">=",
+            "value": 3
+          },
+          "class": {
+            "operator": "==",
+            "value": ["Body Armours", "Bows", "Crossbows", "Quarterstaves", "Talismans", "Staves", "Two Hand Maces"]
+          }
+        },
+        "styles": {
+          "playEffect": "Red",
+          "minimapIcon": { "size": 1, "color": "Red", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
       },
       {
         "id": "base_items_t1_quality",
@@ -374,7 +443,7 @@
           },
           "quality": {
             "operator": ">=",
-            "value": 0
+            "value": 24
           }
         },
         "styles": {
@@ -401,7 +470,7 @@
           },
           "quality": {
             "operator": ">=",
-            "value": 0
+            "value": 24
           }
         },
         "styles": {
@@ -438,7 +507,6 @@
         },
         "styles": {
           "fontSize": 42,
-          "textColor": { "r": 0, "g": 240, "b": 190, "a": 255 },
           "borderColor": { "r": 0, "g": 240, "b": 190, "a": 255 },
           "backgroundColor": { "r": 0, "g": 75, "b": 30, "a": 255 },
           "customSound": "custom_sound/6_item_t2.mp3",
@@ -702,6 +770,207 @@
       }
     ]
   },
+  "waystones": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "waystones_t16",
+        "enabled": true,
+        "name": "Waystone T16",
+        "nameKo": "경로석 16 티어",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Waystones" },
+          "waystoneTier": { "operator": ">=", "value": 16 }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 102, "g": 32, "b": 32, "a": 255 },
+          "playEffect": "Red",
+          "minimapIcon": { "size": 1, "color": "Red", "shape": "Square" },
+          "customSound": "custom_sound/2_currency_a.mp3"
+        }
+      },
+      {
+        "id": "waystones_t15",
+        "enabled": true,
+        "name": "Waystone T15",
+        "nameKo": "경로석 15 티어",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Waystones" },
+          "waystoneTier": { "operator": "==", "value": 15 }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 102, "g": 32, "b": 32, "a": 255 },
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 1, "color": "Orange", "shape": "Square" },
+          "customSound": "custom_sound/9_maps.mp3"
+        }
+      },
+      {
+        "id": "waystones_t14",
+        "enabled": true,
+        "name": "Waystone T14",
+        "nameKo": "경로석 14 티어",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Waystones" },
+          "waystoneTier": { "operator": "==", "value": 14 }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 102, "g": 32, "b": 32, "a": 255 },
+          "playEffect": "Yellow",
+          "minimapIcon": { "size": 1, "color": "Yellow", "shape": "Square" },
+          "customSound": "custom_sound/9_maps.mp3"
+        }
+      },
+      {
+        "id": "waystones_t11_t13",
+        "enabled": true,
+        "name": "Waystone T11-13",
+        "nameKo": "경로석 11-13 티어",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Waystones" },
+          "waystoneTier": { "operator": ">=", "value": 11 }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
+          "borderColor": { "r": 255, "g": 0, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 235, "g": 235, "b": 235, "a": 255 },
+          "minimapIcon": { "size": 1, "color": "White", "shape": "Square" },
+          "customSound": "custom_sound/9_maps.mp3"
+        }
+      },
+      {
+        "id": "waystones_t6_t10",
+        "enabled": true,
+        "name": "Waystone T6-10",
+        "nameKo": "경로석 6-10 티어",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Waystones" },
+          "waystoneTier": { "operator": ">=", "value": 6 }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 190, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 20, "g": 20, "b": 0, "a": 255 },
+          "minimapIcon": { "size": 1, "color": "White", "shape": "Square" },
+          "customSound": "custom_sound/9_maps.mp3"
+        }
+      },
+      {
+        "id": "waystones_t1_t5",
+        "enabled": true,
+        "name": "Waystone T1-5",
+        "nameKo": "경로석 1-5 티어",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Waystones" },
+          "waystoneTier": { "operator": "<", "value": 6 }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 20, "g": 20, "b": 0, "a": 255 },
+          "minimapIcon": { "size": 1, "color": "White", "shape": "Square" }
+        }
+      }
+    ]
+  },
+  "expedition": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "expedition_logbook",
+        "enabled": true,
+        "name": "Expedition Logbook",
+        "nameKo": "탐험 일지",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Expedition Logbooks" },
+          "baseType": { "operator": "==", "value": ["Expedition Logbook"] },
+          "itemLevel": { "operator": ">=", "value": 60 }
+        },
+        "styles": {
+          "fontSize": 40,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 210, "g": 178, "b": 135, "a": 255 },
+          "backgroundColor": { "r": 36, "g": 104, "b": 123, "a": 255 },
+          "playEffect": "Blue Temp",
+          "minimapIcon": { "size": 0, "color": "Blue", "shape": "Square" },
+          "customSound": "custom_sound/9_maps.mp3"
+        }
+      },
+      {
+        "id": "expedition_splinter",
+        "enabled": true,
+        "name": "Runic Splinter",
+        "nameKo": "룬 파편",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Stackable Currency" },
+          "baseType": { "operator": "==", "value": ["Runic Splinter"] }
+        },
+        "styles": {
+          "fontSize": 41,
+          "textColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
+          "borderColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 252, "g": 92, "b": 39, "a": 255 },
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Circle" }
+        }
+      },
+      {
+        "id": "expedition_coinage",
+        "enabled": true,
+        "name": "Exotic Coinage",
+        "nameKo": "특이한 주화",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Stackable Currency" },
+          "baseType": { "operator": "==", "value": ["Exotic Coinage"] }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 240, "g": 90, "b": 35, "a": 255 },
+          "playEffect": "Yellow",
+          "minimapIcon": { "size": 1, "color": "Yellow", "shape": "Circle" }
+        }
+      },
+      {
+        "id": "expedition_artifact",
+        "enabled": true,
+        "name": "Expedition Artifact",
+        "nameKo": "탐험 유물",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Stackable Currency" },
+          "baseType": { "operator": "==", "value": ["Black Scythe Artifact", "Broken Circle Artifact", "Order Artifact", "Sun Artifact"] }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 90, "g": 0, "b": 127, "a": 255 }
+        }
+      }
+    ]
+  },
   "charms": {
     "enabled": true,
     "rules": [
@@ -787,6 +1056,206 @@
           "fontSize": 40,
           "borderColor": { "r": 100, "g": 100, "b": 100, "a": 255 },
           "backgroundColor": { "r": 10, "g": 60, "b": 40, "a": 255 }
+        }
+      }
+    ]
+  },
+  "flasks": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "flask_ilvl83",
+        "enabled": true,
+        "name": "[엔드게임] 극한의 생명력, 마나 플라스크",
+        "nameKo": "[엔드게임] 극한의 생명력, 마나 플라스크",
+        "type": "show",
+        "conditions": {
+          "itemLevel": {
+            "operator": ">=",
+            "value": 83
+          },
+          "baseType": {
+            "operator": "==",
+            "value": ["Ultimate Life Flask", "Ultimate Mana Flask"]
+          }
+        },
+        "styles": {
+          "fontSize": 40,
+          "textColor": { "r": 0, "g": 255, "b": 255, "a": 255 },
+          "borderColor": { "r": 255, "g": 190, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 29, "g": 89, "b": 102, "a": 255 },
+          "playEffect": "Blue",
+          "minimapIcon": { "size": 0, "color": "Blue", "shape": "Raindrop" },
+          "customSound": "custom_sound/8_flask.mp3",
+          "soundVolume": 300
+        }
+      },
+      {
+        "id": "flask_hide_arealv79_quality",
+        "enabled": true,
+        "name": "[엔드게임] T15+ 퀄리티 없는 플라스크 숨김",
+        "nameKo": "[엔드게임] T15+ 퀄리티 없는 플라스크 숨김",
+        "type": "hide",
+        "conditions": {
+          "class": {
+            "operator": "==",
+            "value": "Flasks"
+          },
+          "quality": {
+            "operator": "<",
+            "value": 1
+          },
+          "areaLevel": {
+            "operator": ">=",
+            "value": 79
+          },
+          "rarity": {
+            "operator": "<=",
+            "value": "Magic"
+          }
+        },
+        "styles": {}
+      },
+      {
+        "id": "flask_ultimate_life",
+        "enabled": true,
+        "name": "[엔드게임] 극한의 생명력 플라스크 표시",
+        "nameKo": "[엔드게임] 극한의 생명력 플라스크 표시",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": ">=",
+            "value": "Magic"
+          },
+          "baseType": {
+            "operator": "==",
+            "value": "Ultimate Life Flask"
+          }
+        },
+        "styles": {
+          "fontSize": 38,
+          "borderColor": { "r": 255, "g": 0, "b": 0, "a": 255 },
+          "backgroundColor": { "r": 10, "g": 60, "b": 40, "a": 255 }
+        }
+      },
+      {
+        "id": "flask_ultimate_mana",
+        "enabled": true,
+        "name": "[엔드게임] 극한의 마나 플라스크 표시",
+        "nameKo": "[엔드게임] 극한의 마나 플라스크 표시",
+        "type": "show",
+        "conditions": {
+          "rarity": {
+            "operator": ">=",
+            "value": "Magic"
+          },
+          "baseType": {
+            "operator": "==",
+            "value": "Ultimate Mana Flask"
+          }
+        },
+        "styles": {
+          "fontSize": 38,
+          "borderColor": { "r": 100, "g": 100, "b": 255, "a": 255 },
+          "backgroundColor": { "r": 10, "g": 60, "b": 40, "a": 255 }
+        }
+      },
+      {
+        "id": "flask_quality",
+        "enabled": true,
+        "name": "[엔드게임] 퀄리티 플라스크",
+        "nameKo": "[엔드게임] 퀄리티 플라스크",
+        "type": "show",
+        "conditions": {
+          "quality": {
+            "operator": ">",
+            "value": 1
+          },
+          "class": {
+            "operator": "==",
+            "value": ["Life Flasks", "Mana Flasks"]
+          },
+          "rarity": {
+            "operator": ">=",
+            "value": "Normal"
+          }
+        },
+        "styles": {
+          "fontSize": 38,
+          "borderColor": { "r": 30, "g": 200, "b": 200, "a": 255 },
+          "backgroundColor": { "r": 10, "g": 60, "b": 40, "a": 255 }
+        }
+      },
+      {
+        "id": "flask_hide_low",
+        "enabled": true,
+        "name": "[엔드게임] 낮은 등급 플라스크 숨김",
+        "nameKo": "[엔드게임] 낮은 등급 플라스크 숨김",
+        "type": "hide",
+        "conditions": {
+          "class": {
+            "operator": "==",
+            "value": ["Life Flasks", "Mana Flasks"]
+          },
+          "baseType": {
+            "operator": "==",
+            "value": ["Lesser Life Flask", "Medium Life Flask", "Greater Life Flask", "Grand Life Flask", "Giant Life Flask", "Colossal Life Flask", "Gargantuan Life Flask", "Lesser Mana Flask", "Medium Mana Flask", "Greater Mana Flask", "Grand Mana Flask", "Giant Mana Flask", "Colossal Mana Flask", "Gargantuan Mana Flask"]
+          },
+          "rarity": {
+            "operator": "<=",
+            "value": "Rare"
+          },
+          "areaLevel": {
+            "operator": ">",
+            "value": 64
+          }
+        },
+        "styles": {}
+      },
+      {
+        "id": "flask_leveling_arealv20",
+        "enabled": true,
+        "name": "[레벨링] 20레벨 지역까지 모두 표시",
+        "nameKo": "[레벨링] 20레벨 지역까지 모두 표시",
+        "type": "show",
+        "conditions": {
+          "class": {
+            "operator": "==",
+            "value": ["Life Flasks", "Mana Flasks"]
+          },
+          "areaLevel": {
+            "operator": "<",
+            "value": 20
+          }
+        },
+        "styles": {
+          "fontSize": 38,
+          "borderColor": { "r": 30, "g": 200, "b": 200, "a": 255 }
+        }
+      },
+      {
+        "id": "flask_leveling_hide_normal",
+        "enabled": true,
+        "name": "[레벨링] 일반 등급 숨김",
+        "nameKo": "[레벨링] 일반 등급 숨김",
+        "type": "hide",
+        "conditions": {
+          "class": {
+            "operator": "==",
+            "value": ["Life Flasks", "Mana Flasks"]
+          },
+          "rarity": {
+            "operator": "==",
+            "value": "Normal"
+          },
+          "areaLevel": {
+            "operator": "<",
+            "value": 65
+          }
+        },
+        "styles": {
+          "fontSize": 38,
+          "borderColor": { "r": 30, "g": 200, "b": 200, "a": 255 }
         }
       }
     ]
@@ -884,6 +1353,73 @@
           "textColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
           "borderColor": { "r": 0, "g": 0, "b": 0, "a": 255 },
           "backgroundColor": { "r": 249, "g": 150, "b": 25, "a": 255 }
+        }
+      },
+      {
+        "id": "special_trial_djinn_barya",
+        "enabled": true,
+        "name": "[전직 아이템] 진 바리아",
+        "nameKo": "[전직 아이템] 진 바리아",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Trial Coins" },
+          "baseType": { "operator": "==", "value": "Djinn Barya" }
+        },
+        "styles": {
+          "fontSize": 38,
+          "textColor": { "r": 255, "g": 207, "b": 132, "a": 255 },
+          "borderColor": { "r": 0, "g": 200, "b": 0, "a": 255 }
+        },
+        "itemLevelEnabled": false,
+        "itemLevelOperator": ">=",
+        "itemLevelValue": 83
+      },
+      {
+        "id": "special_inscribed_ultimatum",
+        "enabled": true,
+        "name": "[전직 아이템] 새겨진 결전",
+        "nameKo": "[전직 아이템] 새겨진 결전",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Inscribed Ultimatum" },
+          "baseType": { "operator": "==", "value": "Inscribed Ultimatum" }
+        },
+        "styles": {
+          "fontSize": 40
+        },
+        "itemLevelEnabled": false,
+        "itemLevelOperator": ">=",
+        "itemLevelValue": 83
+      },
+      {
+        "id": "trial_keys",
+        "enabled": true,
+        "name": "[시련] 열쇠",
+        "nameKo": "[시련] 열쇠",
+        "type": "show",
+        "conditions": {
+          "baseTypes": ["Gold Key", "Silver Key", "Bronze Key"]
+        },
+        "styles": {
+          "fontSize": 42,
+          "textColor": { "r": 74, "g": 230, "b": 58, "a": 255 },
+          "playAlertSound": { "id": 3, "volume": 300 },
+          "playEffect": "Green",
+          "minimapIcon": { "size": 0, "color": "Green", "shape": "Pentagon" }
+        }
+      },
+      {
+        "id": "trial_relics",
+        "enabled": true,
+        "name": "[시련] 유물",
+        "nameKo": "[시련] 유물",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": "Relics" },
+          "rarity": { "operator": "<=", "value": "Magic" }
+        },
+        "styles": {
+          "fontSize": 40
         }
       }
     ]
@@ -996,7 +1532,8 @@
           "class": {
             "operator": "==",
             "value": "Stackable Currency"
-          }
+          },
+          "baseTypes": [" Splinter"]
         },
         "styles": {
           "fontSize": 41,

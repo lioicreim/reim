@@ -97,6 +97,15 @@
       "defaultOperator": "==",
       "applicableClasses": ["chance", "gear", "currency", "all"],
       "isMultiple": true
+    },
+    "WaystoneTier": {
+      "code": "WaystoneTier",
+      "name": "경로석 티어",
+      "nameEn": "Waystone Tier",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["waystones", "all"]
     }
   },
   "classConditions": {
@@ -115,6 +124,10 @@
     "gear": {
       "default": ["ItemLevel", "Rarity"],
       "additional": ["AreaLevel", "Quality", "Sockets", "UnidentifiedItemTier", "Corrupted", "Class", "BaseType"]
+    },
+    "waystones": {
+      "default": ["WaystoneTier"],
+      "additional": ["Corrupted", "Rarity", "ItemLevel", "Quality"]
     }
   }
 }

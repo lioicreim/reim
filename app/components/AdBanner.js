@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Google AdSense 광고 배너 컴포넌트
@@ -17,20 +17,95 @@ export default function AdBanner({
   fullWidthResponsive = true,
   className = "",
 }) {
+  const wrapperRef = useRef(null);
+  const insRef = useRef(null);
+  const pushedRef = useRef(false);
+
   useEffect(() => {
-    try {
-      // AdSense 스크립트 로드 확인 및 광고 푸시
-      if (typeof window !== "undefined" && window.adsbygoogle) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+    let observer = null;
+    let rafId = null;
+    let retryTimer = null;
+    let attempts = 0;
+
+    const isReady = () => {
+      if (!wrapperRef.current || !insRef.current) return false;
+      const width = wrapperRef.current.offsetWidth;
+      const height = wrapperRef.current.offsetHeight;
+      if (width <= 0 || height <= 0) return false;
+      return true;
+    };
+
+    const alreadyRendered = () => {
+      if (!insRef.current) return false;
+      return Boolean(insRef.current.getAttribute("data-adsbygoogle-status"));
+    };
+
+    const tryPush = () => {
+      if (pushedRef.current || alreadyRendered()) {
+        pushedRef.current = true;
+        return;
       }
+      if (!isReady()) return;
+      if (typeof window === "undefined" || !window.adsbygoogle) return;
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        pushedRef.current = true;
+      } catch (error) {
+        console.error("AdSense error:", error);
+      }
+    };
+
+    try {
+      // 레이아웃 폭 확보 후 광고 푸시
+      rafId = window.requestAnimationFrame(() => {
+        tryPush();
+      });
+
+      observer = new ResizeObserver(() => {
+        tryPush();
+      });
+
+      if (wrapperRef.current) {
+        observer.observe(wrapperRef.current);
+      }
+
+      const handleResize = () => {
+        tryPush();
+      };
+
+      window.addEventListener("resize", handleResize);
+
+      retryTimer = window.setInterval(() => {
+        attempts += 1;
+        tryPush();
+
+        if (pushedRef.current || attempts >= 10) {
+          window.clearInterval(retryTimer);
+        }
+      }, 1000);
+
+      return () => {
+        if (rafId) {
+          window.cancelAnimationFrame(rafId);
+        }
+        if (observer) {
+          observer.disconnect();
+        }
+        if (retryTimer) {
+          window.clearInterval(retryTimer);
+        }
+        window.removeEventListener("resize", handleResize);
+      };
     } catch (error) {
       console.error("AdSense error:", error);
     }
   }, []);
 
   return (
-    <div className={`ad-banner-wrapper ${className}`}>
+    <div ref={wrapperRef} className={`ad-banner-wrapper ${className}`}>
       <ins
+        ref={insRef}
         className="adsbygoogle"
         style={adStyle}
         data-ad-client="ca-pub-6650201170584917"

@@ -281,6 +281,86 @@ export default function QuickFiltersPage() {
   // 주얼 섹션 접기/펼치기 상태
   const [isJewelsExpanded, setIsJewelsExpanded] = useState(false);
 
+  // 탐험 설정 로드
+  const [expeditionSettings, setExpeditionSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.expedition?.rules || [],
+  });
+  const [isClientExpedition, setIsClientExpedition] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 탐험 설정 불러오기
+  useEffect(() => {
+    setIsClientExpedition(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_expedition");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const defaultRules = quickFilterDefaults.expedition?.rules || [];
+          const savedRules = parsed.rules || [];
+
+          const mergedRules = savedRules.map((savedRule) => {
+            const defaultRule = defaultRules.find((r) => r.id === savedRule.id);
+            if (defaultRule) {
+              const mergedConditions = savedRule.conditions 
+                ? savedRule.conditions 
+                : (defaultRule.conditions || {});
+              return {
+                ...defaultRule,
+                ...savedRule,
+                conditions: mergedConditions,
+                name: defaultRule.name,
+                nameKo: defaultRule.nameKo,
+              };
+            }
+            return savedRule;
+          });
+
+          defaultRules.forEach((defaultRule) => {
+            if (!mergedRules.find((r) => r.id === defaultRule.id)) {
+              mergedRules.push(defaultRule);
+            }
+          });
+
+          setExpeditionSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergedRules,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved expedition settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 탐험 설정 저장
+  useEffect(() => {
+    if (isClientExpedition && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_expedition",
+        JSON.stringify(expeditionSettings)
+      );
+    }
+  }, [expeditionSettings, isClientExpedition]);
+
+  // 탐험 규칙 활성화/비활성화
+  const toggleExpeditionRule = (ruleId) => {
+    const updatedRules = expeditionSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setExpeditionSettings({
+      ...expeditionSettings,
+      enabled: hasAnyEnabled || expeditionSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 탐험 섹션 접기/펼치기 상태
+  const [isExpeditionExpanded, setIsExpeditionExpanded] = useState(false);
+
   // 금고실 열쇠 설정 로드
   const [vaultKeysSettings, setVaultKeysSettings] = useState({
     enabled: true,
@@ -797,6 +877,179 @@ export default function QuickFiltersPage() {
     });
   };
 
+  // 경로석 설정 로드
+  const [waystonesSettings, setWaystonesSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.waystones?.rules || [],
+  });
+  const [isClientWaystones, setIsClientWaystones] = useState(false);
+  const [isWaystonesExpanded, setIsWaystonesExpanded] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 경로석 설정 불러오기
+  useEffect(() => {
+    setIsClientWaystones(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_waystones");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedRules = parsed.rules || [];
+          const defaultRules = quickFilterDefaults.waystones?.rules || [];
+
+          // 저장된 규칙과 기본 규칙 병합
+          const mergedRules = defaultRules.map((defaultRule) => {
+            const savedRule = savedRules.find((r) => r.id === defaultRule.id);
+            if (savedRule) {
+               const mergedConditions = savedRule.conditions 
+                ? savedRule.conditions 
+                : (defaultRule.conditions || {});
+               return {
+                 ...defaultRule,
+                 ...savedRule,
+                 conditions: mergedConditions,
+                 name: defaultRule.name,
+                 nameKo: defaultRule.nameKo,
+               };
+            }
+            return defaultRule;
+          });
+
+          // Add any new defaults not in saved
+           defaultRules.forEach((defaultRule) => {
+             if (!mergedRules.find((r) => r.id === defaultRule.id)) {
+               mergedRules.push(defaultRule);
+             }
+           });
+
+          setWaystonesSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergedRules,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved waystones settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 경로석 설정 저장
+  useEffect(() => {
+    if (isClientWaystones && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_waystones",
+        JSON.stringify(waystonesSettings)
+      );
+    }
+  }, [waystonesSettings, isClientWaystones]);
+
+  // 경로석 규칙 활성화/비활성화
+  const toggleWaystonesRule = (ruleId) => {
+    const updatedRules = waystonesSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+    setWaystonesSettings({
+      ...waystonesSettings,
+      enabled: hasAnyEnabled || waystonesSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 플라스크 설정 로드
+  const [flasksSettings, setFlasksSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.flasks?.rules || [],
+  });
+  const [isClientFlasks, setIsClientFlasks] = useState(false);
+  const [isFlasksExpanded, setIsFlasksExpanded] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 플라스크 설정 불러오기
+  useEffect(() => {
+    setIsClientFlasks(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_flasks");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedRules = parsed.rules || [];
+          const defaultRules = quickFilterDefaults.flasks?.rules || [];
+
+          // 저장된 규칙과 기본 규칙 병합 (기본 규칙 우선 적용)
+          const mergedRules = defaultRules.map((defaultRule) => {
+            const savedRule = savedRules.find((r) => r.id === defaultRule.id);
+            if (savedRule) {
+              const mergedConditions = (() => {
+                if (!savedRule.conditions) {
+                  return defaultRule.conditions || {};
+                }
+                const result = { ...savedRule.conditions };
+                if (
+                  defaultRule.conditions?.itemLevel !== undefined &&
+                  result.itemLevel === undefined
+                ) {
+                  result.itemLevel = defaultRule.conditions.itemLevel;
+                }
+                return result;
+              })();
+              return {
+                ...defaultRule,  // 기본 규칙을 먼저 적용
+                ...savedRule,    // 저장된 규칙으로 덮어쓰기 (enabled, conditions 제외)
+                name: defaultRule.name,
+                nameKo: defaultRule.nameKo,
+                type: defaultRule.type,
+                styles: defaultRule.styles,
+                conditions: mergedConditions,
+                // ItemLevel 관련 속성들도 병합
+                itemLevelEnabled: savedRule.itemLevelEnabled !== undefined ? savedRule.itemLevelEnabled : defaultRule.itemLevelEnabled,
+                itemLevelOperator: savedRule.itemLevelOperator || defaultRule.itemLevelOperator,
+                itemLevelValue: savedRule.itemLevelValue !== undefined ? savedRule.itemLevelValue : defaultRule.itemLevelValue,
+              };
+            }
+            return defaultRule;  // 저장된 규칙이 없으면 기본 규칙 사용
+          });
+
+          defaultRules.forEach((defaultRule) => {
+            if (!mergedRules.find((r) => r.id === defaultRule.id)) {
+              mergedRules.push(defaultRule);
+            }
+          });
+
+          setFlasksSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergedRules,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved flasks settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 플라스크 설정 저장
+  useEffect(() => {
+    if (isClientFlasks && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_flasks",
+        JSON.stringify(flasksSettings)
+      );
+    }
+  }, [flasksSettings, isClientFlasks]);
+
+  // 플라스크 규칙 활성화/비활성화
+  const toggleFlasksRule = (ruleId) => {
+    const updatedRules = flasksSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setFlasksSettings({
+      ...flasksSettings,
+      enabled: hasAnyEnabled || flasksSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
   // 기타 설정 로드
   const [othersSettings, setOthersSettings] = useState({
     enabled: true,
@@ -944,10 +1197,6 @@ export default function QuickFiltersPage() {
     rules: quickFilterDefaults.base_items?.rules || [],
   });
   const [isClientBaseItems, setIsClientBaseItems] = useState(false);
-  const [baseItemsDropdown, setBaseItemsDropdown] = useState({
-    ruleId: null,
-    type: null,
-  });
 
   // 클라이언트에서만 localStorage에서 베이스 아이템 설정 불러오기
   useEffect(() => {
@@ -1006,16 +1255,6 @@ export default function QuickFiltersPage() {
     }
   }, [baseItemsSettings, isClientBaseItems]);
 
-  // 베이스 아이템 드롭다운 외부 클릭 시 닫기
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".base-items-dropdown-wrapper")) {
-        setBaseItemsDropdown({ ruleId: null, type: null });
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   // 베이스 아이템 규칙 활성화/비활성화
   const toggleBaseItemsRule = (ruleId) => {
@@ -1093,6 +1332,153 @@ export default function QuickFiltersPage() {
   // 베이스 아이템 섹션 접기/펼치기 상태
   const [isBaseItemsExpanded, setIsBaseItemsExpanded] = useState(false);
 
+  // 베이스 아이템 (소켓 & 퀄리티) 설정 로드
+  const [baseItemsSocketQualitySettings, setBaseItemsSocketQualitySettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.base_items_socket_quality?.rules || [],
+  });
+  const [isClientBaseItemsSocketQuality, setIsClientBaseItemsSocketQuality] = useState(false);
+  const [isBaseItemsSocketQualityExpanded, setIsBaseItemsSocketQualityExpanded] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 베이스 아이템 (소켓 & 퀄리티) 설정 불러오기
+  useEffect(() => {
+    setIsClientBaseItemsSocketQuality(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_baseItemsSocketQuality");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const defaultRules = quickFilterDefaults.base_items_socket_quality?.rules || [];
+          const savedRules = parsed.rules || [];
+
+          const mergedRules = defaultRules.map((defaultRule) => {
+            const savedRule = savedRules.find((r) => r.id === defaultRule.id);
+            if (savedRule) {
+              const mergedConditions = {
+                ...(defaultRule.conditions || {}),
+                ...(savedRule.conditions || {}),
+              };
+              return {
+                ...defaultRule,
+                ...savedRule,
+                conditions: mergedConditions,
+                name: defaultRule.name,
+                nameKo: defaultRule.nameKo,
+              };
+            }
+            return defaultRule;
+          });
+
+          setBaseItemsSocketQualitySettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergedRules,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved base items socket quality settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 베이스 아이템 (소켓 & 퀄리티) 설정 저장
+  useEffect(() => {
+    if (isClientBaseItemsSocketQuality && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_baseItemsSocketQuality",
+        JSON.stringify(baseItemsSocketQualitySettings)
+      );
+    }
+  }, [baseItemsSocketQualitySettings, isClientBaseItemsSocketQuality]);
+
+
+  // 베이스 아이템 (소켓 & 퀄리티) 규칙 활성화/비활성화
+  const toggleBaseItemsSocketQualityRule = (ruleId) => {
+    const updatedRules = baseItemsSocketQualitySettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setBaseItemsSocketQualitySettings({
+      ...baseItemsSocketQualitySettings,
+      enabled: hasAnyEnabled || baseItemsSocketQualitySettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 베이스 아이템 (소켓 & 퀄리티) 규칙 값 업데이트
+  const updateBaseItemsSocketQualityRule = (ruleId, field, value) => {
+    setBaseItemsSocketQualitySettings({
+      ...baseItemsSocketQualitySettings,
+      rules: baseItemsSocketQualitySettings.rules.map((rule) => {
+        if (rule.id === ruleId) {
+          if (field.includes(".")) {
+            const parts = field.split(".");
+            if (parts.length === 2) {
+              const [parent, child] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: value,
+                },
+              };
+            } else if (parts.length === 3) {
+              const [parent, child, grandchild] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: {
+                    ...rule[parent][child],
+                    [grandchild]: value,
+                  },
+                },
+              };
+            }
+          } else if (
+            field === "fontSize" ||
+            field === "textColor" ||
+            field === "borderColor" ||
+            field === "backgroundColor" ||
+            field === "playEffect" ||
+            field === "minimapIcon" ||
+            field === "customSound"
+          ) {
+            return {
+              ...rule,
+              styles: {
+                ...(rule.styles || {}),
+                [field]: value,
+              },
+            };
+          } else {
+            return {
+              ...rule,
+              [field]: value,
+            };
+          }
+        }
+        return rule;
+      }),
+    });
+  };
+
+  // 레벨링 규칙 활성화/비활성화
+  const toggleLevelingRule = (ruleId) => {
+    const updatedRules = levelingSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setLevelingSettings({
+      ...levelingSettings,
+      enabled: hasAnyEnabled || levelingSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
   // 레벨링 단계 섹션 접기/펴기 상태
   const [isLeagueStartExpanded, setIsLeagueStartExpanded] = useState(false);
 
@@ -1162,14 +1548,18 @@ export default function QuickFiltersPage() {
     { id: "currency", name: "화폐" },
     { id: "uniques", name: "유니크" },
     { id: "uncut_gems", name: "미가공 젬" },
+    { id: "waystones", name: "경로석" },
+    { id: "expedition", name: "탐험" },
   ]);
 
   // 섹션 순서 관리 (오른쪽 열)
   const [rightColumnSections, setRightColumnSections] = useState([
     { id: "base_items", name: "베이스 아이템" },
+    { id: "base_items_socket_quality", name: "소켓 & 퀄리티" },
     { id: "jewels", name: "주얼" },
     { id: "vaultKeys", name: "금고실 열쇠" },
     { id: "charms", name: "호신부" },
+    { id: "flasks", name: "플라스크" },
     { id: "others", name: "기타" },
   ]);
 
@@ -1206,6 +1596,121 @@ export default function QuickFiltersPage() {
       color: "var(--text-muted)",
       fontWeight: "bold",
     };
+  };
+
+  // 현재 설정된 조건들을 요약하여 표시하는 함수
+  const renderConfigSummary = (rule) => {
+    if (!rule || !rule.conditions) return null;
+    const { conditions } = rule;
+    const summaries = [];
+
+    // 1. 희귀도 (Rarity)
+    if (conditions.rarity?.value) {
+      const rarityMap = {
+        Normal: lang === "ko" ? "일반" : "Normal",
+        Magic: lang === "ko" ? "마법" : "Magic",
+        Rare: lang === "ko" ? "희귀" : "Rare",
+        Unique: lang === "ko" ? "유니크" : "Unique",
+      };
+      summaries.push(rarityMap[conditions.rarity.value] || conditions.rarity.value);
+    }
+
+    // 2. 레벨 타입 (LevelType)
+    if (conditions.levelType?.value) {
+      const levelTypeMap = {
+        MIN_ILVL: lang === "ko" ? "최소 레벨" : "Min Lv",
+        MAX_ILVL: lang === "ko" ? "최대 레벨" : "Max Lv",
+      };
+      summaries.push(levelTypeMap[conditions.levelType.value] || conditions.levelType.value);
+    }
+
+    // 3. 아이템 티어 (ItemTier)
+    if (conditions.itemTier?.value && conditions.itemTier.value !== "all") {
+      summaries.push(conditions.itemTier.value);
+    }
+
+    // 4. 미감정 등급 (UnidentifiedItemTier)
+    if (conditions.unidentifiedItemTier?.value) {
+      const op = conditions.unidentifiedItemTier.operator || ">=";
+      summaries.push(lang === "ko" ? `미감정 ${conditions.unidentifiedItemTier.value}${op === ">=" ? "+" : ""}` : `Unid ${conditions.unidentifiedItemTier.value}${op === ">=" ? "+" : ""}`);
+    }
+
+    // 5. 퀄리티 (Quality)
+    if (conditions.quality?.value) {
+      const op = conditions.quality.operator || ">=";
+      const displayOp = op === ">=" ? "+" : (op === "<" ? "-" : "");
+      summaries.push(`${conditions.quality.value}%${displayOp}`);
+    }
+
+    // 6. 소켓 (Sockets)
+    if (conditions.sockets?.value) {
+      summaries.push(lang === "ko" ? `${conditions.sockets.value}소켓` : `${conditions.sockets.value}S`);
+    }
+
+    // 7. 아이템 레벨 (ItemLevel - Others 섹션 및 플라스크용)
+    const itemLevel = (rule.itemLevelEnabled && rule.itemLevelValue) 
+      ? { value: rule.itemLevelValue, operator: rule.itemLevelOperator || ">=" }
+      : (conditions.itemLevel?.value 
+          ? { value: conditions.itemLevel.value, operator: conditions.itemLevel.operator || ">=" }
+          : null);
+
+    if (itemLevel) {
+      const op = itemLevel.operator || ">=";
+      const displayOp = op === ">=" ? "+" : op === "<=" ? "-" : op === "==" ? "" : op;
+      summaries.push(`Lv${itemLevel.value}${displayOp}`);
+    }
+
+    // 8. 중첩 크기 (StackSize)
+    if (conditions.stackSize?.value) {
+      const op = conditions.stackSize.operator || ">=";
+      const displayOp = op === ">=" ? "+" : "";
+      summaries.push(`${conditions.stackSize.value}${displayOp}`);
+    }
+
+    // 9. 지역 레벨 (AreaLevel)
+    if (conditions.areaLevel?.value) {
+      const level = conditions.areaLevel.value;
+      const op = conditions.areaLevel.operator || ">=";
+      const displayOp = op === ">=" ? "+" : (op === "<=" ? "-" : "");
+      
+      if (level >= 65) {
+        const tier = level - 64;
+        summaries.push(lang === "ko" ? `경로석 ${tier}T${displayOp}` : `Waystone ${tier}T${displayOp}`);
+      } else {
+        summaries.push(`Lv${level}${displayOp}`);
+      }
+    }
+
+    // 10. 경로석 티어 (WaystoneTier)
+    if (conditions.waystoneTier?.value) {
+      const op = conditions.waystoneTier.operator || ">=";
+      const displayOp = op === ">=" ? "+" : (op === "<=" ? "-" : "");
+      summaries.push(`T${conditions.waystoneTier.value}${displayOp}`);
+    }
+
+    if (summaries.length === 0) return null;
+
+    return (
+      <div 
+        className="rule-summary-tags"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          color: "var(--text-muted)",
+          fontSize: "12px",
+          marginLeft: "8px",
+          opacity: 0.8
+        }}
+      >
+        {summaries.map((text, idx) => (
+          <Fragment key={idx}>
+            {idx > 0 && <span style={{ opacity: 0.3 }}>|</span>}
+            <span style={{ whiteSpace: "nowrap" }}>{text}</span>
+          </Fragment>
+        ))}
+      </div>
+    );
   };
 
   // 섹션 순서 이동 함수
@@ -1410,15 +1915,44 @@ export default function QuickFiltersPage() {
       : { r: 0, g: 0, b: 0 };
   };
 
-  // 다운로드 핸들러
-  const handleDownload = () => {
-    // TODO: 필터 코드 생성 및 다운로드
-    const filterCode = generateFilterCode({
-      presetId: "starter", // 기본값, 나중에 선택된 프리셋 사용
-      isPS5: false,
-      excludedOptions: {},
-      customGearTiers: {},
-      customCurrencyTiers: {},
+  // 필터 코드 생성 메인 함수 (모든 페이지 통일된 로직)
+  const createFilterCode = () => {
+    const presetId = getActivePresetId();
+    const soundOption =
+      typeof window !== "undefined"
+        ? localStorage.getItem("poe2_sound_option") || "default"
+        : "default";
+    const soundSettings =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("poe2_sound_settings") || "[]")
+        : [];
+    
+    // 상세 설정(티어, 제외옵션 등) 로드
+    const customGearTiers =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("poe2_gear_tiers") || "{}")
+        : {};
+    const customCurrencyTiers =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("poe2_currency_tiers") || "{}")
+        : {};
+    const customModsTiers =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("poe2_mods_tiers") || "{}")
+        : {};
+    const excludedOptions =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("poe2_excluded_options") || "{}")
+        : {};
+
+    return generateFilterCode({
+      presetId,
+      soundOption,
+      soundSettings,
+      excludedOptions,
+      customGearTiers,
+      customCurrencyTiers,
+      customModsTiers,
       selectedLeague: "default",
       quickFilterSettings: {
         leveling: levelingSettings,
@@ -1428,19 +1962,29 @@ export default function QuickFiltersPage() {
         currency: currencySettings,
         vaultKeys: vaultKeysSettings,
         others: othersSettings,
+        flasks: flasksSettings,
         baseItems: baseItemsSettings,
-        chance: { enabled: true }, // TODO: 찬스 아이템 설정 추가
+        baseItemsSocketQuality: baseItemsSocketQualitySettings,
+        chance: { enabled: true },
         levelingClassSelection: levelingClassSelection,
         uncutGems: uncutGemsSettings,
+        waystones: waystonesSettings,
+        expedition: expeditionSettings,
         charms: charmsSettings,
       },
     });
+  };
+
+  // 다운로드 핸들러
+  const handleDownload = () => {
+    const filterCode = createFilterCode();
+    const presetId = getActivePresetId();
 
     const blob = new Blob([filterCode], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `quick-filter-${Date.now()}.filter`;
+    a.download = buildFilterFilename(presetId);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1449,29 +1993,7 @@ export default function QuickFiltersPage() {
 
   // 복사하기 핸들러
   const handleCopy = async () => {
-    // TODO: 필터 코드 생성 및 클립보드에 복사
-    const filterCode = generateFilterCode({
-      presetId: "starter",
-      isPS5: false,
-      excludedOptions: {},
-      customGearTiers: {},
-      customCurrencyTiers: {},
-      selectedLeague: "default",
-      quickFilterSettings: {
-        leveling: levelingSettings,
-        gold: goldSettings,
-        jewels: jewelsSettings,
-        uniques: uniquesSettings,
-        currency: currencySettings,
-        vaultKeys: vaultKeysSettings,
-        others: othersSettings,
-        baseItems: baseItemsSettings,
-        chance: { enabled: true }, // TODO: 찬스 아이템 설정 추가
-        levelingClassSelection: levelingClassSelection,
-        uncutGems: uncutGemsSettings,
-        charms: charmsSettings,
-      },
-    });
+    const filterCode = createFilterCode();
 
     try {
       await navigator.clipboard.writeText(filterCode);
@@ -1490,6 +2012,42 @@ export default function QuickFiltersPage() {
   const getActivePresetId = () => {
     if (typeof window === "undefined") return "starter";
     return localStorage.getItem("poe2_selected_preset") || "starter";
+  };
+
+  const formatDateTimeForFilename = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return {
+      dateStr: `${year}${month}${day}`,
+      timeStr: `${hours}${minutes}`,
+    };
+  };
+
+  const sanitizeFilePart = (value) => {
+    const safe = String(value || "")
+      .trim()
+      .replace(/[\\/:*?"<>|]+/g, "-")
+      .replace(/\s+/g, "_")
+      .replace(/_+/g, "_");
+    return safe || "filter";
+  };
+
+  const getPresetNameForFilename = (presetId) => {
+    const preset = presetsData.presets.find((p) => p.id === presetId);
+    const rawName =
+      lang === "ko"
+        ? preset?.nameKo || preset?.name || presetId
+        : preset?.name || preset?.nameKo || presetId;
+    return sanitizeFilePart(rawName);
+  };
+
+  const buildFilterFilename = (presetId) => {
+    const { dateStr, timeStr } = formatDateTimeForFilename();
+    const presetName = getPresetNameForFilename(presetId);
+    return `${presetName}_${dateStr}_${timeStr}.filter`;
   };
 
   const mergeRulesWithDefaults = (defaultRules = [], savedRules = []) => {
@@ -1526,7 +2084,12 @@ export default function QuickFiltersPage() {
       uniques: quickFilterDefaults.uniques,
       currency: { enabled: true, rules: [], selectedTiers: [], minTier: "E" },
       others: quickFilterDefaults.others,
+      flasks: quickFilterDefaults.flasks,
+      charms: quickFilterDefaults.charms,
+      waystones: quickFilterDefaults.waystones,
+      expedition: quickFilterDefaults.expedition,
       baseItems: quickFilterDefaults.base_items || { enabled: true, rules: [] },
+      baseItemsSocketQuality: quickFilterDefaults.base_items_socket_quality || { enabled: true, rules: [] },
     };
 
     if (typeof window === "undefined") return fallback;
@@ -1556,6 +2119,7 @@ export default function QuickFiltersPage() {
       const uniquesDefaultRules =
         (quickFilterDefaults.uniques || { rules: [] }).rules || [];
       const uncutGemsDefaultRules = quickFilterDefaults.uncut_gems?.rules || [];
+      const flasksDefaultRules = quickFilterDefaults.flasks?.rules || [];
 
       // uncutGems 키는 camelCase/legacy snake_case 둘 다 허용
       const storedUncutGems = stored.uncutGems || stored.uncut_gems;
@@ -1630,10 +2194,29 @@ export default function QuickFiltersPage() {
         },
         // 기타 섹션 (주문 감정서, 찬스 아이템 등)
         others: stored.others || quickFilterDefaults.others || { enabled: true, rules: [] },
+        // 플라스크 섹션
+        flasks: {
+          ...(quickFilterDefaults.flasks || { enabled: true, rules: [] }),
+          ...(stored.flasks || {}),
+          enabled:
+            stored.flasks?.enabled !== undefined
+              ? stored.flasks.enabled
+              : (quickFilterDefaults.flasks || { enabled: true }).enabled,
+          rules: mergeRulesWithDefaults(
+            flasksDefaultRules,
+            stored.flasks?.rules || []
+          ),
+        },
         // 호신부 섹션
         charms: stored.charms || quickFilterDefaults.charms || { enabled: true, rules: [] },
+        // 경로석 섹션
+        waystones: stored.waystones || quickFilterDefaults.waystones || { enabled: true, rules: [] },
+        // 탐험 섹션
+        expedition: stored.expedition || quickFilterDefaults.expedition || { enabled: true, rules: [] },
         // 베이스 아이템 섹션 (baseItems/base_items 둘 다 지원)
         baseItems: stored.baseItems || stored.base_items || quickFilterDefaults.base_items || { enabled: true, rules: [] },
+        // 베이스 아이템 (소켓 & 퀄리티) 섹션
+        baseItemsSocketQuality: stored.baseItemsSocketQuality || quickFilterDefaults.base_items_socket_quality || { enabled: true, rules: [] },
       };
     } catch (e) {
       console.error("Failed to parse quick filter default:", e);
@@ -1659,9 +2242,25 @@ export default function QuickFiltersPage() {
     if (baseline.charms) {
       setCharmsSettings(baseline.charms);
     }
+    // 플라스크 섹션 초기화 추가
+    if (baseline.flasks) {
+      setFlasksSettings(baseline.flasks);
+    }
+    // 경로석 섹션 초기화 추가
+    if (baseline.waystones) {
+      setWaystonesSettings(baseline.waystones);
+    }
+    // 탐험 섹션 초기화 추가
+    if (baseline.expedition) {
+      setExpeditionSettings(baseline.expedition);
+    }
     // 베이스 아이템 섹션 초기화 추가
     if (baseline.baseItems) {
       setBaseItemsSettings(baseline.baseItems);
+    }
+    // 베이스 아이템 (소켓 & 퀄리티) 섹션 초기화 추가
+    if (baseline.baseItemsSocketQuality) {
+      setBaseItemsSocketQualitySettings(baseline.baseItemsSocketQuality);
     }
 
     // 다른 페이지의 설정도 초기화
@@ -1684,6 +2283,10 @@ export default function QuickFiltersPage() {
         JSON.stringify(baseline.charms)
       );
       localStorage.setItem(
+        "quickFilter_flasks",
+        JSON.stringify(baseline.flasks)
+      );
+      localStorage.setItem(
         "quickFilter_currency",
         JSON.stringify(baseline.currency)
       );
@@ -1698,11 +2301,32 @@ export default function QuickFiltersPage() {
           JSON.stringify(baseline.others)
         );
       }
+      // 경로석 섹션 localStorage 저장
+      if (baseline.waystones) {
+        localStorage.setItem(
+          "quickFilter_waystones",
+          JSON.stringify(baseline.waystones)
+        );
+      }
+      // 탐험 섹션 localStorage 저장
+      if (baseline.expedition) {
+        localStorage.setItem(
+          "quickFilter_expedition",
+          JSON.stringify(baseline.expedition)
+        );
+      }
       // 베이스 아이템 섹션 localStorage 저장
       if (baseline.baseItems) {
         localStorage.setItem(
           "quickFilter_baseItems",
           JSON.stringify(baseline.baseItems)
+        );
+      }
+      // 베이스 아이템 (소켓 & 퀄리티) 섹션 localStorage 저장
+      if (baseline.baseItemsSocketQuality) {
+        localStorage.setItem(
+          "quickFilter_baseItemsSocketQuality",
+          JSON.stringify(baseline.baseItemsSocketQuality)
         );
       }
       localStorage.removeItem("tier-list-custom-gear");
@@ -1732,13 +2356,29 @@ export default function QuickFiltersPage() {
     setUniquesSettings(baseline.uniques);
     setCurrencySettings(baseline.currency);
     setVaultKeysSettings(baseline.vaultKeys);
+    // 경로석 섹션 초기화 추가
+    if (baseline.waystones) {
+      setWaystonesSettings(baseline.waystones);
+    }
+    // 탐험 섹션 초기화 추가
+    if (baseline.expedition) {
+      setExpeditionSettings(baseline.expedition);
+    }
     // 기타 섹션 초기화 추가
     if (baseline.others) {
       setOthersSettings(baseline.others);
     }
+    // 플라스크 섹션 초기화 추가
+    if (baseline.flasks) {
+      setFlasksSettings(baseline.flasks);
+    }
     // 베이스 아이템 섹션 초기화 추가
     if (baseline.baseItems) {
       setBaseItemsSettings(baseline.baseItems);
+    }
+    // 베이스 아이템 (소켓 & 퀄리티) 섹션 초기화 추가
+    if (baseline.baseItemsSocketQuality) {
+      setBaseItemsSocketQualitySettings(baseline.baseItemsSocketQuality);
     }
     if (typeof window !== "undefined") {
       localStorage.setItem("quickFilter_gold", JSON.stringify(baseline.gold));
@@ -1762,6 +2402,26 @@ export default function QuickFiltersPage() {
         "quickFilter_vaultKeys",
         JSON.stringify(baseline.vaultKeys)
       );
+      // 경로석 섹션 localStorage 저장
+      if (baseline.waystones) {
+        localStorage.setItem(
+          "quickFilter_waystones",
+          JSON.stringify(baseline.waystones)
+        );
+      }
+      // 탐험 섹션 localStorage 저장
+      if (baseline.expedition) {
+        localStorage.setItem(
+          "quickFilter_expedition",
+          JSON.stringify(baseline.expedition)
+        );
+      }
+      if (baseline.flasks) {
+        localStorage.setItem(
+          "quickFilter_flasks",
+          JSON.stringify(baseline.flasks)
+        );
+      }
       // 기타 섹션 localStorage 저장
       if (baseline.others) {
         localStorage.setItem(
@@ -1781,6 +2441,13 @@ export default function QuickFiltersPage() {
         localStorage.setItem(
           "quickFilter_baseItems",
           JSON.stringify(baseline.baseItems)
+        );
+      }
+      // 베이스 아이템 (소켓 & 퀄리티) 섹션 localStorage 저장
+      if (baseline.baseItemsSocketQuality) {
+        localStorage.setItem(
+          "quickFilter_baseItemsSocketQuality",
+          JSON.stringify(baseline.baseItemsSocketQuality)
         );
       }
     }
@@ -1826,6 +2493,7 @@ export default function QuickFiltersPage() {
           others: othersSettings,
           charms: charmsSettings,
           baseItems: baseItemsSettings,
+          baseItemsSocketQuality: baseItemsSocketQualitySettings,
         };
         localStorage.setItem(defaultKey, JSON.stringify(payload));
         alert(
@@ -2671,27 +3339,6 @@ export default function QuickFiltersPage() {
                     paddingRight: "16px",
                   }}
                 >
-                  <label
-                    className="rule-checkbox"
-                    style={{ marginRight: "10px" }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={rule.enabled}
-                      onChange={() => {
-                        setLevelingSettings({
-                          ...levelingSettings,
-                          rules: levelingSettings.rules.map((r) =>
-                            r.id === rule.id
-                              ? { ...r, enabled: !r.enabled }
-                              : r
-                          ),
-                        });
-                      }}
-                    />
-                  </label>
-
                   <div
                     style={{
                       display: "flex",
@@ -2699,8 +3346,15 @@ export default function QuickFiltersPage() {
                       flex: 1,
                       gap: "8px",
                       overflow: "visible",
+                      paddingLeft: "12px"
                     }}
                   >
+                    <input
+                      type="checkbox"
+                      checked={rule.enabled}
+                      onChange={() => toggleLevelingRule(rule.id)}
+                      style={{ cursor: "pointer", marginRight: "4px" }}
+                    />
                     <span
                       style={{
                         fontSize: "14px",
@@ -2711,6 +3365,10 @@ export default function QuickFiltersPage() {
                     >
                       {lang === "ko" ? rule.nameKo : rule.name}
                     </span>
+                    
+                    {/* 설정 요약 태그 */}
+                    {renderConfigSummary(rule)}
+
                     {(() => {
                       const status = getRuleStatus(rule);
                       return (
@@ -2749,7 +3407,7 @@ export default function QuickFiltersPage() {
                       flexShrink: 0,
                     }}
                   >
-                    수정
+                    {lang === "ko" ? "수정" : "Edit"}
                   </button>
                 </div>
               ))}
@@ -3172,72 +3830,29 @@ export default function QuickFiltersPage() {
                       justifyContent: "space-between"
                     }}
                   >
-                    <label className="rule-checkbox" style={{ marginRight: "10px" }}>
-                      <input
-                        type="checkbox"
-                        checked={rule.enabled}
-                        onChange={() => toggleCurrencyRule(rule.id)}
-                        disabled={!currencySettings.enabled}
-                      />
-                    </label>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, paddingLeft: "12px" }}>
+                        <input
+                          type="checkbox"
+                          checked={rule.enabled}
+                          onChange={() => toggleCurrencyRule(rule.id)}
+                          style={{ cursor: "pointer", marginRight: "4px" }}
+                        />
+                        <span
+                          className="rule-title"
+                          style={{
+                            fontSize: "14px",
+                            color: "var(--text-main)",
+                            fontWeight: "500",
+                            display: "flex",
+                            alignItems: "center",
+                            whiteSpace: "nowrap"
+                          }}
+                        >
+                          {lang === "ko" ? rule.nameKo : rule.name}
+                        </span>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
-                      <span
-                        className="rule-title"
-                        style={{
-                          fontSize: "14px",
-                          color: "var(--text-main)",
-                          fontWeight: "500",
-                          display: "flex",
-                          alignItems: "center"
-                        }}
-                      >
-                        {rule.conditions?.stackSize ? (
-                          <>
-                            {lang === "ko" ? "화폐 중첩 " : "Currency Stacks "}
-                            <input
-                              type="number"
-                              value={rule.conditions.stackSize.value || 0}
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={(e) => {
-                                const val = parseInt(e.target.value) || 0;
-                                setCurrencySettings((prev) => ({
-                                  ...prev,
-                                  rules: prev.rules.map((r) =>
-                                    r.id === rule.id
-                                      ? {
-                                          ...r,
-                                          conditions: {
-                                            ...r.conditions,
-                                            stackSize: {
-                                              ...r.conditions.stackSize,
-                                              value: val,
-                                            },
-                                          },
-                                        }
-                                      : r
-                                  ),
-                                }));
-                              }}
-                              disabled={!currencySettings.enabled || !rule.enabled}
-                              style={{
-                                background: "#000",
-                                border: "1px solid var(--border)",
-                                borderRadius: "4px",
-                                color: "var(--text-main)",
-                                width: "60px",
-                                textAlign: "center",
-                                fontSize: "14px",
-                                margin: "0 6px",
-                                padding: "4px"
-                              }}
-                            />
-                            {lang === "ko" ? "개 이상" : "+"}
-                          </>
-                        ) : (
-                          lang === "ko" ? rule.nameKo : rule.name
-                        )}
-                      </span>
+                      {/* 설정 요약 태그 */}
+                      {renderConfigSummary(rule)}
 
                       {/* 상태 텍스트 (강조/표시/숨김) */}
                       <span
@@ -3573,101 +4188,6 @@ export default function QuickFiltersPage() {
                 // 기타 유니크(D tier) 체크박스는 렌더링에서 제외
                 if (rule.id === "uniques_d_other") return null;
 
-                // 퀄리티 규칙 특수 UI
-                if (rule.id === "uniques_quality23") {
-                  const status = getRuleStatus(rule);
-                  return (
-                    <div
-                      key={rule.id}
-                      className="filter-rule-item"
-                      style={{
-                        opacity:
-                          uniquesSettings.enabled && rule.enabled ? 1 : 0.5,
-                        filter:
-                          uniquesSettings.enabled && rule.enabled
-                            ? "none"
-                            : "grayscale(100%)",
-                        gap: "0",
-                        paddingRight: "16px",
-                      }}
-                    >
-                      <label className="rule-checkbox" style={{ marginRight: "10px" }}>
-                        <input
-                          type="checkbox"
-                          checked={rule.enabled}
-                          onChange={() => toggleUniquesRule(rule.id)}
-                        />
-                      </label>
-
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          flex: 1,
-                          gap: "8px",
-                          overflow: "visible",
-                        }}
-                      >
-                        {/* 퀄리티 조건 표시 */}
-                        <span
-                          style={{
-                            fontSize: "14px",
-                            color: "var(--text-main)",
-                            whiteSpace: "nowrap",
-                            minWidth: "fit-content",
-                          }}
-                        >
-                          {(() => {
-                            const qualityVal =
-                              typeof rule.conditions?.quality === "object"
-                                ? rule.conditions.quality.value
-                                : rule.conditions?.quality || 23;
-
-                            return lang === "ko"
-                              ? `퀄리티 ${qualityVal} 이상`
-                              : `Quality ${qualityVal}+`;
-                          })()}
-                        </span>
-
-                        {/* 상태 텍스트 */}
-                        <span
-                          style={{
-                            fontSize: "14px",
-                            color: status.color,
-                            marginLeft: "auto",
-                            fontWeight: status.fontWeight,
-                            whiteSpace: "nowrap",
-                            minWidth: "fit-content",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {status.text}
-                        </span>
-                      </div>
-
-                      <button
-                        className="rule-edit-button"
-                        onClick={() => {
-                          setEditingRuleId(rule.id);
-                          setEditingRuleSection("uniques");
-                          setStyleModalOpen(true);
-                        }}
-                        disabled={!uniquesSettings.enabled}
-                        style={{
-                          marginLeft: "auto",
-                          opacity: uniquesSettings.enabled ? 1 : 0.5,
-                          cursor: uniquesSettings.enabled
-                            ? "pointer"
-                            : "not-allowed",
-                          flexShrink: 0,
-                        }}
-                      >
-                        수정
-                      </button>
-                    </div>
-                  );
-                }
-                // 기본 체크박스 규칙
                 const status = getRuleStatus(rule);
                 return (
                   <div
@@ -3684,13 +4204,6 @@ export default function QuickFiltersPage() {
                       paddingRight: "16px",
                     }}
                   >
-                    <label className="rule-checkbox" style={{ marginRight: "10px" }}>
-                      <input
-                        type="checkbox"
-                        checked={rule.enabled}
-                        onChange={() => toggleUniquesRule(rule.id)}
-                      />
-                    </label>
                     <div
                       style={{
                         display: "flex",
@@ -3698,8 +4211,15 @@ export default function QuickFiltersPage() {
                         flex: 1,
                         gap: "8px",
                         overflow: "visible",
+                        paddingLeft: "12px"
                       }}
                     >
+                      <input
+                        type="checkbox"
+                        checked={rule.enabled}
+                        onChange={() => toggleUniquesRule(rule.id)}
+                        style={{ cursor: "pointer", marginRight: "4px" }}
+                      />
                       <span
                         className="rule-title"
                         style={{
@@ -3709,8 +4229,15 @@ export default function QuickFiltersPage() {
                           minWidth: "fit-content",
                         }}
                       >
-                        {rule.nameKo || rule.name}
+                        {rule.id === "uniques_quality23" 
+                          ? (lang === "ko" ? "퀄리티" : "Quality")
+                          : (rule.nameKo || rule.name)
+                        }
                       </span>
+
+                      {/* 설정 요약 태그 */}
+                      {renderConfigSummary(rule)}
+
                       <span
                         style={{
                           fontSize: "14px",
@@ -3741,7 +4268,7 @@ export default function QuickFiltersPage() {
                         flexShrink: 0,
                       }}
                     >
-                      수정
+                      {lang === "ko" ? "수정" : "Edit"}
                     </button>
                   </div>
                 );
@@ -3877,17 +4404,6 @@ export default function QuickFiltersPage() {
                   paddingRight: "16px",
                 }}
               >
-                <label
-                  className="rule-checkbox"
-                  style={{ marginRight: "10px" }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={rule.enabled}
-                    onChange={() => toggleUncutGemsRule(rule.id)}
-                  />
-                </label>
-
                 <div
                   style={{
                     display: "flex",
@@ -3895,17 +4411,31 @@ export default function QuickFiltersPage() {
                     flex: 1,
                     gap: "8px",
                     overflow: "hidden",
+                    paddingLeft: "12px"
                   }}
                 >
+                  <input
+                      type="checkbox"
+                      checked={rule.enabled}
+                      onChange={() => toggleUncutGemsRule(rule.id)}
+                      style={{ cursor: "pointer", marginRight: "4px" }}
+                    />
                   <span
+                    className="rule-title"
                     style={{
                       fontSize: "14px",
                       color: "var(--text-main)",
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {rule.nameKo || rule.name}
+                    {rule.id === "flask_ilvl83" 
+                      ? (lang === "ko" ? "83레벨+ 베이스" : "Lv83+ Base")
+                      : (rule.nameKo || rule.name)
+                    }
                   </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
 
                   <span
                     style={{
@@ -3937,7 +4467,7 @@ export default function QuickFiltersPage() {
                     marginLeft: "auto",
                   }}
                 >
-                  수정
+                  {lang === "ko" ? "수정" : "Edit"}
                 </button>
               </div>
             );
@@ -4073,55 +4603,207 @@ export default function QuickFiltersPage() {
               const levelTypeValue =
                 rule.conditions?.levelType?.value || "MIN_ILVL";
 
-              const rarityLabel =
-                rarityOptions.find((opt) => opt.value === rarityValue)?.[
-                  lang === "ko" ? "labelKo" : "labelEn"
-                ] || rarityValue;
-              const levelTypeLabel =
-                levelTypeOptions.find((opt) => opt.value === levelTypeValue)?.[
-                  lang === "ko" ? "labelKo" : "labelEn"
-                ] || levelTypeValue;
 
-              const isRarityDropdownOpen =
-                baseItemsDropdown.ruleId === rule.id &&
-                baseItemsDropdown.type === "rarity";
-              const isLevelTypeDropdownOpen =
-                baseItemsDropdown.ruleId === rule.id &&
-                baseItemsDropdown.type === "levelType";
-              const rarityZIndex = isRarityDropdownOpen ? 1001 : 1;
-              const levelTypeZIndex = isLevelTypeDropdownOpen ? 1001 : 1;
+              return (
+                <Fragment key={rule.id}>
+                  {rule.id === "base_items_jewellery" && (
+                    <div
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px 0 16px",
+                        fontSize: "13px",
+                        color: "var(--muted)",
+                        lineHeight: "1.4",
+                      }}
+                    >
+                      {lang === "ko"
+                        ? "미감정 등급은 등급이 높을 수록 더 좋은 티어의 옵션을 가질 확률이 있습니다"
+                        : "Higher Unidentified Tier means improved chances for better modifiers"}
+                    </div>
+                  )}
+                  <div
+                    className="filter-rule-item"
+                    style={{
+                      opacity:
+                        baseItemsSettings.enabled && rule.enabled ? 1 : 0.5,
+                      filter:
+                        baseItemsSettings.enabled && rule.enabled
+                          ? "none"
+                          : "grayscale(100%)",
+                      gap: "0",
+                      paddingRight: "16px",
+                      position: "relative",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flex: 1,
+                        gap: "8px",
+                        overflow: "visible",
+                        paddingLeft: "12px"
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={rule.enabled}
+                        onChange={() => toggleBaseItemsRule(rule.id)}
+                        style={{ cursor: "pointer", marginRight: "4px" }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          color: "var(--text-main)",
+                          whiteSpace: "nowrap",
+                          minWidth: "30px",
+                        }}
+                      >
+                        {tierName}
+                      </span>
+
+                      {/* 설정 요약 태그 */}
+                      {renderConfigSummary(rule)}
+
+                      {/* 상태 텍스트 (숨김/표시/강조) */}
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          color: status.color,
+                          marginLeft: "auto",
+                          fontWeight: status.fontWeight,
+                          whiteSpace: "nowrap",
+                          minWidth: "fit-content",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {status.text}
+                      </span>
+                    </div>
+
+                    <button
+                      className="rule-edit-button"
+                      onClick={() => {
+                        setEditingRuleId(rule.id);
+                        setEditingRuleSection("base_items");
+                        setStyleModalOpen(true);
+                      }}
+                    >
+                      {lang === "ko" ? "수정" : "Edit"}
+                    </button>
+                  </div>
+                </Fragment>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // 베이스 아이템 (소켓 & 퀄리티) 섹션 렌더링 함수
+  const renderBaseItemsSocketQualitySection = () => {
+    // 티어 옵션
+    const tierOptions = [
+      { value: "all", labelKo: "전체", labelEn: "All" },
+      { value: "T1", labelKo: "T1", labelEn: "T1" },
+      { value: "T2", labelKo: "T2", labelEn: "T2" },
+    ];
+
+    // 희귀도 옵션
+    const rarityOptions = [
+      { value: "Normal", labelKo: "일반", labelEn: "Normal" },
+      { value: "Magic", labelKo: "마법", labelEn: "Magic" },
+      { value: "Rare", labelKo: "희귀", labelEn: "Rare" },
+    ];
+
+    // 희귀도 색상 매핑
+    const rarityColors = {
+      Rare: "#FFFF77",
+      Magic: "#8888FF",
+      Normal: "#FFFFFF",
+    };
+
+    // 레벨 타입 옵션
+    const levelTypeOptions = [
+      { value: "MIN_ILVL", labelKo: "최소 레벨", labelEn: "Min Level" },
+      { value: "CAP_ILVL", labelKo: "최대 레벨", labelEn: "Max Level" },
+    ];
+
+    return (
+      <div className="quick-filter-section" style={{ marginTop: "0" }}>
+        <div
+          className={`section-header ${
+            isBaseItemsSocketQualityExpanded ? "section-header-expanded" : ""
+          }`}
+          onClick={() => setIsBaseItemsSocketQualityExpanded(!isBaseItemsSocketQualityExpanded)}
+        >
+          <label
+            className="section-checkbox"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              checked={baseItemsSocketQualitySettings.enabled}
+              onChange={(e) => {
+                e.stopPropagation();
+                const newEnabled = e.target.checked;
+                setBaseItemsSocketQualitySettings({
+                  ...baseItemsSocketQualitySettings,
+                  enabled: newEnabled,
+                  rules: baseItemsSocketQualitySettings.rules.map((rule) => ({
+                    ...rule,
+                    enabled: newEnabled ? true : false,
+                  })),
+                });
+              }}
+            />
+          </label>
+          <h3
+            className="section-title"
+            style={{
+              opacity: baseItemsSocketQualitySettings.enabled ? 1 : 0.5,
+            }}
+          >
+            {lang === "ko" ? "소켓 & 퀄리티" : "Socket & Quality"}
+          </h3>
+          <span className="section-toggle-icon">
+            {isBaseItemsSocketQualityExpanded ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </span>
+        </div>
+        {isBaseItemsSocketQualityExpanded && (
+          <div className="section-content" style={{ background: "#141414" }}>
+            {baseItemsSocketQualitySettings.rules.map((rule) => {
+              const status = getRuleStatus(rule);
+              const ruleName = lang === "ko" ? rule.nameKo : rule.name;
+              const tierValue = rule.conditions?.itemTier?.value || "T1";
+              const rarityValue = rule.conditions?.rarity?.value || "Normal";
+              const levelTypeValue = rule.conditions?.levelType?.value || "MIN_ILVL";
+
+
+
+              // 소켓 규칙인지 퀄리티 규칙인지 확인
 
               return (
                 <div
                   key={rule.id}
                   className="filter-rule-item"
                   style={{
-                    opacity:
-                      baseItemsSettings.enabled && rule.enabled ? 1 : 0.5,
-                    filter:
-                      baseItemsSettings.enabled && rule.enabled
-                        ? "none"
-                        : "grayscale(100%)",
+                    opacity: baseItemsSocketQualitySettings.enabled && rule.enabled ? 1 : 0.5,
+                    filter: baseItemsSocketQualitySettings.enabled && rule.enabled ? "none" : "grayscale(100%)",
                     gap: "0",
                     paddingRight: "16px",
                     position: "relative",
-                    zIndex:
-                      isRarityDropdownOpen || isLevelTypeDropdownOpen
-                        ? 1002
-                        : "auto",
                   }}
                 >
-                  <label
-                    className="rule-checkbox"
-                    style={{ marginRight: "10px" }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={rule.enabled}
-                      onChange={() => toggleBaseItemsRule(rule.id)}
-                    />
-                  </label>
-
                   <div
                     style={{
                       display: "flex",
@@ -4129,8 +4811,15 @@ export default function QuickFiltersPage() {
                       flex: 1,
                       gap: "8px",
                       overflow: "visible",
+                      paddingLeft: "12px"
                     }}
                   >
+                     <input
+                      type="checkbox"
+                      checked={rule.enabled}
+                      onChange={() => toggleBaseItemsSocketQualityRule(rule.id)}
+                      style={{ cursor: "pointer", marginRight: "4px" }}
+                    />
                     <span
                       style={{
                         fontSize: "14px",
@@ -4139,277 +4828,38 @@ export default function QuickFiltersPage() {
                         minWidth: "30px",
                       }}
                     >
-                      {tierName}
+                      {ruleName}
                     </span>
 
-                    {/* 티어 드롭다운 - jewellery 규칙에만 표시 */}
-                    {rule.id === "base_items_jewellery" && (
-                      <select
-                        value={rule.conditions?.itemTier?.value || "all"}
-                        onChange={(e) => {
-                          updateBaseItemsRule(rule.id, "conditions.itemTier.value", e.target.value);
-                        }}
-                        style={{
-                          padding: "4px 8px",
-                          borderRadius: "4px",
-                          border: "1px solid var(--border)",
-                          background: "#2a2a2a",
-                          color: "var(--text-main)",
-                          fontSize: "13px",
-                          cursor: "pointer",
-                          minWidth: "60px",
-                        }}
-                      >
-                        <option value="all">{lang === "ko" ? "전체" : "All"}</option>
-                        <option value="T1">T1</option>
-                        <option value="T2">T2</option>
-                      </select>
-                    )}
+                    {/* 설정 요약 태그 */}
+                    {renderConfigSummary(rule)}
 
-                    {/* 희귀도 드롭다운 */}
-                    <div
-                      className="leveling-dropdown-wrapper base-items-dropdown-wrapper"
+                    {/* 상태 텍스트 (숨김/표시/강조) */}
+                    <span
                       style={{
-                        position: "relative",
-                        minWidth: "60px",
-                        maxWidth: "70px",
-                        zIndex: rarityZIndex,
+                        fontSize: "14px",
+                        color: status.color,
+                        marginLeft: "auto",
+                        fontWeight: status.fontWeight,
+                        whiteSpace: "nowrap",
+                        minWidth: "fit-content",
+                        flexShrink: 0,
                       }}
                     >
-                      <button
-                        className="leveling-dropdown-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setBaseItemsDropdown((prev) =>
-                            prev.ruleId === rule.id && prev.type === "rarity"
-                              ? { ruleId: null, type: null }
-                              : { ruleId: rule.id, type: "rarity" }
-                          );
-                        }}
-                      >
-                        <span style={{ color: rarityColors[rarityValue] }}>
-                          {rarityLabel}
-                        </span>
-                        <span className="dropdown-icon">
-                          {baseItemsDropdown.ruleId === rule.id &&
-                          baseItemsDropdown.type === "rarity"
-                            ? "▲"
-                            : "▼"}
-                        </span>
-                      </button>
-                      {baseItemsDropdown.ruleId === rule.id &&
-                        baseItemsDropdown.type === "rarity" && (
-                          <div className="leveling-dropdown-menu">
-                            {rarityOptions.map((opt) => (
-                              <button
-                                key={opt.value}
-                                className={`leveling-dropdown-item ${
-                                  rarityValue === opt.value ? "selected" : ""
-                                }`}
-                                onClick={() => {
-                                  updateBaseItemsRule(
-                                    rule.id,
-                                    "conditions.rarity.value",
-                                    opt.value
-                                  );
-                                  setBaseItemsDropdown({
-                                    ruleId: null,
-                                    type: null,
-                                  });
-                                }}
-                              >
-                                <span
-                                  style={{ color: rarityColors[opt.value] }}
-                                >
-                                  {lang === "ko" ? opt.labelKo : opt.labelEn}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                    </div>
-
-                    {/* 레벨 타입 드롭다운 - jewellery 규칙이 아닐 때만 표시 */}
-                    {rule.id !== "base_items_jewellery" && (
-                    <div
-                      className="leveling-dropdown-wrapper base-items-dropdown-wrapper"
-                      style={{
-                        position: "relative",
-                        minWidth: "60px",
-                        maxWidth: "70px",
-                        zIndex: levelTypeZIndex,
-                      }}
-                    >
-                      <button
-                        className="leveling-dropdown-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setBaseItemsDropdown((prev) =>
-                            prev.ruleId === rule.id && prev.type === "levelType"
-                              ? { ruleId: null, type: null }
-                              : { ruleId: rule.id, type: "levelType" }
-                          );
-                        }}
-                      >
-                        <span>{levelTypeLabel}</span>
-                        <span className="dropdown-icon">
-                          {baseItemsDropdown.ruleId === rule.id &&
-                          baseItemsDropdown.type === "levelType"
-                            ? "▲"
-                            : "▼"}
-                        </span>
-                      </button>
-                      {baseItemsDropdown.ruleId === rule.id &&
-                        baseItemsDropdown.type === "levelType" && (
-                          <div className="leveling-dropdown-menu">
-                            {levelTypeOptions.map((opt) => (
-                              <button
-                                key={opt.value}
-                                className={`leveling-dropdown-item ${
-                                  levelTypeValue === opt.value ? "selected" : ""
-                                }`}
-                                onClick={() => {
-                                  updateBaseItemsRule(
-                                    rule.id,
-                                    "conditions.levelType.value",
-                                    opt.value
-                                  );
-                                  setBaseItemsDropdown({
-                                    ruleId: null,
-                                    type: null,
-                                  });
-                                }}
-                              >
-                                {lang === "ko" ? opt.labelKo : opt.labelEn}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                    </div>
-                    )}
-
-                    {/* 미감정 등급 - jewellery 규칙에만 표시 */}
-                    {rule.id === "base_items_jewellery" && (
-                      <>
-                        <input
-                          type="checkbox"
-                          checked={!!rule.conditions?.unidentifiedItemTier}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              updateBaseItemsRule(rule.id, "conditions.unidentifiedItemTier", { operator: ">=", value: 5 });
-                            } else {
-                              // 조건 삭제
-                              const newConditions = { ...rule.conditions };
-                              delete newConditions.unidentifiedItemTier;
-                              setBaseItemsSettings(prev => ({
-                                ...prev,
-                                rules: prev.rules.map(r => r.id === rule.id ? { ...r, conditions: newConditions } : r)
-                              }));
-                            }
-                          }}
-                          style={{ marginLeft: "8px" }}
-                        />
-                        <span
-                          style={{
-                            fontSize: "14px",
-                            color: rule.conditions?.unidentifiedItemTier ? "var(--text-main)" : "var(--muted)",
-                            whiteSpace: "nowrap",
-                            opacity: rule.conditions?.unidentifiedItemTier ? 1 : 0.5,
-                          }}
-                        >
-                          {lang === "ko" ? "미감정 등급" : "Unidentified Tier"}
-                        </span>
-                        <select
-                          value={rule.conditions?.unidentifiedItemTier?.value || 5}
-                          onChange={(e) => {
-                            updateBaseItemsRule(rule.id, "conditions.unidentifiedItemTier.value", parseInt(e.target.value, 10));
-                          }}
-                          disabled={!rule.conditions?.unidentifiedItemTier}
-                          style={{
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            border: "1px solid var(--border)",
-                            background: "#2a2a2a",
-                            color: "var(--text-main)",
-                            fontSize: "13px",
-                            cursor: rule.conditions?.unidentifiedItemTier ? "pointer" : "not-allowed",
-                            marginLeft: "4px",
-                            minWidth: "50px",
-                            opacity: rule.conditions?.unidentifiedItemTier ? 1 : 0.5,
-                          }}
-                        >
-                          {[1, 2, 3, 4, 5].map((tier) => (
-                            <option key={tier} value={tier}>{tier}</option>
-                          ))}
-                        </select>
-                      </>
-                    )}
-
-                    {/* Quality 입력 필드 - quality 규칙에만 표시 */}
-                    {rule.id.includes('quality') && (
-                      <>
-                        <span
-                          style={{
-                            fontSize: "14px",
-                            color: "var(--text-main)",
-                            whiteSpace: "nowrap",
-                            marginLeft: "8px",
-                          }}
-                        >
-                          {lang === "ko" ? "퀄리티" : "Quality"}
-                        </span>
-
-                        {/* Quality 연산자 드롭다운 */}
-                        <select
-                          value={rule.conditions?.quality?.operator || '>='}
-                          onChange={(e) => {
-                            updateBaseItemsRule(
-                              rule.id,
-                              "conditions.quality.operator",
-                              e.target.value
-                            );
-                          }}
-                          style={{
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            border: "1px solid var(--border)",
-                            background: "#2a2a2a",
-                            color: "var(--text-main)",
-                            fontSize: "13px",
-                            cursor: "pointer",
-                            marginLeft: "4px",
-                            minWidth: "50px",
-                          }}
-                        >
-                          <option value=">=">≥</option>
-                          <option value="==">=</option>
-                          <option value="<">&lt;</option>
-                        </select>
-
-                        {/* Quality 값 선택 - 24%/28% 드롭다운 */}
-                        <select
-                          value={rule.conditions?.quality?.value || 24}
-                          onChange={(e) => {
-                            updateBaseItemsRule(rule.id, "conditions.quality.value", parseInt(e.target.value, 10));
-                          }}
-                          style={{
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            border: "1px solid var(--border)",
-                            background: "#2a2a2a",
-                            color: "var(--text-main)",
-                            fontSize: "13px",
-                            cursor: "pointer",
-                            marginLeft: "4px",
-                            minWidth: "80px",
-                          }}
-                        >
-                          <option value="24">24%</option>
-                          <option value="28">28%</option>
-                        </select>
-                      </>
-                    )}
+                      {status.text}
+                    </span>
                   </div>
+
+                  <button
+                    className="rule-edit-button"
+                    onClick={() => {
+                      setEditingRuleId(rule.id);
+                      setEditingRuleSection("base_items_socket_quality");
+                      setStyleModalOpen(true);
+                    }}
+                  >
+                    {lang === "ko" ? "수정" : "Edit"}
+                  </button>
                 </div>
               );
             })}
@@ -4519,18 +4969,6 @@ export default function QuickFiltersPage() {
                   paddingRight: "16px",
                 }}
               >
-                <label
-                  className="rule-checkbox"
-                  style={{ marginRight: "10px" }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={rule.enabled}
-                    onChange={() => toggleGoldRule(rule.id)}
-                  />
-                </label>
-
-                {/* 텍스트 기반 정보 표시 */}
                 <div
                   style={{
                     display: "flex",
@@ -4538,10 +4976,15 @@ export default function QuickFiltersPage() {
                     flex: 1,
                     gap: "8px",
                     overflow: "visible",
+                    paddingLeft: "12px"
                   }}
                 >
-                  {/* 골드 수량 텍스트 (왼쪽에 먼저 표시) */}
-                  {showStackSize && (
+                    <input
+                      type="checkbox"
+                      checked={rule.enabled}
+                      onChange={() => toggleGoldRule(rule.id)}
+                      style={{ cursor: "pointer", marginRight: "4px" }}
+                    />
                     <span
                       style={{
                         fontSize: "14px",
@@ -4550,125 +4993,44 @@ export default function QuickFiltersPage() {
                         minWidth: "fit-content",
                       }}
                     >
-                      {(() => {
-                        const stackValue = rule.conditions.stackSize.value;
-                        const operator =
-                          rule.conditions.stackSize.operator || ">=";
-
-                        // 연산자에 따른 텍스트 매핑
-                        const operatorText = {
-                          ">=": { ko: "이상", en: "+" },
-                          ">": { ko: "초과", en: ">" },
-                          "<=": { ko: "이하", en: "<=" },
-                          "<": { ko: "미만", en: "<" },
-                          "==": { ko: "", en: "" },
-                          "=": { ko: "", en: "" },
-                        };
-
-                        const opKo = operatorText[operator]?.ko ?? "이상";
-                        const opEn = operatorText[operator]?.en ?? "+";
-
-                        return lang === "ko"
-                          ? `골드 ${stackValue} ${opKo}`
-                          : `Gold ${stackValue}${opEn}`;
-                      })()}
+                      {rule.nameKo || rule.name || (lang === "ko" ? "골드" : "Gold")}
                     </span>
-                  )}
 
-                  {/* 구분자 (둘 다 있을 때만) */}
-                  {showAreaLevel && showStackSize && (
-                    <span style={{ color: "var(--border)", margin: "0 4px" }}>
-                      |
-                    </span>
-                  )}
+                    {/* 설정 요약 태그 */}
+                    {renderConfigSummary(rule)}
 
-                  {/* 지역 레벨 텍스트 (오른쪽에 표시) */}
-                  {showAreaLevel && (
+                    {/* 상태 텍스트 (강조/표시/숨김) */}
                     <span
                       style={{
                         fontSize: "14px",
-                        color: "var(--text-main)",
+                        color: status.color,
+                        marginLeft: "auto",
+                        fontWeight: status.fontWeight,
                         whiteSpace: "nowrap",
                         minWidth: "fit-content",
+                        flexShrink: 0,
                       }}
                     >
-                      {(() => {
-                        const level = rule.conditions.areaLevel.value;
-                        const operator =
-                          rule.conditions.areaLevel.operator || ">=";
-
-                        // 연산자에 따른 텍스트 매핑
-                        const operatorText = {
-                          ">=": { ko: "이상", en: "+" },
-                          ">": { ko: "초과", en: ">" },
-                          "<=": { ko: "이하", en: "<=" },
-                          "<": { ko: "미만", en: "<" },
-                          "==": { ko: "", en: "" }, // 같음은 별도 표기 없음
-                          "=": { ko: "", en: "" },
-                        };
-
-                        const opKo = operatorText[operator]?.ko ?? "이상";
-                        const opEn = operatorText[operator]?.en ?? "+";
-
-                        if (level >= 65) {
-                          const tier = level - 64;
-                          return lang === "ko"
-                            ? `경로석 ${tier} 티어 ${opKo}`
-                            : `Waystone Tier ${tier}${opEn}`;
-                        }
-                        return lang === "ko"
-                          ? `지역레벨 ${level} ${opKo}`
-                          : `Area Level ${level}${opEn}`;
-                      })()}
+                      {status.text}
                     </span>
-                  )}
+                  </div>
 
-                  {/* 조건이 없는 기본 규칙인 경우 */}
-                  {!showAreaLevel && !showStackSize && (
-                    <span
-                      style={{
-                        fontSize: "14px",
-                        color: "var(--text-main)",
-                        whiteSpace: "nowrap",
-                        minWidth: "fit-content",
-                      }}
-                    >
-                      {rule.nameKo || rule.name}
-                    </span>
-                  )}
-
-                  {/* 상태 텍스트 (강조/표시/숨김) */}
-                  <span
+                  <button
+                    className="rule-edit-button"
+                    onClick={() => {
+                      setEditingRuleId(rule.id);
+                      setEditingRuleSection("gold");
+                      setStyleModalOpen(true);
+                    }}
                     style={{
-                      fontSize: "14px",
-                      color: status.color,
-                      marginLeft: "auto",
-                      fontWeight: status.fontWeight,
-                      whiteSpace: "nowrap",
-                      minWidth: "fit-content",
+                      opacity: goldSettings.enabled ? 1 : 0.5,
+                      cursor: goldSettings.enabled ? "pointer" : "not-allowed",
                       flexShrink: 0,
                     }}
                   >
-                    {status.text}
-                  </span>
+                    {lang === "ko" ? "수정" : "Edit"}
+                  </button>
                 </div>
-
-                <button
-                  className="rule-edit-button"
-                  onClick={() => {
-                    setEditingRuleId(rule.id);
-                    setEditingRuleSection("gold");
-                    setStyleModalOpen(true);
-                  }}
-                  style={{
-                    opacity: goldSettings.enabled ? 1 : 0.5,
-                    cursor: goldSettings.enabled ? "pointer" : "not-allowed",
-                    flexShrink: 0,
-                  }}
-                >
-                  수정
-                </button>
-              </div>
             );
           })}
         </div>
@@ -4769,17 +5131,6 @@ export default function QuickFiltersPage() {
                   paddingRight: "16px",
                 }}
               >
-                <label
-                  className="rule-checkbox"
-                  style={{ marginRight: "10px" }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={rule.enabled}
-                    onChange={() => toggleJewelsRule(rule.id)}
-                  />
-                </label>
-
                 <div
                   style={{
                     display: "flex",
@@ -4787,8 +5138,15 @@ export default function QuickFiltersPage() {
                     flex: 1,
                     gap: "8px",
                     overflow: "hidden",
+                    paddingLeft: "12px"
                   }}
                 >
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleJewelsRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
                   <span
                     style={{
                       fontSize: "14px",
@@ -4798,6 +5156,9 @@ export default function QuickFiltersPage() {
                   >
                     {rule.nameKo || rule.name}
                   </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
 
                   <span
                     style={{
@@ -4827,7 +5188,7 @@ export default function QuickFiltersPage() {
                     marginLeft: "auto",
                   }}
                 >
-                  수정
+                  {lang === "ko" ? "수정" : "Edit"}
                 </button>
               </div>
             );
@@ -5127,6 +5488,139 @@ export default function QuickFiltersPage() {
     );
   };
 
+  // 경로석 섹션 렌더링 함수
+  const renderWaystonesSection = () => {
+    return (
+      <div className="quick-filter-section" style={{ marginTop: "0" }}>
+        <div
+          className={`section-header ${
+            isWaystonesExpanded ? "section-header-expanded" : ""
+          }`}
+          onClick={() => setIsWaystonesExpanded(!isWaystonesExpanded)}
+        >
+          <label
+            className="section-checkbox"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              checked={waystonesSettings.enabled}
+              onChange={(e) => {
+                e.stopPropagation();
+                const newEnabled = e.target.checked;
+                setWaystonesSettings({
+                  ...waystonesSettings,
+                  enabled: newEnabled,
+                  rules: waystonesSettings.rules.map((rule) => ({
+                    ...rule,
+                    enabled: newEnabled ? true : false,
+                  })),
+                });
+              }}
+            />
+          </label>
+          <h3
+            className="section-title"
+            style={{ opacity: waystonesSettings.enabled ? 1 : 0.5 }}
+          >
+            {lang === "ko" ? "경로석" : "Waystones"}
+          </h3>
+          <span className="section-toggle-icon">
+            {isWaystonesExpanded ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </span>
+        </div>
+        {isWaystonesExpanded && (
+          <div className="section-content" style={{ background: "#141414" }}>
+            {waystonesSettings.rules.map((rule) => {
+              const status = getRuleStatus(rule);
+              return (
+                <div
+                  key={rule.id}
+                  className="filter-rule-item"
+                  style={{
+                    opacity: waystonesSettings.enabled && rule.enabled ? 1 : 0.5,
+                    filter: waystonesSettings.enabled && rule.enabled ? "none" : "grayscale(100%)",
+                    gap: "0",
+                    paddingRight: "16px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      flex: 1,
+                      gap: "8px",
+                      overflow: "hidden",
+                      paddingLeft: "12px"
+                    }}
+                  >
+                   <input
+                        type="checkbox"
+                        checked={rule.enabled}
+                        onChange={() => toggleWaystonesRule(rule.id)}
+                        style={{ cursor: "pointer", marginRight: "4px" }}
+                    />
+                    <span
+                      className="rule-title"
+                      style={{
+                        fontSize: "14px",
+                        color: "var(--text-main)",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {rule.nameKo || rule.name}
+                    </span>
+
+                    {/* 설정 요약 태그 */}
+                    {renderConfigSummary(rule)}
+
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        color: status.color,
+                        marginLeft: "auto",
+                        fontWeight: status.fontWeight,
+                        whiteSpace: "nowrap",
+                        minWidth: "fit-content",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {status.text}
+                    </span>
+                  </div>
+
+                  <button
+                    className="rule-edit-button"
+                    onClick={() => {
+                      setEditingRuleId(rule.id);
+                      setEditingRuleSection("waystones");
+                      setStyleModalOpen(true);
+                    }}
+                    style={{
+                      opacity: waystonesSettings.enabled ? 1 : 0.5,
+                      cursor: waystonesSettings.enabled ? "pointer" : "not-allowed",
+                      marginLeft: "auto",
+                    }}
+                  >
+                    {lang === "ko" ? "수정" : "Edit"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // 호신부 섹션 렌더링 함수
   const renderCharmsSection = () => (
     <div className="quick-filter-section" style={{ marginTop: "0" }}>
@@ -5220,17 +5714,6 @@ export default function QuickFiltersPage() {
                   paddingRight: "16px",
                 }}
               >
-                <label
-                  className="rule-checkbox"
-                  style={{ marginRight: "10px" }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={rule.enabled}
-                    onChange={() => toggleCharmsRule(rule.id)}
-                  />
-                </label>
-
                 <div
                   style={{
                     display: "flex",
@@ -5238,8 +5721,15 @@ export default function QuickFiltersPage() {
                     flex: 1,
                     gap: "8px",
                     overflow: "hidden",
+                    paddingLeft: "12px"
                   }}
                 >
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleCharmsRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
                   <span
                     style={{
                       fontSize: "14px",
@@ -5249,6 +5739,9 @@ export default function QuickFiltersPage() {
                   >
                     {rule.nameKo || rule.name}
                   </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
 
                   <span
                     style={{
@@ -5280,7 +5773,169 @@ export default function QuickFiltersPage() {
                     marginLeft: "auto",
                   }}
                 >
-                  수정
+                  {lang === "ko" ? "수정" : "Edit"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  // 플라스크 섹션 렌더링 함수
+  const renderFlasksSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${
+          isFlasksExpanded ? "section-header-expanded" : ""
+        }`}
+        onClick={() => setIsFlasksExpanded(!isFlasksExpanded)}
+      >
+        <label
+          className="section-checkbox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={flasksSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              const newEnabled = e.target.checked;
+              setFlasksSettings({
+                ...flasksSettings,
+                enabled: newEnabled,
+                rules: flasksSettings.rules.map((rule) => ({
+                  ...rule,
+                  enabled: newEnabled ? true : false,
+                })),
+              });
+            }}
+          />
+        </label>
+        <h3
+          className="section-title"
+          style={{
+            opacity: flasksSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "플라스크" : "Flasks"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isFlasksExpanded ? (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isFlasksExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          {flasksSettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: flasksSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter:
+                    flasksSettings.enabled && rule.enabled
+                      ? "none"
+                      : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flex: 1,
+                    gap: "8px",
+                    overflow: "hidden",
+                    paddingLeft: "12px"
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleFlasksRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: "var(--text-main)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {rule.nameKo || rule.name}
+                  </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
+
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: status.color,
+                      marginLeft: "auto",
+                      fontWeight: status.fontWeight,
+                      whiteSpace: "nowrap",
+                      minWidth: "fit-content",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {status.text}
+                  </span>
+                </div>
+
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("flasks");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: flasksSettings.enabled ? 1 : 0.5,
+                    cursor: flasksSettings.enabled
+                      ? "pointer"
+                      : "not-allowed",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {lang === "ko" ? "수정" : "Edit"}
                 </button>
               </div>
             );
@@ -5379,18 +6034,10 @@ export default function QuickFiltersPage() {
                     othersSettings.enabled && rule.enabled
                       ? "none"
                       : "grayscale(100%)",
-                  gap: "10px",
+                  gap: "0",
                   paddingRight: "16px",
                 }}
               >
-                <label className="rule-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={rule.enabled}
-                    onChange={() => toggleOthersRule(rule.id)}
-                  />
-                </label>
-
                 <div
                   style={{
                     display: "flex",
@@ -5398,8 +6045,15 @@ export default function QuickFiltersPage() {
                     flex: 1,
                     gap: "8px",
                     overflow: "hidden",
+                    paddingLeft: "12px"
                   }}
                 >
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleOthersRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
                   <span
                     style={{
                       fontSize: "14px",
@@ -5409,6 +6063,9 @@ export default function QuickFiltersPage() {
                   >
                     {rule.nameKo || rule.name}
                   </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
 
                   <span
                     style={{
@@ -5438,7 +6095,167 @@ export default function QuickFiltersPage() {
                     marginLeft: "auto",
                   }}
                 >
-                  수정
+                  {lang === "ko" ? "수정" : "Edit"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  // 탐험 섹션 렌더링 함수
+  const renderExpeditionSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${
+          isExpeditionExpanded ? "section-header-expanded" : ""
+        }`}
+        onClick={() => setIsExpeditionExpanded(!isExpeditionExpanded)}
+      >
+        <label
+          className="section-checkbox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={expeditionSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              const newEnabled = e.target.checked;
+              setExpeditionSettings({
+                ...expeditionSettings,
+                enabled: newEnabled,
+                rules: expeditionSettings.rules.map((rule) => ({
+                  ...rule,
+                  enabled: newEnabled ? true : false,
+                })),
+              });
+            }}
+          />
+        </label>
+        <h3
+          className="section-title"
+          style={{
+            opacity: expeditionSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "탐험" : "Expedition"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isExpeditionExpanded ? (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isExpeditionExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          {expeditionSettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: expeditionSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter:
+                    expeditionSettings.enabled && rule.enabled
+                      ? "none"
+                      : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flex: 1,
+                    gap: "8px",
+                    overflow: "hidden",
+                    paddingLeft: "12px"
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleExpeditionRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: "var(--text-main)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {rule.nameKo || rule.name}
+                  </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
+
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: status.color,
+                      marginLeft: "auto",
+                      fontWeight: status.fontWeight,
+                      whiteSpace: "nowrap",
+                      minWidth: "fit-content",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {status.text}
+                  </span>
+                </div>
+
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("expedition");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: expeditionSettings.enabled ? 1 : 0.5,
+                    cursor: expeditionSettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {lang === "ko" ? "수정" : "Edit"}
                 </button>
               </div>
             );
@@ -5473,12 +6290,20 @@ export default function QuickFiltersPage() {
                   return <div key={section.id}>{renderUniquesSection()}</div>;
                 } else if (section.id === "uncut_gems") {
                   return <div key={section.id}>{renderUncutGemsSection()}</div>;
+                } else if (section.id === "waystones") {
+                  return <div key={section.id}>{renderWaystonesSection()}</div>;
+                } else if (section.id === "expedition") {
+                  return <div key={section.id}>{renderExpeditionSection()}</div>;
                 } else if (section.id === "base_items") {
                   return <div key={section.id}>{renderBaseItemsSection()}</div>;
+                } else if (section.id === "base_items_socket_quality") {
+                  return <div key={section.id}>{renderBaseItemsSocketQualitySection()}</div>;
                 } else if (section.id === "jewels") {
                   return <div key={section.id}>{renderJewelsSection()}</div>;
                 } else if (section.id === "charms") {
                   return <div key={section.id}>{renderCharmsSection()}</div>;
+                } else if (section.id === "flasks") {
+                  return <div key={section.id}>{renderFlasksSection()}</div>;
                 } else if (section.id === "others") {
                   return <div key={section.id}>{renderOthersSection()}</div>;
                 }
@@ -5491,6 +6316,9 @@ export default function QuickFiltersPage() {
               {rightColumnSections.map((section) => {
                 if (section.id === "base_items") {
                   return <div key={section.id}>{renderBaseItemsSection()}</div>;
+                }
+                if (section.id === "base_items_socket_quality") {
+                  return <div key={section.id}>{renderBaseItemsSocketQualitySection()}</div>;
                 }
                 if (section.id === "jewels") {
                   return <div key={section.id}>{renderJewelsSection()}</div>;
@@ -5519,6 +6347,9 @@ export default function QuickFiltersPage() {
                 }
                 if (section.id === "charms") {
                   return <div key={section.id}>{renderCharmsSection()}</div>;
+                }
+                if (section.id === "flasks") {
+                  return <div key={section.id}>{renderFlasksSection()}</div>;
                 }
                 if (section.id === "others") {
                   return <div key={section.id}>{renderOthersSection()}</div>;
@@ -5588,10 +6419,20 @@ export default function QuickFiltersPage() {
                 ? levelingSettings.rules.find((r) => r.id === editingRuleId)
                 : editingRuleSection === "uncut_gems"
                 ? uncutGemsSettings.rules.find((r) => r.id === editingRuleId)
+                : editingRuleSection === "waystones"
+                ? waystonesSettings.rules.find((r) => r.id === editingRuleId)
+                : editingRuleSection === "expedition"
+                ? expeditionSettings.rules.find((r) => r.id === editingRuleId)
                 : editingRuleSection === "others"
                 ? othersSettings.rules.find((r) => r.id === editingRuleId)
                 : editingRuleSection === "charms"
                 ? charmsSettings.rules.find((r) => r.id === editingRuleId)
+                : editingRuleSection === "flasks"
+                ? flasksSettings.rules.find((r) => r.id === editingRuleId)
+                : editingRuleSection === "base_items"
+                ? baseItemsSettings.rules.find((r) => r.id === editingRuleId)
+                : editingRuleSection === "base_items_socket_quality"
+                ? baseItemsSocketQualitySettings.rules.find((r) => r.id === editingRuleId)
                 : uniquesSettings.rules.find((r) => r.id === editingRuleId);
           }
           if (!editingRule) return null;
@@ -5615,6 +6456,9 @@ export default function QuickFiltersPage() {
               case "jewels":
                 defaultRules = quickFilterDefaults.jewels?.rules || [];
                 break;
+              case "flasks":
+                defaultRules = quickFilterDefaults.flasks?.rules || [];
+                break;
               case "leveling":
                 defaultRules = quickFilterDefaults.leveling?.rules || [];
                 break;
@@ -5627,8 +6471,20 @@ export default function QuickFiltersPage() {
               case "uncut_gems":
                 defaultRules = quickFilterDefaults.uncut_gems?.rules || [];
                 break;
+              case "waystones":
+                defaultRules = quickFilterDefaults.waystones?.rules || [];
+                break;
+              case "expedition":
+                defaultRules = quickFilterDefaults.expedition?.rules || [];
+                break;
               case "others":
                 defaultRules = quickFilterDefaults.others?.rules || [];
+                break;
+              case "base_items":
+                defaultRules = quickFilterDefaults.base_items?.rules || [];
+                break;
+              case "base_items_socket_quality":
+                defaultRules = quickFilterDefaults.base_items_socket_quality?.rules || [];
                 break;
               case "charms":
                 defaultRules = quickFilterDefaults.charms?.rules || [];
@@ -5694,6 +6550,7 @@ export default function QuickFiltersPage() {
               conditions={mergedConditions}
               presetDefaults={presetDefaultRule}
               itemClass={itemClass}
+              section={editingRuleSection}
               hideConditions={editingRuleId === "gold_default"}
 
               onConditionsChange={(newConditions) => {
@@ -5736,6 +6593,20 @@ export default function QuickFiltersPage() {
                       rule.id === ruleId ? { ...rule, conditions: newConditions } : rule
                     ),
                   }));
+                } else if (section === "waystones") {
+                  setWaystonesSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, conditions: newConditions } : rule
+                    ),
+                  }));
+                } else if (section === "expedition") {
+                  setExpeditionSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, conditions: newConditions } : rule
+                    ),
+                  }));
                 } else if (section === "uniques") {
                   setUniquesSettings((prev) => ({
                     ...prev,
@@ -5752,6 +6623,27 @@ export default function QuickFiltersPage() {
                   }));
                 } else if (section === "charms") {
                   setCharmsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, conditions: newConditions } : rule
+                    ),
+                  }));
+                } else if (section === "flasks") {
+                  setFlasksSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, conditions: newConditions } : rule
+                    ),
+                  }));
+                } else if (section === "base_items") {
+                  setBaseItemsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, conditions: newConditions } : rule
+                    ),
+                  }));
+                } else if (section === "base_items_socket_quality") {
+                  setBaseItemsSocketQualitySettings((prev) => ({
                     ...prev,
                     rules: prev.rules.map((rule) =>
                       rule.id === ruleId ? { ...rule, conditions: newConditions } : rule
@@ -5823,6 +6715,20 @@ export default function QuickFiltersPage() {
                       rule.id === ruleId ? { ...rule, styles: newStyles } : rule
                     ),
                   }));
+                } else if (section === "waystones") {
+                  setWaystonesSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, styles: newStyles } : rule
+                    ),
+                  }));
+                } else if (section === "expedition") {
+                  setExpeditionSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, styles: newStyles } : rule
+                    ),
+                  }));
                 } else if (section === "others") {
                   setOthersSettings((prev) => ({
                     ...prev,
@@ -5832,6 +6738,27 @@ export default function QuickFiltersPage() {
                   }));
                 } else if (section === "charms") {
                   setCharmsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, styles: newStyles } : rule
+                    ),
+                  }));
+                } else if (section === "flasks") {
+                  setFlasksSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, styles: newStyles } : rule
+                    ),
+                  }));
+                } else if (section === "base_items") {
+                  setBaseItemsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, styles: newStyles } : rule
+                    ),
+                  }));
+                } else if (section === "base_items_socket_quality") {
+                  setBaseItemsSocketQualitySettings((prev) => ({
                     ...prev,
                     rules: prev.rules.map((rule) =>
                       rule.id === ruleId ? { ...rule, styles: newStyles } : rule
@@ -5850,10 +6777,18 @@ export default function QuickFiltersPage() {
                   ? "Vault Keys"
                   : editingRuleSection === "uncut_gems"
                   ? "Uncut Gems"
+                  : editingRuleSection === "waystones"
+                  ? "Waystones"
                   : editingRuleSection === "others"
                   ? "Others"
                   : editingRuleSection === "charms"
                   ? "Charms"
+                  : editingRuleSection === "flasks"
+                  ? "Flasks"
+                  : editingRuleSection === "base_items"
+                  ? "Base Items"
+                  : editingRuleSection === "base_items_socket_quality"
+                  ? "Base Items (Socket & Quality)"
                   : editingRuleSection === "leveling"
                   ? "Leveling"
                   : "Unique"
@@ -5871,13 +6806,27 @@ export default function QuickFiltersPage() {
                   ? "Vault Keys"
                   : editingRuleSection === "uncut_gems"
                   ? "Uncut Gems"
+                  : editingRuleSection === "waystones"
+                  ? "Waystones"
                   : editingRuleSection === "others"
                   ? "Others"
                   : editingRuleSection === "charms"
                   ? "Charms"
+                  : editingRuleSection === "flasks"
+                  ? "Flasks"
+                  : editingRuleSection === "base_items"
+                  ? "Base Items"
+                  : editingRuleSection === "base_items_socket_quality"
+                  ? "Socket & Quality Items"
                   : "Unique"
               }
-              title={editingRule.nameKo || editingRule.name}
+              title={
+                editingRule.id === "flask_ilvl83"
+                  ? (editingRule.nameKo || editingRule.name || "")
+                      .replace(/\s*\(lv.*\)\s*$/i, "")
+                      .replace(/\s*\|\s*\d+렙\+?\s*$/i, "")
+                  : editingRule.nameKo || editingRule.name
+              }
               onTitleChange={(newTitle) => {
                 // 함수형 업데이트 패턴 사용: stale closure 방지
                 const ruleId = editingRuleId;
@@ -5928,6 +6877,24 @@ export default function QuickFiltersPage() {
                         : rule
                     ),
                   }));
+                } else if (section === "waystones") {
+                  setWaystonesSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, nameKo: newTitle, name: newTitle }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "expedition") {
+                  setExpeditionSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, nameKo: newTitle, name: newTitle }
+                        : rule
+                    ),
+                  }));
                 } else if (section === "others") {
                   setOthersSettings((prev) => ({
                     ...prev,
@@ -5939,6 +6906,24 @@ export default function QuickFiltersPage() {
                   }));
                 } else if (section === "charms") {
                   setCharmsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, nameKo: newTitle, name: newTitle }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "flasks") {
+                  setFlasksSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, nameKo: newTitle, name: newTitle }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "leveling") {
+                  setLevelingSettings((prev) => ({
                     ...prev,
                     rules: prev.rules.map((rule) =>
                       rule.id === ruleId
@@ -5999,6 +6984,24 @@ export default function QuickFiltersPage() {
                         : rule
                     ),
                   }));
+                } else if (section === "waystones") {
+                  setWaystonesSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "expedition") {
+                  setExpeditionSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
                 } else if (section === "others") {
                   setOthersSettings((prev) => ({
                     ...prev,
@@ -6010,6 +7013,42 @@ export default function QuickFiltersPage() {
                   }));
                 } else if (section === "charms") {
                   setCharmsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "flasks") {
+                  setFlasksSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "base_items") {
+                  setBaseItemsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "base_items_socket_quality") {
+                  setBaseItemsSocketQualitySettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId
+                        ? { ...rule, enabled: newEnabled }
+                        : rule
+                    ),
+                  }));
+                } else if (section === "leveling") {
+                  setLevelingSettings((prev) => ({
                     ...prev,
                     rules: prev.rules.map((rule) =>
                       rule.id === ruleId
@@ -6060,6 +7099,20 @@ export default function QuickFiltersPage() {
                       rule.id === ruleId ? { ...rule, type: newType } : rule
                     ),
                   }));
+                } else if (section === "waystones") {
+                  setWaystonesSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, type: newType } : rule
+                    ),
+                  }));
+                } else if (section === "expedition") {
+                  setExpeditionSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, type: newType } : rule
+                    ),
+                  }));
                 } else if (section === "others") {
                   setOthersSettings((prev) => ({
                     ...prev,
@@ -6069,6 +7122,34 @@ export default function QuickFiltersPage() {
                   }));
                 } else if (section === "charms") {
                   setCharmsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, type: newType } : rule
+                    ),
+                  }));
+                } else if (section === "flasks") {
+                  setFlasksSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, type: newType } : rule
+                    ),
+                  }));
+                } else if (section === "base_items") {
+                  setBaseItemsSettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, type: newType } : rule
+                    ),
+                  }));
+                } else if (section === "base_items_socket_quality") {
+                  setBaseItemsSocketQualitySettings((prev) => ({
+                    ...prev,
+                    rules: prev.rules.map((rule) =>
+                      rule.id === ruleId ? { ...rule, type: newType } : rule
+                    ),
+                  }));
+                } else if (section === "leveling") {
+                  setLevelingSettings((prev) => ({
                     ...prev,
                     rules: prev.rules.map((rule) =>
                       rule.id === ruleId ? { ...rule, type: newType } : rule
@@ -7035,6 +8116,45 @@ export default function QuickFiltersPage() {
         .leveling-dropdown-button option {
           background-color: #1a1a1a;
           color: #ffffff;
+        }
+
+        /* 베이스 아이템/소켓 & 퀄리티 드롭다운 컴팩트 스타일 */
+        .base-items-dropdown-wrapper.leveling-dropdown-wrapper,
+        .base-items-socket-quality-dropdown-wrapper.leveling-dropdown-wrapper {
+          width: auto !important;
+          min-width: 0 !important;
+          max-width: none !important;
+          flex: 0 0 auto !important;
+        }
+
+        .compact-dropdown-button {
+          padding: 0 4px !important;
+          height: 30px !important;
+          width: auto !important;
+          min-width: 0 !important;
+          max-width: none !important;
+          gap: 2px !important;
+          justify-content: center !important;
+          white-space: nowrap !important;
+        }
+
+        .compact-dropdown-button > span:first-child {
+          flex: 0 0 auto !important;
+          text-align: center !important;
+        }
+
+        .compact-dropdown-button .dropdown-icon {
+          margin-left: 2px !important;
+          font-size: 10px !important;
+        }
+
+        .compact-dropdown-select {
+          padding: 0 4px !important;
+          height: 30px !important;
+          width: auto !important;
+          min-width: 0 !important;
+          max-width: none !important;
+          white-space: nowrap !important;
         }
       `}</style>
     </main>

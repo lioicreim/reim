@@ -784,10 +784,34 @@ body {
 /* 애드센스 사이드바 */
 .ad-sidebar {
   width: 300px;
+  min-width: 300px;
   padding: 24px 16px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.ad-banner-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.ad-leaderboard {
+  width: 100%;
+  min-height: 90px;
+}
+
+.ad-rectangle {
+  width: 300px;
+  min-height: 250px;
+}
+
+.ad-skyscraper {
+  width: 300px;
+  min-height: 600px;
 }
 
 .ad-placeholder {

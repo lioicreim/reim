@@ -1,25 +1,36 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import ItemFilterActions from "@/app/components/ItemFilterActions";
 
+const VOLUME_OPTIONS = [100, 200, 300];
+const normalizeVolume = (value) =>
+  VOLUME_OPTIONS.includes(value) ? value : 300;
+
 const DEFAULT_SOUND_SETTINGS = [
-  { id: "currency_s", name: "화폐 S 티어", pcFile: "1_currency_s.mp3", ps5Slot: 5, volume: 300, enabled: true, category: "currency" },
-  { id: "currency_a", name: "화폐 A 티어", pcFile: "2_currency_a.mp3", ps5Slot: 1, volume: 300, enabled: true, category: "currency" },
-  { id: "currency_b", name: "화폐 B 티어", pcFile: "3_currency_b.mp3", ps5Slot: 2, volume: 300, enabled: true, category: "currency" },
-  { id: "currency_c", name: "화폐 C 티어", pcFile: "4_currency_c.mp3", ps5Slot: 2, volume: 300, enabled: true, category: "currency" },
-  { id: "currency_stack", name: "화폐 중첩 (Stack)", pcFile: "10_stack.mp3", ps5Slot: null, volume: 200, enabled: true, category: "currency" },
-  { id: "waystones", name: "경로석 (Waystones)", pcFile: "9_maps.mp3", ps5Slot: null, volume: 300, enabled: true, category: "map" },
-  { id: "gear_t1", name: "장비 아이템 T1", pcFile: "5_item_t1.mp3", ps5Slot: null, volume: 300, enabled: true, category: "gear" },
-  { id: "gear_t2", name: "장비 아이템 T2", pcFile: "6_item_t2.mp3", ps5Slot: null, volume: 300, enabled: true, category: "gear" },
-  { id: "gear_t3", name: "장비 아이템 T3", pcFile: "7_item_t3.mp3", ps5Slot: null, volume: 300, enabled: true, category: "gear" },
-  { id: "flasks", name: "플라스크 (Flasks)", pcFile: "8_flask.mp3", ps5Slot: null, volume: 300, enabled: true, category: "etc" },
+  { id: "currency_s", name: "화폐 S 티어", pcFile: "1_currency_s.mp3", ps5Slot: 5, volume: 300, enabled: true, category: "currency", type: "custom", ingameId: 6 },
+  { id: "currency_a", name: "화폐 A 티어", pcFile: "2_currency_a.mp3", ps5Slot: 1, volume: 300, enabled: true, category: "currency", type: "custom", ingameId: 2 },
+  { id: "currency_b", name: "화폐 B 티어", pcFile: "3_currency_b.mp3", ps5Slot: 2, volume: 300, enabled: true, category: "currency", type: "custom", ingameId: 2 },
+  { id: "currency_c", name: "화폐 C 티어", pcFile: "4_currency_c.mp3", ps5Slot: 2, volume: 300, enabled: true, category: "currency", type: "custom", ingameId: 2 },
+  { id: "currency_stack", name: "화폐 중첩 (Stack)", pcFile: "10_stack.mp3", ps5Slot: null, volume: 200, enabled: true, category: "currency", type: "custom", ingameId: null },
+  { id: "waystones", name: "경로석 (Waystones)", pcFile: "9_maps.mp3", ps5Slot: null, volume: 300, enabled: true, category: "map", type: "custom", ingameId: null },
+  { id: "gear_t1", name: "장비 아이템 T1", pcFile: "5_item_t1.mp3", ps5Slot: null, volume: 300, enabled: true, category: "gear", type: "custom", ingameId: null },
+  { id: "gear_t2", name: "장비 아이템 T2", pcFile: "6_item_t2.mp3", ps5Slot: null, volume: 300, enabled: true, category: "gear", type: "custom", ingameId: null },
+  { id: "gear_t3", name: "장비 아이템 T3", pcFile: "7_item_t3.mp3", ps5Slot: null, volume: 300, enabled: true, category: "gear", type: "custom", ingameId: null },
+  { id: "flasks", name: "플라스크 (Flasks)", pcFile: "8_flask.mp3", ps5Slot: null, volume: 300, enabled: true, category: "etc", type: "custom", ingameId: null },
 ];
 
 export default function SoundManagerPage() {
   const [lang, setLang] = useState("ko");
   const [soundOption, setSoundOption] = useState("default"); // default, ps5, s_only, none
   const [soundSettings, setSoundSettings] = useState(DEFAULT_SOUND_SETTINGS);
+  const [audioPreviews, setAudioPreviews] = useState({}); // { id: blobUrl }
+
+  const normalizeSoundSettings = (settings) =>
+    (settings || []).map((item) => ({
+      ...item,
+      volume: normalizeVolume(item.volume),
+    }));
 
   useEffect(() => {
     // 언어 설정 불러오기
@@ -34,10 +45,13 @@ export default function SoundManagerPage() {
     const savedSettings = localStorage.getItem("poe2_sound_settings");
     if (savedSettings) {
       try {
-        setSoundSettings(JSON.parse(savedSettings));
+        const parsedSettings = JSON.parse(savedSettings);
+        setSoundSettings(normalizeSoundSettings(parsedSettings));
       } catch (e) {
         console.error("Failed to parse sound settings", e);
       }
+    } else {
+      setSoundSettings(normalizeSoundSettings(DEFAULT_SOUND_SETTINGS));
     }
 
     const handleStorage = (e) => {
@@ -46,70 +60,124 @@ export default function SoundManagerPage() {
     };
 
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      // 컴포넌트 언마운트 시 생성된 Blob URL 해제 (메모리 누수 방지)
+      Object.values(audioPreviews).forEach(url => URL.revokeObjectURL(url));
+    };
   }, []);
 
   // 설정 저장
   const saveAll = (newOption, newSettings) => {
     localStorage.setItem("poe2_sound_option", newOption);
-    localStorage.setItem("poe2_sound_settings", JSON.stringify(newSettings));
+    const normalized = normalizeSoundSettings(newSettings);
+    localStorage.setItem("poe2_sound_settings", JSON.stringify(normalized));
     
     // 타 페이지 연동을 위한 커스텀 이벤트
     window.dispatchEvent(new Event("poe2_sound_settings_changed"));
   };
 
-  const handleOptionChange = (option) => {
-    setSoundOption(option);
-    saveAll(option, soundSettings);
+  // 볼륨 변경 핸들러
+  const handleVolumeChange = (id, newVolume) => {
+    const updated = soundSettings.map((item) =>
+      item.id === id ? { ...item, volume: parseInt(newVolume) } : item
+    );
+    setSoundSettings(updated);
+    saveAll(soundOption, updated);
   };
 
-  const updateSetting = (id, key, value) => {
-    const newSettings = soundSettings.map((s) =>
-      s.id === id ? { ...s, [key]: value } : s
+  // 활성화 토글 핸들러
+  const handleEnabledToggle = (id) => {
+    const updated = soundSettings.map((item) =>
+      item.id === id ? { ...item, enabled: !item.enabled } : item
     );
-    setSoundSettings(newSettings);
-    saveAll(soundOption, newSettings);
+    setSoundSettings(updated);
+    saveAll(soundOption, updated);
+  };
+
+  // 파일 변경 핸들러
+  const handleFileChange = (id, event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 기존 미리보기 URL 해제
+    if (audioPreviews[id]) {
+      URL.revokeObjectURL(audioPreviews[id]);
+    }
+
+    // 새 미리보기 URL 생성
+    const url = URL.createObjectURL(file);
+    setAudioPreviews(prev => ({ ...prev, [id]: url }));
+
+    // 파일 이름만 추출 (확장자 포함)
+    const fileName = file.name;
+    
+    const updated = soundSettings.map((item) =>
+      item.id === id ? { ...item, pcFile: fileName } : item
+    );
+    setSoundSettings(updated);
+    saveAll(soundOption, updated);
+  };
+
+  // 타입 변경 핸들러
+  const handleTypeChange = (id, newType) => {
+    const updated = soundSettings.map((item) =>
+      item.id === id ? { ...item, type: newType } : item
+    );
+    setSoundSettings(updated);
+    saveAll(soundOption, updated);
+  };
+
+  // 인게임 ID 변경 핸들러
+  const handleIngameIdChange = (id, newId) => {
+    const updated = soundSettings.map((item) =>
+      item.id === id ? { ...item, ingameId: parseInt(newId) } : item
+    );
+    setSoundSettings(updated);
+    saveAll(soundOption, updated);
+  };
+
+  // 파일명 초기화 핸들러 (취소 기능)
+  const handleResetFile = (id) => {
+    const defaultItem = DEFAULT_SOUND_SETTINGS.find((d) => d.id === id);
+    if (!defaultItem) return;
+
+    // 미리보기 해제
+    if (audioPreviews[id]) {
+        URL.revokeObjectURL(audioPreviews[id]);
+        setAudioPreviews(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+        });
+    }
+
+    const updated = soundSettings.map((item) =>
+      item.id === id ? { ...item, pcFile: defaultItem.pcFile } : item
+    );
+    setSoundSettings(updated);
+    saveAll(soundOption, updated);
+  };
+
+  // 사운드 재생 핸들러
+  const handlePlaySound = (id) => {
+    const url = audioPreviews[id];
+    if (!url) {
+      alert(lang === "ko" ? "먼저 파일을 변경하여 사운드를 로드해야 합니다." : "Please change the file to load sound first.");
+      return;
+    }
+
+    const item = soundSettings.find(s => s.id === id);
+    const volume = item ? item.volume : 300;
+    
+    const audio = new Audio(url);
+    // HTML Audio volume is 0.0 to 1.0. Map 300 -> 1.0, 0 -> 0.0
+    audio.volume = Math.min(volume / 300, 1.0);
+    audio.play().catch(e => console.error("Playback failed:", e));
   };
 
   return (
     <main className="container">
-      {/* 1. 글로벌 프리셋 선택 */}
-      <section className="card mb-24">
-        <div className="cardHeader">
-          <h2 className="cardTitle">{lang === "ko" ? "글로벌 사운드 프리셋" : "Global Sound Preset"}</h2>
-        </div>
-        <div className="cardBody">
-          <div className="preset-radio-group">
-            {[
-              { id: "default", label: lang === "ko" ? "PC 커스텀" : "PC Custom" },
-              { id: "ps5", label: lang === "ko" ? "PS5 인게임" : "PS5 In-game" },
-              { id: "s_only", label: lang === "ko" ? "S 티어만 듣기" : "S-Tier Only" },
-              { id: "none", label: lang === "ko" ? "무음 (Silent)" : "Silent" },
-            ].map((opt) => (
-              <label key={opt.id} className={`preset-radio-item ${soundOption === opt.id ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  name="soundOption"
-                  value={opt.id}
-                  checked={soundOption === opt.id}
-                  onChange={() => handleOptionChange(opt.id)}
-                />
-                <span className="radio-mark"></span>
-                <span className="radio-label">{opt.label}</span>
-              </label>
-            ))}
-          </div>
-          <div className="description-box mt-12">
-            <p className="description-text">
-              {soundOption === "default" && (lang === "ko" ? "기본 커스텀 사운드를 적용합니다. PC 사용자에게 권장됩니다." : "Applies default custom sounds. Recommended for PC users.")}
-              {soundOption === "ps5" && (lang === "ko" ? "인게임 기본 사운드를 적용합니다. PS5 및 콘솔 사용자용입니다." : "Applies in-game default sounds. For PS5 and Console users.")}
-              {soundOption === "s_only" && (lang === "ko" ? "가장 가치 있는 S 티어 아이템에 대해서만 사운드가 출력됩니다." : "Sounds will only play for the most valuable S-tier items.")}
-              {soundOption === "none" && (lang === "ko" ? "모든 아이템의 사운드를 제거하여 정숙한 플레이가 가능합니다." : "Removes sounds from all items for silent gameplay.")}
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* 2. 다운로드 및 가이드 */}
       {soundOption === "default" && (
         <section className="card mb-24 info-card">
@@ -118,7 +186,15 @@ export default function SoundManagerPage() {
               <h3 className="info-title">{lang === "ko" ? "추천 커스텀 사운드 팩" : "Recommended Sound Pack"}</h3>
               <p className="info-desc">{lang === "ko" ? "기본 설정된 파일명이 포함된 사운드 팩을 다운로드하세요." : "Download the sound pack containing the default filenames."}</p>
             </div>
-            <button className="btn-download-pack" onClick={() => window.open('https://github.com', '_blank')}>
+            <button
+              className="btn-download-pack"
+              onClick={() =>
+                window.open(
+                  "https://blog.kakaocdn.net/dna/cNVwZG/dJMb99SAI0E/AAAAAAAAAAAAAAAAAAAAADK2BeM3xX-EpczErBX2hf7gV3c1lqJTIrGUGu30df5Q/custom_sound.zip?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1769871599&allow_ip=&allow_referer=&signature=0sfprH0jFoZPBnKg63URZo2a6fM%3D&attach=1&knm=tfile.zip",
+                  "_blank"
+                )
+              }
+            >
               {lang === "ko" ? "다운로드 (.zip)" : "Download (.zip)"}
             </button>
           </div>
@@ -126,8 +202,8 @@ export default function SoundManagerPage() {
             <h4 className="guide-title">{lang === "ko" ? "설치 가이드" : "Installation Guide"}</h4>
             <ol className="guide-list">
               <li>{lang === "ko" ? "압축 파일을 해제합니다." : "Extract the downloaded ZIP file."}</li>
-              <li>{lang === "ko" ? "필터 파일이 있는 폴더 안에 'custom_sound' 폴더를 생성합니다." : "Create a 'custom_sound' folder in your filter directory."}</li>
-              <li>{lang === "ko" ? "해당 폴더 안에 .mp3 파일들을 넣습니다." : "Place the .mp3 files inside that folder."}</li>
+              <li>{lang === "ko" ? "인게임에서 설정-게임-아이템 필터의 폴더 아이콘을 클릭하세요" : "In-game, go to Settings - Game - Item Filter and click the folder icon."}</li>
+              <li>{lang === "ko" ? "폴더가 열리면 압축이 풀린 custom_sound 폴더를 폴더채 넣으세요" : "When the folder opens, copy the extracted custom_sound folder into it."}</li>
             </ol>
           </div>
         </section>
@@ -146,93 +222,204 @@ export default function SoundManagerPage() {
         </section>
       )}
 
-      {/* 3. 고급 사운드 매핑 */}
-      <section className="card">
-        <div className="cardHeader">
-          <h2 className="cardTitle">{lang === "ko" ? "상세 사운드 설정" : "Advanced Sound Mapping"}</h2>
-        </div>
-        <div className="cardBody p-0">
-          <div className="table-container">
-            <table className="sound-table">
-              <thead>
-                <tr>
-                  <th>{lang === "ko" ? "구분" : "Category"}</th>
-                  <th>{lang === "ko" ? "활성" : "On"}</th>
-                  <th>{lang === "ko" ? (soundOption === "ps5" ? "슬롯" : "파일명") : (soundOption === "ps5" ? "Slot" : "File")}</th>
-                  <th>{lang === "ko" ? "볼륨" : "Vol"}</th>
-                  <th>{lang === "ko" ? "테스트" : "Test"}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {soundSettings.map((item) => (
-                  <tr key={item.id} className={!item.enabled ? 'disabled' : ''}>
-                    <td className="item-name">{item.name}</td>
-                    <td>
-                      <label className="checkbox-container">
-                        <input
-                          type="checkbox"
-                          checked={item.enabled}
-                          onChange={(e) => updateSetting(item.id, "enabled", e.target.checked)}
-                        />
-                        <span className="checkmark"></span>
-                      </label>
-                    </td>
-                    <td>
-                      {soundOption === "ps5" ? (
-                        item.ps5Slot !== null ? (
+      {/* 3. 사운드 파일 관리 테이블 */}
+      {soundOption === "default" && (
+        <section className="card mb-24">
+          <div className="cardBody p-0">
+            <div className="table-container">
+              <table className="sound-table">
+                <thead>
+                  <tr>
+                    <th>{lang === "ko" ? "사용" : "Use"}</th>
+                    <th>{lang === "ko" ? "아이템" : "Item"}</th>
+                    <th>{lang === "ko" ? "PC 파일명" : "PC Filename"}</th>
+                    <th>{lang === "ko" ? "볼륨" : "Volume"}</th>
+                    <th>{lang === "ko" ? "테스트" : "Test"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {soundSettings.map((item) => (
+                    <tr key={item.id} className={!item.enabled ? "disabled" : ""}>
+                      <td>
+                        <label className="checkbox-container">
+                          <input
+                            type="checkbox"
+                            checked={item.enabled}
+                            onChange={() => handleEnabledToggle(item.id)}
+                          />
+                          <span className="checkmark"></span>
+                        </label>
+                      </td>
+                      <td className="item-name">{item.name}</td>
+                      <td style={{ minWidth: "320px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          {/* 타입 선택 (기본/커스텀) */}
+                          <select
+                            className="select-input"
+                            value={item.type || "custom"} // 기존 데이터 호환 위해 기본값 custom
+                            onChange={(e) => handleTypeChange(item.id, e.target.value)}
+                            style={{ width: "90px", flexShrink: 0 }}
+                          >
+                            <option value="custom">{lang === "ko" ? "커스텀" : "Custom"}</option>
+                            <option value="default">{lang === "ko" ? "기본" : "Basic"}</option>
+                          </select>
+
+                          {/* 타입에 따른 입력 UI */}
+                          {(item.type === "default") ? (
+                            <select
+                                className="select-input"
+                                value={item.ingameId || ""}
+                                onChange={(e) => handleIngameIdChange(item.id, e.target.value)}
+                                style={{ flex: 1 }}
+                            >
+                                <option value="">{lang === "ko" ? "선택 안함" : "None"}</option>
+                                {Array.from({ length: 16 }, (_, i) => i + 1).map(num => (
+                                    <option key={num} value={num}>
+                                        {num}
+                                    </option>
+                                ))}
+                            </select>
+                          ) : (
+                            <div style={{ display: "flex", alignItems: "center", gap: "4px", flex: 1, minWidth: 0 }}>
+                              <span style={{ color: "var(--muted)", fontSize: "13px", whiteSpace: "nowrap" }}>
+                                custom_sound/
+                              </span>
+                              <input
+                                type="text"
+                                className="text-input"
+                                value={item.pcFile}
+                                readOnly
+                                style={{ flex: 1, minWidth: "100px" }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="vol-cell">
+                        <div className="vol-control">
+                          <select
+                            className="select-input volume-select"
+                            value={item.volume}
+                            onChange={(e) => handleVolumeChange(item.id, e.target.value)}
+                          >
+                            {VOLUME_OPTIONS.map((vol) => (
+                              <option key={vol} value={vol}>
+                                {vol}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="test-actions">
+                          <button
+                            className="btn-play-mini"
+                            title={lang === "ko" ? "재생" : "Play"}
+                            onClick={() => handlePlaySound(item.id)}
+                            disabled={!audioPreviews[item.id]}
+                            style={{ 
+                              opacity: audioPreviews[item.id] ? 1 : 0.5,
+                              backgroundColor: audioPreviews[item.id] ? "#3166ff" : "var(--panel2)", // 활성화 시 파란색
+                              color: audioPreviews[item.id] ? "#fff" : "var(--text)", // 활성화 시 흰색
+                              borderColor: audioPreviews[item.id] ? "#3166ff" : "var(--border)"
+                            }}
+                          >
+                            ▶
+                          </button>
+                          
+                          {/* 초기화(취소) 버튼: 항상 표시하되 상태에 따라 스타일 변경 */}
+                          {(() => {
+                            const defaultFile = DEFAULT_SOUND_SETTINGS.find(d => d.id === item.id)?.pcFile;
+                            const isChanged = item.pcFile !== defaultFile;
+                            
+                            return (
+                              <button
+                                className={`btn-reset-mini ${!isChanged ? "disabled" : ""}`}
+                                onClick={() => isChanged && handleResetFile(item.id)}
+                                title={lang === "ko" 
+                                  ? (isChanged ? "기본 설정으로 되돌리기" : "기본 설정입니다") 
+                                  : (isChanged ? "Reset to default" : "Default setting")}
+                                disabled={!isChanged}
+                              >
+                                ✕
+                              </button>
+                            );
+                          })()}
+                          
+                          <label className="btn-file-mini">
+                            {lang === "ko" ? "파일 변경" : "Change File"}
+                            <input
+                              type="file"
+                              accept=".mp3,.wav,.ogg"
+                              onChange={(e) => handleFileChange(item.id, e)}
+                              style={{ display: "none" }}
+                            />
+                          </label>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* PS5 사운드 슬롯 테이블 */}
+      {soundOption === "ps5" && (
+        <section className="card mb-24">
+          <div className="cardBody p-0">
+            <div className="table-container">
+              <table className="sound-table">
+                <thead>
+                  <tr>
+                    <th>{lang === "ko" ? "사용" : "Use"}</th>
+                    <th>{lang === "ko" ? "아이템" : "Item"}</th>
+                    <th>{lang === "ko" ? "PS5 슬롯" : "PS5 Slot"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {DEFAULT_SOUND_SETTINGS.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <label className="checkbox-container">
+                          <input
+                            type="checkbox"
+                            checked={item.enabled}
+                            readOnly
+                          />
+                          <span className="checkmark"></span>
+                        </label>
+                      </td>
+                      <td className="item-name">{item.name}</td>
+                      <td>
+                        {item.ps5Slot !== null ? (
                           <select
                             className="select-input"
                             value={item.ps5Slot}
-                            onChange={(e) => updateSetting(item.id, "ps5Slot", parseInt(e.target.value))}
-                            disabled={!item.enabled}
+                            disabled
                           >
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                              <option key={n} value={n}>Slot {n}</option>
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((slot) => (
+                              <option key={slot} value={slot}>
+                                {slot}
+                              </option>
                             ))}
                           </select>
                         ) : (
-                          <span className="no-mapping">{lang === "ko" ? "지원불가" : "N/A"}</span>
-                        )
-                      ) : (
-                        <input
-                          type="text"
-                          className="text-input"
-                          value={item.pcFile}
-                          onChange={(e) => updateSetting(item.id, "pcFile", e.target.value)}
-                          disabled={!item.enabled}
-                        />
-                      )}
-                    </td>
-                    <td className="vol-cell">
-                      <div className="vol-control">
-                        <span className="vol-value">{item.volume}</span>
-                        <input
-                          type="range"
-                          min="0"
-                          max={soundOption === "ps5" ? 300 : 100}
-                          step={soundOption === "ps5" ? 10 : 5}
-                          value={item.volume}
-                          onChange={(e) => updateSetting(item.id, "volume", parseInt(e.target.value))}
-                          disabled={!item.enabled}
-                          className="mini-range"
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <button 
-                        className="btn-play-mini"
-                        disabled={!item.enabled || (soundOption === "ps5" && item.ps5Slot === null)}
-                      >
-                        ▶
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <span className="no-mapping">
+                            {lang === "ko" ? "매핑 없음" : "No mapping"}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <ItemFilterActions
         lang={lang}
@@ -244,12 +431,12 @@ export default function SoundManagerPage() {
             localStorage.removeItem("poe2_sound_option");
             localStorage.removeItem("poe2_sound_settings");
             setSoundOption("default");
-            setSoundSettings(DEFAULT_SOUND_SETTINGS);
+            setSoundSettings(normalizeSoundSettings(DEFAULT_SOUND_SETTINGS));
             if (onSuccess) onSuccess(lang === "ko" ? "초기화되었습니다." : "Reset complete.");
           }
         }}
         onResetPage={(onSuccess) => {
-          setSoundSettings(DEFAULT_SOUND_SETTINGS);
+          setSoundSettings(normalizeSoundSettings(DEFAULT_SOUND_SETTINGS));
           saveAll(soundOption, DEFAULT_SOUND_SETTINGS);
           if (onSuccess) onSuccess(lang === "ko" ? "페이지 설정이 복구되었습니다." : "Page settings restored.");
         }}
@@ -357,7 +544,7 @@ export default function SoundManagerPage() {
         .btn-download-pack {
           padding: 10px 20px;
           background: var(--poe2-primary);
-          color: #000;
+          color: #fff;
           border: none;
           font-weight: 700;
           font-size: 14px;
@@ -408,6 +595,7 @@ export default function SoundManagerPage() {
         .sound-table td {
           padding: 12px 16px;
           border-bottom: 1px solid var(--border);
+          vertical-align: middle;
         }
 
         .sound-table tr:hover {
@@ -450,26 +638,8 @@ export default function SoundManagerPage() {
           gap: 12px;
         }
 
-        .vol-value {
-          font-family: monospace;
-          font-size: 13px;
-          width: 30px;
-          text-align: right;
-        }
-
-        .mini-range {
-          flex: 1;
-          height: 4px;
-          background: var(--panel2);
-          -webkit-appearance: none;
-        }
-
-        .mini-range::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 12px;
-          height: 12px;
-          background: var(--poe2-primary);
-          cursor: pointer;
+        .volume-select {
+          width: 100%;
         }
 
         .btn-play-mini {
@@ -480,6 +650,73 @@ export default function SoundManagerPage() {
           color: var(--text);
           cursor: pointer;
           font-size: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        .test-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        /* 초기화 버튼 */
+        .btn-reset-mini {
+          width: 32px;
+          height: 32px;
+          background: var(--panel2);
+          border: 1px solid var(--border);
+          color: #ff4444; /* 활성화 시 빨간색 */
+          cursor: pointer;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          box-sizing: border-box;
+          transition: all 0.2s;
+        }
+        .btn-reset-mini:not(.disabled):hover {
+          background: var(--panel);
+          border-color: #ff4444;
+          transform: scale(1.05);
+        }
+        
+        /* 비활성 상태 (기본값일 때) */
+        .btn-reset-mini.disabled {
+          color: var(--muted);     /* 흑백/회색 */
+          border-color: transparent;
+          cursor: default;
+          opacity: 0.3;
+        }
+
+        .btn-file-mini {
+          height: 32px;
+          padding: 0 16px;
+          border: none;
+          background: var(--poe2-primary); /* 항상 파란색 */
+          color: #ffffff; /* 항상 흰색 */
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          border-radius: 2px;
+          transition: opacity 0.2s;
+        }
+        
+        .btn-file-mini:hover {
+          opacity: 0.9;
+        }
+
+        .btn-file-mini:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
         }
 
         /* 체크박스 커스텀 */
@@ -489,6 +726,7 @@ export default function SoundManagerPage() {
           padding-left: 24px;
           cursor: pointer;
           user-select: none;
+          height: 100%;
         }
 
         .checkbox-container input {
@@ -501,12 +739,13 @@ export default function SoundManagerPage() {
 
         .checkmark {
           position: absolute;
-          top: 0;
+          top: 50%;
           left: 0;
           height: 18px;
           width: 18px;
           background-color: var(--panel2);
           border: 1px solid var(--border);
+          transform: translateY(-50%);
         }
 
         .checkbox-container:hover input ~ .checkmark {

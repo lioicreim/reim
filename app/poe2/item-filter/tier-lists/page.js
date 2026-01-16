@@ -143,6 +143,7 @@ export default function TierListPage() {
   const [customCurrencyTiers, setCustomCurrencyTiers] = useState({});
   const [customGearTiers, setCustomGearTiers] = useState({});
   const [customUniquesTiers, setCustomUniquesTiers] = useState({});
+  const [uniqueTierStyles, setUniqueTierStyles] = useState({}); // 유니크 티어 스타일 (S, A, B, C)
   const [customModsTiers, setCustomModsTiers] = useState({});
   
   // 다중 선택 상태 (화폐 아이템 선택)
@@ -461,7 +462,19 @@ export default function TierListPage() {
           console.error("Failed to parse saved uniques tiers", e);
         }
       }
+
+      // 유니크 티어 스타일 불러오기
+      const uniqueStylesKey = "uniques-tier-styles";
+      const savedUniqueStyles = localStorage.getItem(uniqueStylesKey);
+      if (savedUniqueStyles) {
+        try {
+          setUniqueTierStyles(JSON.parse(savedUniqueStyles));
+        } catch (e) {
+          console.error("Failed to parse saved unique tier styles", e);
+        }
+      }
     }
+
     
     // 모드 커스텀 티어 불러오기
     if (selectedCategory === "mods") {
@@ -804,27 +817,59 @@ export default function TierListPage() {
     return () => clearTimeout(timer);
   }, [uniqueSearchQuery]);
 
+  // 검색어 하이라이트 헬퍼 함수
+  const highlightTextParts = (text, searchQuery) => {
+    if (!searchQuery || !searchQuery.trim()) {
+      return [{ text, highlight: false }];
+    }
+    
+    const lowerText = text.toLowerCase();
+    const lowerQuery = searchQuery.toLowerCase().trim();
+    if (!lowerQuery) return [{ text, highlight: false }];
+
+    const parts = [];
+    let lastIndex = 0;
+    
+    let searchIndex = lowerText.indexOf(lowerQuery, lastIndex);
+    while (searchIndex !== -1) {
+      if (searchIndex > lastIndex) {
+        parts.push({ text: text.substring(lastIndex, searchIndex), highlight: false });
+      }
+      parts.push({ text: text.substring(searchIndex, searchIndex + lowerQuery.length), highlight: true });
+      lastIndex = searchIndex + lowerQuery.length;
+      searchIndex = lowerText.indexOf(lowerQuery, lastIndex);
+    }
+    if (lastIndex < text.length) {
+      parts.push({ text: text.substring(lastIndex), highlight: false });
+    }
+    
+    return parts.length > 0 ? parts : [{ text, highlight: false }];
+  };
+
+  // 역방향 검색 키 캐싱 (최적화)
+  const reverseMatchKeys = useMemo(() => {
+    if (!debouncedSearchQuery.trim()) return new Set();
+    const searchQueryLower = debouncedSearchQuery.toLowerCase();
+    const keys = new Set();
+    
+    // 검색어가 한글인 경우에만 수행
+    if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(debouncedSearchQuery)) {
+      for (const [key, value] of Object.entries(dict)) {
+        if (typeof value === 'string' && value.toLowerCase().includes(searchQueryLower)) {
+            keys.add(key.toLowerCase());
+            keys.add(key.replace(/\s/g, "_").toLowerCase());
+            keys.add(encodeURIComponent(key).toLowerCase());
+        }
+      }
+    }
+    return keys;
+  }, [debouncedSearchQuery]);
+
   // 검색어로 필터링하는 함수 (컴포넌트 레벨에서 정의)
   const searchFilter = (items) => {
     if (!debouncedSearchQuery.trim()) return items;
     
     const searchQueryLower = debouncedSearchQuery.toLowerCase();
-    // 역방향 검색을 위한 캐시: 검색어가 한글일 때 매칭되는 영문 키들
-    const reverseMatchKeys = new Set();
-    
-    // 검색어가 한글인 경우에만 역방향 검색 수행 (성능 최적화)
-    const isKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(debouncedSearchQuery);
-    
-    if (isKorean) {
-      // dict에서 검색어가 포함된 항목의 키만 찾기
-      for (const [key, value] of Object.entries(dict)) {
-        if (typeof value === 'string' && value.toLowerCase().includes(searchQueryLower)) {
-          reverseMatchKeys.add(key.toLowerCase());
-          reverseMatchKeys.add(key.replace(/\s/g, "_").toLowerCase());
-          reverseMatchKeys.add(encodeURIComponent(key).toLowerCase());
-        }
-      }
-    }
     
     return items.filter(itemName => {
       const itemNameLower = itemName.toLowerCase();
@@ -837,8 +882,8 @@ export default function TierListPage() {
         return true;
       }
       
-      // 역방향 검색: 검색어가 한글일 때만 수행
-      if (isKorean && reverseMatchKeys.has(itemNameLower)) {
+      // 역방향 검색 (캐시된 키 사용)
+      if (reverseMatchKeys.has(itemNameLower)) {
         return true;
       }
       
@@ -1189,53 +1234,136 @@ export default function TierListPage() {
     return null;
   }, [selectedLeague, getCurrencyItemTier]);
 
+  // filter-generator.js의 getUniqueTierColors와 동일한 기본값 (로컬 사용)
+  const getUniqueTierColorsFromGenerator = (tier) => {
+    const styles = {
+      S: {
+        fontSize: 45,
+        textColor: { r: 175, g: 96, b: 37, a: 255 },
+        borderColor: { r: 175, g: 96, b: 37, a: 255 },
+        backgroundColor: { r: 255, g: 255, b: 255, a: 255 },
+        playEffect: "Red",
+        minimapIcon: { size: 0, color: "Red", shape: "Star" },
+        customSound: null, // ingameSound 우선
+        ingameSound: { id: 6, volume: 300 }
+      },
+      A: {
+        fontSize: 45,
+        textColor: { r: 255, g: 255, b: 255, a: 255 },
+        borderColor: { r: 255, g: 255, b: 255, a: 255 },
+        backgroundColor: { r: 175, g: 96, b: 37, a: 255 },
+        playEffect: "Orange",
+        minimapIcon: { size: 0, color: "Orange", shape: "Star" },
+        customSound: null, // ingameSound 우선
+        ingameSound: { id: 2, volume: 200 }
+      },
+      B: {
+        fontSize: 40,
+        textColor: { r: 175, g: 96, b: 37, a: 255 },
+        borderColor: { r: 175, g: 96, b: 37, a: 255 },
+        backgroundColor: { r: 0, g: 0, b: 0, a: 255 },
+        playEffect: "Yellow",
+        minimapIcon: { size: 1, color: "Yellow", shape: "Star" },
+        customSound: null
+      },
+      C: {
+        fontSize: 35,
+        textColor: { r: 175, g: 96, b: 37, a: 255 },
+        borderColor: { r: 0, g: 0, b: 0, a: 0 },
+        backgroundColor: { r: 0, g: 0, b: 0, a: 0 },
+        playEffect: null,
+        minimapIcon: null,
+        customSound: null
+      },
+      D: {
+        fontSize: 35,
+        textColor: { r: 175, g: 96, b: 37, a: 255 },
+        borderColor: { r: 0, g: 0, b: 0, a: 0 },
+        backgroundColor: { r: 0, g: 0, b: 0, a: 0 },
+        playEffect: null,
+        minimapIcon: null,
+        customSound: null
+      }
+    };
+    return styles[tier] || styles.C;
+  };
+
+  // 유니크 티어 스타일 가져오기 (커스텀 병합)
+  const getUniqueTierStyle = (tier) => {
+    const defaultStyle = getUniqueTierColorsFromGenerator(tier);
+    const customStyle = uniqueTierStyles[tier];
+    if (customStyle) {
+      return mergeTierStyles(defaultStyle, customStyle);
+    }
+    return defaultStyle;
+  };
+
+  // 유니크 티어 스타일 저장
+  const saveUniqueTierStyle = (tier, styles) => {
+    const newStyles = { ...uniqueTierStyles, [tier]: styles };
+    setUniqueTierStyles(newStyles);
+    localStorage.setItem("uniques-tier-styles", JSON.stringify(newStyles));
+  };
+
   // 티어 헤더 클릭 핸들러
   const handleTierHeaderClick = (tier) => {
-    if (selectedCategory !== "currency") return;
-    
-    const currencyTypeId = selectedCurrencyTypes.length === 0 
-      ? null 
-      : selectedCurrencyTypes.length === 1 
-        ? selectedCurrencyTypes[0] 
-        : null; // 다중 선택 시 null (전체와 동일하게 처리)
-    
-    // 현재 스타일 가져오기
-    let currentStyles = null;
-    if (currencyTypeId) {
-      // 특정 화폐 종류의 티어 스타일
-      const storageKey = `currency-type-tier-styles-${selectedLeague}`;
-      const savedStyles = JSON.parse(localStorage.getItem(storageKey) || "{}");
-      currentStyles = savedStyles[currencyTypeId]?.[tier] || getCurrencyTypeTierStyle(currencyTypeId, tier);
-    } else {
-      // 전체 상태: 기본 스타일 사용 (또는 "currency" 종류의 기본 스타일)
-      const defaultStyle = getCurrencyTypeTierStyle("currency", tier);
-      if (defaultStyle) {
-        currentStyles = defaultStyle;
+    if (selectedCategory === "currency") {
+      const currencyTypeId = selectedCurrencyTypes.length === 0 
+        ? null 
+        : selectedCurrencyTypes.length === 1 
+          ? selectedCurrencyTypes[0] 
+          : null; // 다중 선택 시 null (전체와 동일하게 처리)
+      
+      // ... (기존 currency 로직 유지)
+      // 현재 스타일 가져오기
+      let currentStyles = null;
+      if (currencyTypeId) {
+        // 특정 화폐 종류의 티어 스타일
+        const storageKey = `currency-type-tier-styles-${selectedLeague}`;
+        const savedStyles = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        currentStyles = savedStyles[currencyTypeId]?.[tier] || getCurrencyTypeTierStyle(currencyTypeId, tier);
       } else {
-        // 기본값이 없을 때만 fallback 사용
-        const tierColorsFromGen = getCurrencyTierColorsFromGenerator(tier);
-        currentStyles = {
-          fontSize: 45,
-          textColor: { r: 255, g: 255, b: 255, a: 255 },
-          borderColor: { r: 255, g: 255, b: 255, a: 255 },
-          backgroundColor: tierColors[tier] === "var(--tier-s)" ? { r: 255, g: 71, b: 87, a: 255 } :
-                           tierColors[tier] === "var(--tier-a)" ? { r: 255, g: 99, b: 72, a: 255 } :
-                           tierColors[tier] === "var(--tier-b)" ? { r: 255, g: 152, b: 0, a: 255 } :
-                           tierColors[tier] === "var(--tier-c)" ? { r: 255, g: 193, b: 7, a: 255 } :
-                           { r: 149, g: 165, b: 166, a: 255 },
-          playEffect: tierColorsFromGen.playEffect,
-          minimapIcon: tierColorsFromGen.minimapIcon || { size: null, color: null, shape: null },
-          customSound: tierColorsFromGen.customSound,
-        };
+        // 전체 상태: 기본 스타일 사용 (또는 "currency" 종류의 기본 스타일)
+        const defaultStyle = getCurrencyTypeTierStyle("currency", tier);
+        if (defaultStyle) {
+          currentStyles = defaultStyle;
+        } else {
+          // 기본값이 없을 때만 fallback 사용
+          const tierColorsFromGen = getCurrencyTierColorsFromGenerator(tier);
+          currentStyles = {
+            fontSize: 45,
+            textColor: { r: 255, g: 255, b: 255, a: 255 },
+            borderColor: { r: 255, g: 255, b: 255, a: 255 },
+            backgroundColor: tierColors[tier] === "var(--tier-s)" ? { r: 255, g: 71, b: 87, a: 255 } :
+                             tierColors[tier] === "var(--tier-a)" ? { r: 255, g: 99, b: 72, a: 255 } :
+                             tierColors[tier] === "var(--tier-b)" ? { r: 255, g: 152, b: 0, a: 255 } :
+                             tierColors[tier] === "var(--tier-c)" ? { r: 255, g: 193, b: 7, a: 255 } :
+                             { r: 149, g: 165, b: 166, a: 255 },
+            playEffect: tierColorsFromGen.playEffect,
+            minimapIcon: tierColorsFromGen.minimapIcon || { size: null, color: null, shape: null },
+            customSound: tierColorsFromGen.customSound,
+          };
+        }
       }
+      
+      setTierStyleModal({
+        isOpen: true,
+        tier,
+        currencyType: currencyTypeId,
+        styles: currentStyles,
+      });
+    } else if (selectedCategory === "uniques") {
+      // E 티어는 스타일 수정 불가 (숨김 티어)
+      if (tier === "E") return;
+      
+      const currentStyles = getUniqueTierStyle(tier);
+      setTierStyleModal({
+        isOpen: true,
+        tier,
+        currencyType: null, // 유니크는 화폐 타입 없음
+        styles: currentStyles,
+      });
     }
-    
-    setTierStyleModal({
-      isOpen: true,
-      tier,
-      currencyType: currencyTypeId,
-      styles: currentStyles,
-    });
   };
 
   // 화폐 아이템 티어 변경
@@ -1429,8 +1557,12 @@ export default function TierListPage() {
         customCurrencyTiers: customCurrencyTiers,
         customModsTiers: customModsTiers,
         excludedItems: excludedItems,
+        customCurrencyTiers: customCurrencyTiers,
+        customModsTiers: customModsTiers,
+        excludedItems: excludedItems,
         selectedLeague: selectedLeague,
-        quickFilterSettings: quickFilterSettings
+        quickFilterSettings: quickFilterSettings,
+        uniqueTierStyles: uniqueTierStyles // 유니크 티어 스타일 전달
       });
       
       const blob = new Blob([filterCode], { type: "text/plain" });
@@ -1484,8 +1616,10 @@ export default function TierListPage() {
         customGearTiers: customGearTiers,
         customCurrencyTiers: customCurrencyTiers,
         customModsTiers: customModsTiers,
+        customModsTiers: customModsTiers,
         selectedLeague: selectedLeague,
-        quickFilterSettings: quickFilterSettings
+        quickFilterSettings: quickFilterSettings,
+        uniqueTierStyles: uniqueTierStyles // 유니크 티어 스타일 전달
       });
 
       await navigator.clipboard.writeText(filterCode);
@@ -2215,6 +2349,32 @@ export default function TierListPage() {
                   </div>
                 </>
               )}
+              <div className="item-search-wrapper" style={{ marginLeft: "auto" }}>
+                <div className="item-search-input">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.6 }}>
+                    <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M14 14L11.1 11.1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder={lang === "ko" ? "아이템 검색..." : "Search items..."}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="item-search-field"
+                  />
+                  <button
+                    type="button"
+                    className={`item-search-clear ${searchQuery ? "item-search-clear-visible" : "item-search-clear-hidden"}`}
+                    onClick={() => setSearchQuery("")}
+                    aria-label={lang === "ko" ? "검색어 지우기" : "Clear search"}
+                    disabled={!searchQuery}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
         </div>
       )}
 
@@ -2494,9 +2654,9 @@ export default function TierListPage() {
                   style={{
                     background: tierColors[tier],
                     color: tier === "C" ? "#000000" : "#ffffff",
-                    cursor: selectedCategory === "currency" ? "pointer" : "default",
+                    cursor: (selectedCategory === "currency" || (selectedCategory === "uniques" && tier !== "E")) ? "pointer" : "default",
                   }}
-                  onClick={() => selectedCategory === "currency" && handleTierHeaderClick(tier)}
+                  onClick={() => (selectedCategory === "currency" || (selectedCategory === "uniques" && tier !== "E")) && handleTierHeaderClick(tier)}
                 >
                   <div className="tier-label">{tier} 티어</div>
                   <div className="tier-count">
@@ -3348,6 +3508,14 @@ export default function TierListPage() {
                             const actualTier = getGearItemTier(item.name);
                             return actualTier === tier && !excludedItems["gear-bases"]?.includes(item.name);
                           });
+
+                          // 검색어 필터링 적용
+                          if (debouncedSearchQuery.trim()) {
+                            const itemNames = classItems.map(item => item.name);
+                            const filteredNames = searchFilter(itemNames);
+                            const filteredNameSet = new Set(filteredNames);
+                            classItems = classItems.filter(item => filteredNameSet.has(item.name));
+                          }
                           
                           if (classItems.length === 0) return null;
 
@@ -3391,7 +3559,13 @@ export default function TierListPage() {
                                         <div className="tier-item-drag-handle-dot"></div>
                                       </div>
                                     </div>
-                                    <div className="tier-item-name">{translateItemName(item.name)}</div>
+                                    <div className="tier-item-name">
+                                      {highlightTextParts(translateItemName(item.name), debouncedSearchQuery).map((part, i) => (
+                                        <span key={i} style={{ color: part.highlight ? "#a3ff12" : undefined, fontWeight: part.highlight ? 600 : undefined }}>
+                                          {part.text}
+                                        </span>
+                                      ))}
+                                    </div>
                                   </div>
                                 );
                               })}
@@ -3443,6 +3617,14 @@ export default function TierListPage() {
                                     const actualTier = getGearItemTier(item.name);
                                     return actualTier === "E" && !excludedItems["gear-bases"]?.includes(item.name);
                                   });
+
+                                  // 검색어 필터링 적용
+                                  if (debouncedSearchQuery.trim()) {
+                                    const itemNames = classItems.map(item => item.name);
+                                    const filteredNames = searchFilter(itemNames);
+                                    const filteredNameSet = new Set(filteredNames);
+                                    classItems = classItems.filter(item => filteredNameSet.has(item.name));
+                                  }
                                   
                                   if (classItems.length === 0) return null;
 
@@ -3492,7 +3674,13 @@ export default function TierListPage() {
                                                 <div className="tier-item-drag-handle-dot"></div>
                                               </div>
                                             </div>
-                                            <div className="tier-item-name">{translateItemName(item.name)}</div>
+                                            <div className="tier-item-name">
+                                              {highlightTextParts(translateItemName(item.name), debouncedSearchQuery).map((part, i) => (
+                                                <span key={i} style={{ color: part.highlight ? "#a3ff12" : undefined, fontWeight: part.highlight ? 600 : undefined }}>
+                                                  {part.text}
+                                                </span>
+                                              ))}
+                                            </div>
                                           </div>
                                         );
                                       })}
@@ -3745,6 +3933,15 @@ export default function TierListPage() {
             // onChange는 모달이 닫히기 전에 호출되므로, 여기서 확인 모달을 먼저 표시
             const { tier, currencyType } = tierStyleModal;
             
+            if (selectedCategory === "uniques") {
+              // 유니크 티어 스타일 저장
+              saveUniqueTierStyle(tier, newStyles);
+              setTierStyleModal({ isOpen: false, tier: null, currencyType: null, styles: null });
+              // 유니크는 상태로 즉시 반영되므로 reload 불필요 (하지만 일관성을 위해 reload 할 수도 있음)
+              // 여기서는 상태 update가 되므로 reload 없이 반영됨
+              return;
+            }
+
             if (currencyType === null) {
               // 전체 상태: 모든 화폐 종류에 적용
               // 확인 모달 표시
@@ -3773,10 +3970,14 @@ export default function TierListPage() {
               setTierStyleModal({ isOpen: false, tier: null, currencyType: null, styles: null });
               
               // 페이지 새로고침 또는 상태 업데이트로 변경사항 반영
+              // 페이지 새로고침 또는 상태 업데이트로 변경사항 반영
               window.location.reload();
             }
           }}
           itemName={(() => {
+            if (selectedCategory === "uniques") {
+              return `유니크 ${tierStyleModal.tier} 티어`;
+            }
             // 티어의 첫 번째 아이템 이름 가져오기
             const firstItemName = getFirstItemNameInTier(tierStyleModal.tier, tierStyleModal.currencyType);
             

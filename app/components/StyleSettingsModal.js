@@ -6,6 +6,8 @@ import ItemPreviewBox from "./ItemPreviewBox";
 import OperatorSlider from "./OperatorSlider";
 import NotificationModal from "./NotificationModal";
 import filterConditions from "@/data/filter-conditions.json";
+import dict from "@/data/dict.json";
+import { translateItemName } from "@/lib/translations";
 
 /**
  * 스타일 설정 모달 컴포넌트
@@ -43,6 +45,24 @@ const areaLevelToPathTier = (areaLevel) => {
   return tier ? parseInt(tier) : null;
 };
 
+const rarityOptions = [
+  { value: "Normal", labelKo: "일반", labelEn: "Normal" },
+  { value: "Magic", labelKo: "마법", labelEn: "Magic" },
+  { value: "Rare", labelKo: "희귀", labelEn: "Rare" },
+  { value: "Unique", labelKo: "유니크", labelEn: "Unique" },
+];
+
+const levelTypeOptions = [
+  { value: "MIN_ILVL", labelKo: "최소 레벨", labelEn: "Min Level" },
+  { value: "MAX_ILVL", labelKo: "최대 레벨", labelEn: "Max Level" },
+];
+
+const itemTierOptions = [
+  { value: "all", labelKo: "전체", labelEn: "All" },
+  { value: "T1", labelKo: "T1", labelEn: "T1" },
+  { value: "T2", labelKo: "T2", labelEn: "T2" },
+];
+
 // 경로석 티어 표시 텍스트 생성
 const getPathTierDisplay = (areaLevel, lang = "ko") => {
   const tier = areaLevelToPathTier(areaLevel);
@@ -50,6 +70,138 @@ const getPathTierDisplay = (areaLevel, lang = "ko") => {
     return lang === "ko" ? `T${tier} 경로석` : `T${tier} Path`;
   }
   return areaLevel.toString();
+};
+
+const CustomSelect = ({
+  value,
+  options,
+  onChange,
+  placeholder = "Select",
+  disabled = false,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((o) => o.value === value);
+
+  return (
+    <div className={`custom-select ${disabled ? "disabled" : ""}`} ref={ref}>
+      <div
+        className="custom-select-trigger"
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+      >
+        <span>
+          {selectedOption
+            ? selectedOption.label
+            : value
+            ? value.replace("custom_sound/", "")
+            : placeholder}
+        </span>
+        <span className="arrow">▼</span>
+      </div>
+      {isOpen && (
+        <div className="custom-select-options">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`custom-select-option ${
+                option.value === value ? "selected" : ""
+              }`}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+      <style jsx>{`
+        .custom-select {
+          position: relative;
+          width: 100%;
+          font-size: 13px;
+          color: var(--text-main);
+          font-family: var(--font-main);
+        }
+        .custom-select.disabled {
+          opacity: 0.5;
+          pointer-events: none;
+        }
+        .custom-select-trigger {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 12px;
+          background: rgba(0, 0, 0, 0.5);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 4px;
+          cursor: pointer;
+          height: 36px;
+          box-sizing: border-box;
+          transition: border-color 0.2s;
+        }
+        .custom-select-trigger:hover {
+          border-color: rgba(255, 255, 255, 0.4);
+        }
+        .custom-select-options {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: #1a1a1a;
+          border: 1px solid #333;
+          border-radius: 4px;
+          margin-top: 4px;
+          z-index: 100;
+          max-height: 240px;
+          overflow-y: auto;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+        .custom-select-option {
+          padding: 10px 12px;
+          cursor: pointer;
+          border-bottom: 1px solid #252525;
+          color: #e0e0e0;
+          transition: background 0.1s;
+        }
+        .custom-select-option:last-child {
+          border-bottom: none;
+        }
+        .custom-select-option:hover,
+        .custom-select-option.selected {
+          background: var(--poe2-primary, #3b82f6);
+          color: white;
+        }
+        .arrow {
+          font-size: 10px;
+          color: var(--text-muted);
+          margin-left: 8px;
+        }
+        .custom-select-options::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-select-options::-webkit-scrollbar-track {
+          background: #1a1a1a;
+        }
+        .custom-select-options::-webkit-scrollbar-thumb {
+          background: #444;
+          border-radius: 3px;
+        }
+      `}</style>
+    </div>
+  );
 };
 
 export default function StyleSettingsModal({
@@ -72,6 +224,7 @@ export default function StyleSettingsModal({
   onEnabledChange = null,
   presetDefaults = null, // 프리셋 기본값 (초기화 버튼용)
   itemClass = null, // 아이템 클래스 (예: "Uncut Skill Gems", "Uncut Spirit Gems", "Uncut Support Gems")
+  section = null, // 현재 편집 중인 섹션 (예: "base_items", "gold", "currency" 등)
   hideConditions = false // 조건 설정 UI 숨김 여부 (gold_default 등)
 }) {
   // 인게임 기본값 상수
@@ -99,7 +252,7 @@ export default function StyleSettingsModal({
 
   const [localStyles, setLocalStyles] = useState(() => {
     // styles가 null 값을 덮어씌우는 것을 방지하기 위해 기본값 보장
-    return {
+    const initialStyles = {
       fontSize: 30,
       textColor: DEFAULT_TEXT_COLOR,
       borderColor: null,
@@ -116,19 +269,56 @@ export default function StyleSettingsModal({
       soundPlatform: null,
       soundType: "default",
       ...styles,
-      // null 값이 덮어씌워지지 않도록 기본값 보장 (체크 해제 상태 유지) - ?? 사용
+      // null 값이 덮어씌워지지 않도록 기본값 보장
       textColor: styles.textColor ?? DEFAULT_TEXT_COLOR,
       borderColor: styles.borderColor ?? null,
       backgroundColor: styles.backgroundColor ?? { r: 0, g: 0, b: 0, a: 255 },
-      // soundType과 soundPlatform 설정
-      soundPlatform: styles.soundPlatform ?? (styles.customSound ? "PC" : null),
-      soundType: styles.soundPlatform === "PS5" ? "default" : (styles.channel ? "default" : (styles.soundType || (styles.customSound ? "custom" : "default")))
     };
+
+    // ingameSound(PlayAlertSound)가 있으면 기본(Default) 모드로 설정 및 값 매핑
+    if (styles.ingameSound) {
+      initialStyles.soundType = "default";
+      initialStyles.soundPlatform = "PS5"; // 내부적으로 PS5 모드 사용 (슬롯/ID 기반)
+      initialStyles.ps5Sound = styles.ingameSound.id;
+      initialStyles.ps5SoundVolume = styles.ingameSound.volume;
+    } else {
+      // 기존 로직 유지
+      initialStyles.soundPlatform = styles.soundPlatform ?? (styles.customSound ? "PC" : null);
+      
+      // soundType 결정
+      if (styles.soundPlatform === "PS5") {
+        initialStyles.soundType = "default";
+      } else if (styles.channel) {
+        initialStyles.soundType = "default";
+      } else if (styles.soundType) {
+        initialStyles.soundType = styles.soundType;
+      } else if (styles.customSound) {
+        initialStyles.soundType = "custom";
+      } else {
+        initialStyles.soundType = "default";
+      }
+    }
+
+    return initialStyles;
   });
 
   const [localRules, setLocalRules] = useState(additionalRules || []);
   const [showRuleDropdown, setShowRuleDropdown] = useState(false);
   const [localTitle, setLocalTitle] = useState(title || "");
+  // 한글 이름을 영어 이름으로 변환하기 위한 역사전 생성
+  const reverseDict = useRef({});
+  useEffect(() => {
+    if (Object.keys(dict).length > 0) {
+      const rev = {};
+      Object.entries(dict).forEach(([en, ko]) => {
+        // 영어 이름이 키이므로, 값을 키로 사용하여 역사전 생성
+        // 이미 존재한다면 (드물지만) 덮어씌움
+        rev[ko] = en;
+      });
+      reverseDict.current = rev;
+    }
+  }, []);
+
   const [localConditions, setLocalConditions] = useState(conditions || {});
   const [areaLevelInputMode, setAreaLevelInputMode] = useState(false);
   const [lang, setLang] = useState("ko");
@@ -158,6 +348,30 @@ export default function StyleSettingsModal({
   
   // 모달 ref (컬러피커 위치 계산용)
   const modalContentRef = useRef(null);
+
+  // 커스텀 사운드 옵션 (localStorage에서 로드)
+  const [pcSoundOptions, setPcSoundOptions] = useState([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("poe2_sound_settings");
+      if (saved) {
+        try {
+          const settings = JSON.parse(saved);
+          const options = settings.map((s) => ({
+            value: s.pcFile?.startsWith("custom_sound/")
+              ? s.pcFile
+              : `custom_sound/${s.pcFile}`,
+            label: s.pcFile?.replace("custom_sound/", ""),
+            labelEn: s.pcFile?.replace("custom_sound/", ""),
+          }));
+          setPcSoundOptions(options);
+        } catch (e) {
+          console.error("Failed to parse sound settings", e);
+        }
+      }
+    }
+  }, [isOpen]); // 모달 열릴 때마다 갱신
 
   // 언어 설정 불러오기
   useEffect(() => {
@@ -205,6 +419,15 @@ export default function StyleSettingsModal({
         ruleType: ruleType || "show",
         ...styles
       };
+      
+      // ingameSound 처리 (초기화 시)
+      if (styles.ingameSound) {
+        initial.soundType = "default";
+        initial.soundPlatform = "PS5";
+        initial.ps5Sound = styles.ingameSound.id;
+        initial.ps5SoundVolume = styles.ingameSound.volume;
+      }
+      
       setInitialStyles(initial);
       setInitialTitle(title || "");
       setInitialConditionsSnapshot(conditions || {});
@@ -600,25 +823,15 @@ export default function StyleSettingsModal({
   /* -------------------------------
    * sound options 정의 (추가됨)
    * ------------------------------- */
-  const pcSoundOptions = [
-    { value: null, label: "없음", labelEn: "None" },
-    { value: "custom_sound/1_currency_s.mp3", label: "사운드 1 (S)", labelEn: "Sound 1 (S)" },
-    { value: "custom_sound/2_currency_a.mp3", label: "사운드 2 (A)", labelEn: "Sound 2 (A)" },
-    { value: "custom_sound/3_currency_b.mp3", label: "사운드 3 (B)", labelEn: "Sound 3 (B)" },
-    { value: "custom_sound/4_currency_c.mp3", label: "사운드 4 (C)", labelEn: "Sound 4 (C)" },
-    // 필요 시 추가
-  ];
+
 
   const ps5SoundOptions = [
     { value: null, label: "없음", labelEn: "None" },
-    // 0~16 (일부 값 예시)
-    { value: 1, label: "슬롯 1", labelEn: "Slot 1" },
-    { value: 2, label: "슬롯 2", labelEn: "Slot 2" },
-    { value: 3, label: "슬롯 3", labelEn: "Slot 3" },
-    { value: 4, label: "슬롯 4", labelEn: "Slot 4" },
-    { value: 5, label: "슬롯 5", labelEn: "Slot 5" },
-    { value: 10, label: "슬롯 10", labelEn: "Slot 10" },
-    { value: 16, label: "슬롯 16", labelEn: "Slot 16" }
+    ...Array.from({ length: 16 }, (_, i) => ({
+      value: i + 1,
+      label: `${i + 1}`,
+      labelEn: `${i + 1}`
+    }))
   ];
 
   // 퀄리티 입력 필드 스크롤 방지 (비수동 리스너) -- 기존 코드 유지
@@ -637,17 +850,17 @@ export default function StyleSettingsModal({
             // 현재 값 가져오기
             let currentVal = 0;
             if (typeof prev.quality === 'object') {
-              currentVal = prev.quality?.value || prev.quality?.min || 0;
+              currentVal = prev.quality?.value ?? prev.quality?.min ?? 0;
             } else {
-              currentVal = prev.quality || 0;
+              currentVal = prev.quality ?? 0;
             }
             
             const newVal = Math.max(0, currentVal + delta);
             
             if (typeof newConditions.quality === 'object') {
-               newConditions.quality = { ...newConditions.quality, min: newVal, value: newVal };
+               newConditions.quality = { ...newConditions.quality, value: newVal };
             } else {
-               newConditions.quality = newVal;
+               newConditions.quality = { operator: ">", value: newVal };
             }
             return newConditions;
           });
@@ -1163,7 +1376,7 @@ export default function StyleSettingsModal({
                   onChange={(e) => handleStyleChange("ps5SoundVolume", parseInt(e.target.value))}
                   disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
                 >
-                  <option value="300">300 ({lang === "ko" ? "최대" : "Max"})</option>
+                  <option value="300">300</option>
                   <option value="250">250</option>
                   <option value="200">200</option>
                   <option value="150">150</option>
@@ -1171,20 +1384,16 @@ export default function StyleSettingsModal({
                   <option value="50">50</option>
                 </select>
 
-                {/* 커스텀 모드: 입력 필드 + 파일 버튼 표시 */}
+                {/* 커스텀 모드: 드롭다운 선택 */}
                 {localStyles.soundType === "custom" && (
-                  <div className="custom-sound-input-wrapper">
-                    <input
-                      type="text"
-                      className="style-input sound-input"
-                      placeholder={lang === "ko" ? "사운드 파일 경로 (예: custom_sound/1_currency_s.mp3)" : "Sound file path (e.g. custom_sound/1_currency_s.mp3)"}
+                  <div className="custom-sound-input-wrapper" style={{ flex: 1 }}>
+                    <CustomSelect
                       value={localStyles.customSound || ""}
-                      onChange={(e) => handleStyleChange("customSound", e.target.value || null)}
+                      options={pcSoundOptions}
+                      onChange={(val) => handleStyleChange("customSound", val || null)}
+                      placeholder={lang === "ko" ? "사운드 선택" : "Select Sound"}
                       disabled={!localStyles.customSound && !localStyles.ps5Sound}
                     />
-                    <button className="sound-file-button">
-                      {lang === "ko" ? "파일" : "File"}
-                    </button>
                   </div>
                 )}
 
@@ -1225,6 +1434,23 @@ export default function StyleSettingsModal({
             {(localConditions.quality !== undefined || title === "퀄리티") && (
               <div className="style-setting-group">
                 <div className="quality-condition-ui" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {(() => {
+                    const qualityCondition = localConditions.quality;
+                    const defaultOperator =
+                      typeof title === "string" &&
+                      (title.includes("없는") || title.includes("숨김"))
+                        ? "<"
+                        : ">";
+                    const qualityOperator =
+                      typeof qualityCondition === "object"
+                        ? qualityCondition.operator || defaultOperator
+                        : defaultOperator;
+                    const qualityValue =
+                      typeof qualityCondition === "object"
+                        ? (qualityCondition.value ?? qualityCondition.min ?? 1)
+                        : (qualityCondition ?? 1);
+                    return (
+                      <>
                   <input
                     type="checkbox"
                     id="quality-checkbox"
@@ -1232,8 +1458,8 @@ export default function StyleSettingsModal({
                     checked={localConditions.quality !== undefined && localConditions.quality !== null}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        handleConditionChange("quality", "value", 23);
-                        handleConditionChange("quality", "min", 23);
+                        handleConditionChange("quality", "operator", defaultOperator);
+                        handleConditionChange("quality", "value", 1);
                       } else {
                         const newConditions = { ...localConditions };
                         delete newConditions.quality;
@@ -1244,24 +1470,117 @@ export default function StyleSettingsModal({
                   <label htmlFor="quality-checkbox" className="style-setting-label-inline">
                       <span>{lang === "ko" ? "퀄리티" : "Quality"}</span>
                   </label>
+                  <select
+                    className="style-select"
+                    value={qualityOperator}
+                    onChange={(e) => handleConditionChange("quality", "operator", e.target.value)}
+                    disabled={localConditions.quality === undefined || localConditions.quality === null}
+                    style={{ width: "52px" }}
+                  >
+                    <option value=">=">&gt;=</option>
+                    <option value=">">&gt;</option>
+                    <option value="==">==</option>
+                    <option value="<=">&lt;=</option>
+                    <option value="<">&lt;</option>
+                  </select>
                   <input
                     ref={qualityInputRef}
                     type="number"
                     className="font-size-input"
                     style={{ width: "60px" }}
-                    value={localConditions.quality?.min || localConditions.quality?.value || localConditions.quality || 0}
+                    value={qualityValue}
                     onChange={(e) => {
                       const val = parseInt(e.target.value) || 0;
                       const newConditions = { ...localConditions };
                       if (typeof newConditions.quality === 'object') {
-                          newConditions.quality = { ...newConditions.quality, min: val, value: val };
+                          newConditions.quality = { ...newConditions.quality, value: val };
                       } else {
-                          newConditions.quality = val;
+                          newConditions.quality = { operator: defaultOperator, value: val };
                       }
                       setLocalConditions(newConditions);
                     }}
                     disabled={localConditions.quality === undefined || localConditions.quality === null}
                   />
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* 아이템 레벨 조건 설정 */}
+            {localConditions.itemLevel !== undefined && (
+              <div className="style-setting-group">
+                <div className="quality-condition-ui" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {(() => {
+                    const itemLevelCondition = localConditions.itemLevel;
+                    const itemLevelOperator =
+                      typeof itemLevelCondition === "object"
+                        ? itemLevelCondition.operator || ">="
+                        : ">=";
+                    const itemLevelValue =
+                      typeof itemLevelCondition === "object"
+                        ? (itemLevelCondition.value ?? 83)
+                        : (itemLevelCondition ?? 83);
+                    return (
+                      <>
+                        <input
+                          type="checkbox"
+                          id="itemlevel-checkbox"
+                          className="color-checkbox"
+                          checked={localConditions.itemLevel !== undefined && localConditions.itemLevel !== null}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              const newConditions = {
+                                ...localConditions,
+                                itemLevel: { operator: ">=", value: 83 },
+                              };
+                              setLocalConditions(newConditions);
+                            } else {
+                              const newConditions = { ...localConditions };
+                              delete newConditions.itemLevel;
+                              setLocalConditions(newConditions);
+                            }
+                          }}
+                        />
+                        <label htmlFor="itemlevel-checkbox" className="style-setting-label-inline">
+                          <span>{lang === "ko" ? "아이템 레벨" : "Item Level"}</span>
+                        </label>
+                        <select
+                          className="style-select"
+                          value={itemLevelOperator}
+                          onChange={(e) => handleConditionChange("itemLevel", "operator", e.target.value)}
+                          disabled={localConditions.itemLevel === undefined || localConditions.itemLevel === null}
+                          style={{ width: "52px" }}
+                        >
+                          <option value=">=">&gt;=</option>
+                          <option value=">">&gt;</option>
+                          <option value="==">==</option>
+                          <option value="<=">&lt;=</option>
+                          <option value="<">&lt;</option>
+                        </select>
+                        <input
+                          type="number"
+                          className="font-size-input"
+                          style={{ width: "60px" }}
+                          value={itemLevelValue}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 0;
+                            const newConditions = { ...localConditions };
+                            if (typeof newConditions.itemLevel === "object") {
+                              newConditions.itemLevel = { ...newConditions.itemLevel, value: val };
+                            } else {
+                              newConditions.itemLevel = { operator: ">=", value: val };
+                            }
+                            setLocalConditions(newConditions);
+                          }}
+                          disabled={localConditions.itemLevel === undefined || localConditions.itemLevel === null}
+                          min="1"
+                          max="100"
+                        />
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             )}
@@ -1488,7 +1807,7 @@ export default function StyleSettingsModal({
               )}
 
               {/* 기존 조건 설정 섹션 (가로 분리선 + 텍스트) */}
-              {(isGear || baseType === "Gold" || isScrollOfWisdom || baseType === "Others") && (
+              {(!hideConditions && (section || isGear || baseType === "Gold" || isScrollOfWisdom || baseType === "Others")) && (
                 <div className="condition-settings-group">
                    <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "16px 0 12px 0" }}>
                       <div style={{ flex: 1, height: "1px", background: "var(--border)" }}></div>
@@ -1499,43 +1818,298 @@ export default function StyleSettingsModal({
                    </div>
 
                   {(() => {
-                    const areaLevelCondition = localConditions.areaLevel;
-                    const stackSizeCondition = localConditions.stackSize;
+                    const isBaseItemSection = section === "base_items" || section === "base_items_socket_quality";
+                    const itemTierCondition = localConditions.itemTier;
+                    const levelTypeCondition = localConditions.levelType;
+                    const unidentifiedItemTierCondition = localConditions.unidentifiedItemTier;
 
-                    if (isScrollOfWisdom) {
-                      const displayLevel = areaLevelCondition?.value || 65;
-                      const currentPathTier =
-                        displayLevel >= 65 && displayLevel <= 80
-                          ? displayLevel - 64
-                          : null;
-                      const isCustomInput =
-                        displayLevel > 0 && (displayLevel < 65 || displayLevel > 80);
+                    const renderBaseItemConditions = () => {
+                      if (!isBaseItemSection) return null;
+                      
+                      return (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                            {/* ItemTier (Jewellery 전용) */}
+                            {itemTierCondition && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <span className="style-setting-label" style={{ minWidth: "auto" }}>
+                                  {lang === "ko" ? "아이템 티어" : "Item Tier"}
+                                </span>
+                                <select
+                                  className="condition-value"
+                                  value={itemTierCondition.value || "all"}
+                                  onChange={(e) => handleConditionChange("itemTier", "value", e.target.value)}
+                                  style={{ width: "80px" }}
+                                >
+                                  {itemTierOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                      {lang === "ko" ? opt.labelKo : opt.labelEn}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+
+                            {/* LevelType */}
+                            {levelTypeCondition && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <span className="style-setting-label" style={{ minWidth: "auto" }}>
+                                  {lang === "ko" ? "레벨 기준" : "Level Type"}
+                                </span>
+                                <select
+                                  className="condition-value"
+                                  value={levelTypeCondition.value || "MIN_ILVL"}
+                                  onChange={(e) => handleConditionChange("levelType", "value", e.target.value)}
+                                  style={{ width: "100px" }}
+                                >
+                                  {levelTypeOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                      {lang === "ko" ? opt.labelKo : opt.labelEn}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+
+                            {/* UnidentifiedItemTier (Jewellery 전용) */}
+                            {unidentifiedItemTierCondition && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <span className="style-setting-label" style={{ minWidth: "auto" }}>
+                                  {lang === "ko" ? "미감정 등급" : "Unidentified Tier"}
+                                </span>
+                                <select
+                                  className="condition-operator"
+                                  value={unidentifiedItemTierCondition.operator || ">="}
+                                  onChange={(e) => handleConditionChange("unidentifiedItemTier", "operator", e.target.value)}
+                                  style={{ width: "50px", minWidth: "50px" }}
+                                >
+                                  <option value=">=">≥</option>
+                                  <option value="<=">≤</option>
+                                  <option value=">">&gt;</option>
+                                  <option value="<">&lt;</option>
+                                  <option value="==">==</option>
+                                </select>
+                                <select
+                                  className="condition-value"
+                                  value={unidentifiedItemTierCondition.value || 1}
+                                  onChange={(e) => handleConditionChange("unidentifiedItemTier", "value", parseInt(e.target.value))}
+                                  style={{ width: "60px" }}
+                                >
+                                  {[1, 2, 3, 4, 5].map(v => (
+                                    <option key={v} value={v}>{v}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Sockets / Quality (Socket & Quality 전용 또는 일반 베이스 아이템) */}
+                          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                            {localConditions.sockets && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <span className="style-setting-label" style={{ minWidth: "auto" }}>
+                                  {lang === "ko" ? "소켓 수" : "Sockets"}
+                                </span>
+                                <select
+                                  className="condition-operator"
+                                  value={localConditions.sockets.operator || ">="}
+                                  onChange={(e) => handleConditionChange("sockets", "operator", e.target.value)}
+                                  style={{ width: "50px", minWidth: "50px" }}
+                                >
+                                  <option value=">=">≥</option>
+                                  <option value="<=">≤</option>
+                                  <option value="==">==</option>
+                                </select>
+                                <select
+                                  className="condition-value"
+                                  value={localConditions.sockets.value || 0}
+                                  onChange={(e) => handleConditionChange("sockets", "value", parseInt(e.target.value))}
+                                  style={{ width: "60px" }}
+                                >
+                                  {[0, 1, 2, 3].map(v => (
+                                    <option key={v} value={v}>{v}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+
+                            {localConditions.quality && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <span className="style-setting-label" style={{ minWidth: "auto" }}>
+                                  {lang === "ko" ? "퀄리티" : "Quality"}
+                                </span>
+                                <select
+                                  className="condition-operator"
+                                  value={localConditions.quality.operator || ">="}
+                                  onChange={(e) => handleConditionChange("quality", "operator", e.target.value)}
+                                  style={{ width: "50px", minWidth: "50px" }}
+                                >
+                                  <option value=">=">≥</option>
+                                  <option value="<=">≤</option>
+                                  <option value="==">==</option>
+                                </select>
+                                <input
+                                  type="number"
+                                  className="condition-value"
+                                  value={localConditions.quality.value || 0}
+                                  onChange={(e) => handleConditionChange("quality", "value", parseInt(e.target.value) || 0)}
+                                  style={{ width: "60px" }}
+                                  min="0"
+                                  max="28"
+                                />
+                                <span style={{ fontSize: "12px", color: "var(--muted)" }}>%</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    };
+
+                    const renderWaystoneConditions = () => {
+                      if (section !== "waystones") return null;
+
+                      const waystoneTierCondition = localConditions.waystoneTier;
+                      const corruptedCondition = localConditions.corrupted;
 
                       return (
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                          <input
-                            type="checkbox"
-                            checked={!!areaLevelCondition}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                const newConditions = {
-                                  ...localConditions,
-                                  areaLevel: { operator: ">=", value: 65 },
-                                };
-                                setLocalConditions(newConditions);
-                                if (onConditionsChange) {
-                                  onConditionsChange(newConditions);
+                        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                            {/* WaystoneTier */}
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <input
+                                  type="checkbox"
+                                  id="waystonetier-checkbox"
+                                  className="color-checkbox"
+                                  checked={!!waystoneTierCondition}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      const newConditions = { 
+                                        ...localConditions,
+                                        waystoneTier: { operator: ">=", value: 16 } 
+                                      };
+                                      setLocalConditions(newConditions);
+                                      if (onConditionsChange) onConditionsChange(newConditions);
+                                    } else {
+                                      const newConditions = { ...localConditions };
+                                      delete newConditions.waystoneTier;
+                                      setLocalConditions(newConditions);
+                                      if (onConditionsChange) onConditionsChange(newConditions);
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="waystonetier-checkbox" className="style-setting-label-inline">
+                                  <span>{lang === "ko" ? "경로석 티어" : "Waystone Tier"}</span>
+                                </label>
+                                <select
+                                  className="style-select"
+                                  value={waystoneTierCondition?.operator || ">="}
+                                  onChange={(e) => handleConditionChange("waystoneTier", "operator", e.target.value)}
+                                  disabled={!waystoneTierCondition}
+                                  style={{ width: "52px" }}
+                                >
+                                  <option value=">=">≥</option>
+                                  <option value="<=">≤</option>
+                                  <option value=">">&gt;</option>
+                                  <option value="<">&lt;</option>
+                                  <option value="==">==</option>
+                                </select>
+                                <input
+                                  type="number"
+                                  className="font-size-input"
+                                  style={{ width: "60px" }}
+                                  value={waystoneTierCondition?.value || 16}
+                                  onChange={(e) => handleConditionChange("waystoneTier", "value", parseInt(e.target.value) || 0)}
+                                  disabled={!waystoneTierCondition}
+                                  min="1"
+                                  max="16"
+                                />
+                            </div>
+
+                             {/* Corrupted */}
+                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <input
+                                  type="checkbox"
+                                  id="corrupted-checkbox"
+                                  className="color-checkbox"
+                                  checked={corruptedCondition !== undefined}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      const newConditions = { 
+                                        ...localConditions,
+                                        corrupted: { operator: "==", value: true } 
+                                      };
+                                      setLocalConditions(newConditions);
+                                      if (onConditionsChange) onConditionsChange(newConditions);
+                                    } else {
+                                      const newConditions = { ...localConditions };
+                                      delete newConditions.corrupted;
+                                      setLocalConditions(newConditions);
+                                      if (onConditionsChange) onConditionsChange(newConditions);
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="corrupted-checkbox" className="style-setting-label-inline">
+                                  <span>{lang === "ko" ? "타락" : "Corrupted"}</span>
+                                </label>
+                                {corruptedCondition && (
+                                    <>
+                                        <select
+                                          className="style-select"
+                                          value={corruptedCondition.value ? "True" : "False"}
+                                          onChange={(e) => handleConditionChange("corrupted", "value", e.target.value === "True")}
+                                          style={{ width: "80px" }}
+                                        >
+                                          <option value="True">True</option>
+                                          <option value="False">False</option>
+                                        </select>
+                                    </>
+                                )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    };
+
+                    const areaLevelCondition = localConditions.areaLevel;
+                    const stackSizeCondition = localConditions.stackSize;
+                    
+                    // Fix: Define variables used in render
+                    const displayLevel = areaLevelCondition?.value;
+                    const currentPathTier = areaLevelToPathTier(displayLevel);
+                    // isCustomInput: areaLevelCondition이 있고 티어 매핑이 안 되면 커스텀 입력으로 간주
+                    const isCustomInput = areaLevelCondition && !currentPathTier;
+
+                    return (
+                      <>
+
+                        {renderBaseItemConditions()}
+                        {renderWaystoneConditions()}
+
+                        {isScrollOfWisdom && (
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                            <input
+                              type="checkbox"
+                              checked={!!areaLevelCondition}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  const newConditions = {
+                                    ...localConditions,
+                                    areaLevel: { operator: ">=", value: 65 },
+                                  };
+                                  setLocalConditions(newConditions);
+                                  if (onConditionsChange) {
+                                    onConditionsChange(newConditions);
+                                  }
+                                } else {
+                                  const newConditions = { ...localConditions };
+                                  delete newConditions.areaLevel;
+                                  setLocalConditions(newConditions);
+                                  if (onConditionsChange) {
+                                    onConditionsChange(newConditions);
+                                  }
                                 }
-                              } else {
-                                const newConditions = { ...localConditions };
-                                delete newConditions.areaLevel;
-                                setLocalConditions(newConditions);
-                                if (onConditionsChange) {
-                                  onConditionsChange(newConditions);
-                                }
-                              }
-                            }}
-                          />
+                              }}
+                            />
                           <span
                             className="style-setting-label"
                             style={{
@@ -1609,27 +2183,10 @@ export default function StyleSettingsModal({
                             </select>
                           )}
                         </div>
-                      );
-                    }
+                        )}
 
-
-                    // Gold 타입이면 전용 UI 표시 (hideConditions가 false일 때만)
-                    if (baseType === "Gold" && !hideConditions) {
-                        
-                        // 조건이 없어도 UI 값을 표시하기 위한 임시 변수
-                        // 조건이 있으면 그 값을, 없으면 기본값(65)이나 마지막 선택값을 사용
-                        // 여기서는 조건이 없으면 0으로 처리되지만, UI상 1티어(65)처럼 보이게 할지 결정 필요
-                        // 다만, disabled 상태이므로 값은 크게 중요하지 않을 수 있음. 
-                        const displayLevel = areaLevelCondition?.value || 65; 
-                        
-                        // 경로석 티어 계산 (65~80)
-                        const currentPathTier = displayLevel >= 65 && displayLevel <= 80 
-                            ? displayLevel - 64 
-                            : null;
-                        
-                        const isCustomInput = displayLevel > 0 && (displayLevel < 65 || displayLevel > 80);
-
-                        return (
+                        {/* Gold 타입이면 전용 UI 표시 (hideConditions가 false일 때만) */}
+                        {baseType === "Gold" && !hideConditions && (
                              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "8px" }}>
                                 {/* 왼쪽: 지역 레벨 설정 */}
                                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -1638,8 +2195,6 @@ export default function StyleSettingsModal({
                                         checked={!!areaLevelCondition}
                                         onChange={(e) => {
                                             if (e.target.checked) {
-                                                // 조건 추가 (기본값: >= 65 (1티어))
-                                                // 중요: 조건이 변경되었음을 확실히 알리기 위해 새로운 객체 생성
                                                 const newConditions = { 
                                                     ...localConditions,
                                                     areaLevel: { operator: ">=", value: 65 } 
@@ -1649,7 +2204,6 @@ export default function StyleSettingsModal({
                                                     onConditionsChange(newConditions);
                                                 }
                                             } else {
-                                                // 조건 삭제
                                                 const newConditions = { ...localConditions };
                                                 delete newConditions.areaLevel;
                                                 setLocalConditions(newConditions);
@@ -1690,22 +2244,16 @@ export default function StyleSettingsModal({
                                             <option value="==">==</option>
                                         </select>
                                         
-                                        {/* 경로석 티어 드롭다운 또는 직접 입력 인풋 */}
                                         {areaLevelInputMode ? (
                                              <input
                                                 ref={(el) => {
-                                                    // 스크롤 방지 로직 적용
                                                     if (el) {
                                                         const handleWheel = (e) => {
                                                             if (document.activeElement === el) {
                                                                 e.preventDefault();
-                                                                // 필요한 경우 여기서 값 변경 로직 추가 가능
                                                             }
                                                         };
                                                         el.addEventListener("wheel", handleWheel, { passive: false });
-                                                        // 클린업 함수는 useEffect에서 처리하거나, 여기서 매번 리스너를 추가하지 않도록 주의해야 함.
-                                                        // 리액트 ref 콜백 패턴상 이 방식은 리렌더링마다 리스너가 중복될 수 있음.
-                                                        // 따라서 별도 useEffect로 처리하는 것이 안전함. 여기서 ref만 할당.
                                                         goldInputRefs.current.areaLevel = el;
                                                     }
                                                 }}
@@ -1746,7 +2294,7 @@ export default function StyleSettingsModal({
                                 
                                 {/* 구분선 */}
                                 <div style={{ width: "1px", height: "24px", background: "var(--border)" }}></div>
-
+    
                                 {/* 오른쪽: 골드 설정 (항상 표시 / 조건 없으면 빈 값) */}
                                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                      <span className="style-setting-label" style={{ minWidth: "auto" }}>
@@ -1777,13 +2325,12 @@ export default function StyleSettingsModal({
                                     />
                                 </div>
                              </div>
-                        );
-                    }
+                        )}
 
-                    // 기본 렌더링 (골드 아닐 때만 렌더링하도록 조건 추가)
-                    return (
-                        <>
-                          {localConditions.stackSize && baseType !== "Gold" && (
+                        {/* 기본 렌더링 (골드/감별 주문서 아닐 때만 렌더링하도록 조건 추가) */}
+                        {!isScrollOfWisdom && baseType !== "Gold" && (
+                          <>
+                            {localConditions.stackSize && (
                             <div className="condition-row-inline">
                                 <span className="style-setting-label">
                                     {lang === "ko" ? "스택 수량" : "Stack Size"}
@@ -1859,8 +2406,8 @@ export default function StyleSettingsModal({
                           {/* Corrupted/Rarity 조건: 한 줄에 배치 */}
                           {(localConditions.corrupted !== undefined || localConditions.rarity !== undefined) && (
                             <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
-                              {/* Corrupted 조건 */}
-                              {localConditions.corrupted !== undefined && (
+                              {/* Corrupted 조건 (chance_base 등에서 사용) */}
+                              {localConditions.corrupted !== undefined && section !== "waystones" && (
                                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                                   <input
                                     type="checkbox"
@@ -2009,7 +2556,7 @@ export default function StyleSettingsModal({
                                       fontSize: "13px"
                                     }}
                                   >
-                                    <span>{item}</span>
+                                    <span>{lang === "ko" ? translateItemName(item) : item}</span>
                                     <button
                                       onClick={() => {
                                         setLocalConditions(prev => ({
@@ -2054,7 +2601,10 @@ export default function StyleSettingsModal({
                                   }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter" && e.target.value.trim()) {
-                                      const newItem = e.target.value.trim();
+                                      const inputVal = e.target.value.trim();
+                                      // 한글 입력이면 영어 이름으로 변환, 아니면 그대로 사용
+                                      const newItem = reverseDict.current[inputVal] || inputVal;
+                                      
                                       setLocalConditions(prev => ({
                                         ...prev,
                                         baseTypes: [...(prev.baseTypes || []), newItem]
@@ -2067,7 +2617,10 @@ export default function StyleSettingsModal({
                                   onClick={() => {
                                     const input = document.getElementById("baseTypes-input");
                                     if (input && input.value.trim()) {
-                                      const newItem = input.value.trim();
+                                      const inputVal = input.value.trim();
+                                      // 한글 입력이면 영어 이름으로 변환, 아니면 그대로 사용
+                                      const newItem = reverseDict.current[inputVal] || inputVal;
+                                      
                                       setLocalConditions(prev => ({
                                         ...prev,
                                         baseTypes: [...(prev.baseTypes || []), newItem]
@@ -2092,8 +2645,10 @@ export default function StyleSettingsModal({
                             </div>
                           )}
                         </>
-                    );
-                  })()}
+                      )}
+                    </>
+                  );
+                })()}
                 </div>
               )}
               {/* 추가 규칙 (기본코드 + 추가 코드 순서) */}
@@ -2204,7 +2759,6 @@ export default function StyleSettingsModal({
                   </div>
                 </div>
               )}
-
         </div>
         {/* 하단 버튼 영역 (규칙 추가 + 복사/붙여넣기 + 초기화 + 적용) */}
         <div className="style-settings-footer">
@@ -3359,6 +3913,6 @@ export default function StyleSettingsModal({
           }
         }
       `}</style>
-    </div>
+     </div>
   );
 }

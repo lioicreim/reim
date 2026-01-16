@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import presetsData from "@/data/presets.json";
+import quickFilterDefaults from "@/data/quick-filter-defaults.json";
 import currencyTiers from "@/data/currency-tiers.json";
 import bases from "@/data/bases.json";
 import { generateFilterCode } from "@/lib/filter-generator";
@@ -14,6 +15,7 @@ export default function PreviewPage() {
   const [lang, setLang] = useState("ko");
   const [filterCode, setFilterCode] = useState("");
   const [showCodePreview, setShowCodePreview] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // 섹션 체크박스 상태
   const [sections, setSections] = useState({
@@ -52,6 +54,14 @@ export default function PreviewPage() {
       window.removeEventListener("langchange", handleLangChange);
     };
   }, []);
+
+  // 성공 메시지 자동 숨김
+  useEffect(() => {
+    if (showSuccessMessage) {
+      const timer = setTimeout(() => setShowSuccessMessage(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessMessage]);
 
 
   // 로컬스토리지에서 커스텀 티어 불러오기
@@ -98,35 +108,67 @@ export default function PreviewPage() {
     return escaped.replace(/\b(Show|Hide)\b/g, '<span style="color: #FFFFFF;">$1</span>');
   };
 
-  // 필터 코드 생성
+  // 공통 필터 생성 로직
+  const createFilterCode = () => {
+    // 빠른 설정 불러오기 (모든 섹션)
+    const getQuickSetting = (key) => {
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem(`quickFilter_${key}`);
+        if (saved) return JSON.parse(saved);
+      }
+      return quickFilterDefaults[key];
+    };
+
+    const quickFilterSettings = {
+      gold: getQuickSetting("gold"),
+      jewels: getQuickSetting("jewels"),
+      uniques: getQuickSetting("uniques"),
+      currency: getQuickSetting("currency"),
+      vaultKeys: getQuickSetting("vaultKeys"),
+      others: getQuickSetting("others"),
+      flasks: getQuickSetting("flasks"),
+      baseItems: getQuickSetting("baseItems"),
+      baseItemsSocketQuality: getQuickSetting("baseItemsSocketQuality"),
+      uncutGems: getQuickSetting("uncutGems"),
+      waystones: getQuickSetting("waystones"),
+      expedition: getQuickSetting("expedition"),
+      charms: getQuickSetting("charms"),
+      
+      chance: { enabled: true },
+      
+      leveling: getQuickSetting("leveling"),
+      levelingClassSelection: getQuickSetting("levelingClassSelection"),
+    };
+
+    const storedSoundOption =
+      typeof window !== "undefined"
+        ? localStorage.getItem("poe2_sound_option") || "default"
+        : "default";
+    const soundOption = isPS5 ? "ps5" : storedSoundOption;
+    const soundSettings =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("poe2_sound_settings") || "[]")
+        : [];
+
+    return generateFilterCode({
+      presetId: selectedPreset,
+      soundOption,
+      soundSettings,
+      excludedOptions: excludedOptions,
+      customGearTiers: customGearTiers,
+      customCurrencyTiers: customCurrencyTiers,
+      selectedLeague: selectedLeague,
+      quickFilterSettings,
+    });
+  };
+
+  // 필터 코드 생성 (프리뷰용)
   const handleGeneratePreview = () => {
     try {
-      // 빠른 설정에서 골드 설정 불러오기
-      let quickFilterSettings = null;
-      if (typeof window !== "undefined") {
-        const savedGold = localStorage.getItem("quickFilter_gold");
-        if (savedGold) {
-          try {
-            quickFilterSettings = {
-              gold: JSON.parse(savedGold),
-            };
-          } catch (e) {
-            console.error("Failed to parse saved gold settings", e);
-          }
-        }
-      }
-
-      const code = generateFilterCode({
-        presetId: selectedPreset,
-        isPS5: isPS5,
-        excludedOptions: excludedOptions,
-        customGearTiers: customGearTiers,
-        customCurrencyTiers: customCurrencyTiers,
-        selectedLeague: selectedLeague,
-        quickFilterSettings: quickFilterSettings,
-      });
+      const code = createFilterCode();
       setFilterCode(code);
       setShowCodePreview(true);
+      setShowSuccessMessage(true);
     } catch (error) {
       console.error("Filter generation failed:", error);
       alert(lang === "ko" ? "필터 생성 중 오류가 발생했습니다." : "Error generating filter.");
@@ -135,32 +177,29 @@ export default function PreviewPage() {
 
   // 필터 코드 다운로드
   const handleDownload = () => {
-    if (!filterCode) {
-      handleGeneratePreview();
-      return;
+    try {
+      const code = createFilterCode();
+      const preset = presetsData.presets.find((p) => p.id === selectedPreset);
+      const blob = new Blob([code], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${preset?.nameKo || preset?.name || "filter"}.filter`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert(lang === "ko" ? "다운로드 중 오류가 발생했습니다." : "Error downloading filter.");
     }
-
-    const preset = presetsData.presets.find((p) => p.id === selectedPreset);
-    const blob = new Blob([filterCode], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${preset?.nameKo || preset?.name || "filter"}.filter`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   // 필터 코드 클립보드 복사
   const handleCopyToClipboard = async () => {
-    if (!filterCode) {
-      handleGeneratePreview();
-      return;
-    }
-
     try {
-      await navigator.clipboard.writeText(filterCode);
+      const code = createFilterCode();
+      await navigator.clipboard.writeText(code);
       alert(lang === "ko" ? "클립보드에 복사되었습니다!" : "Copied to clipboard!");
     } catch (err) {
       console.error("클립보드 복사 실패:", err);
@@ -491,6 +530,11 @@ export default function PreviewPage() {
             <h3 className="filter-output-title">
               {lang === "ko" ? "필터 미리보기" : "FILTER PREVIEW"}
             </h3>
+            {showSuccessMessage && (
+              <span style={{ fontSize: '13px', color: 'var(--muted)', marginRight: '12px', fontWeight: 500 }}>
+                {lang === "ko" ? "코드가 생성되었습니다" : "Code generated successfully"}
+              </span>
+            )}
             <button className="btn-code-preview" onClick={handleGeneratePreview}>
               {lang === "ko" ? "코드 생성" : "GENERATE CODE"}
             </button>
