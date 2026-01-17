@@ -1,0 +1,459 @@
+{
+  "lastUpdated": "2026-01-18T03:45:26.636318",
+  "source": "poe2db.tw",
+  "totalMods": 26,
+  "mods": [
+    {
+      "id": "1____________1_prefix",
+      "groupId": "능력치요구사항_감소",
+      "nameKo": "1능력치요구사항% 감소",
+      "nameEn": "1능력치요구사항% 감소",
+      "type": "prefix",
+      "description": "능력치요구사항(10—20)% 감소1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "능력치"
+      ],
+      "minLevel": 1,
+      "values": "능력치요구사항(10—20)% 감소1"
+    },
+    {
+      "id": "1_______________1_prefix",
+      "groupId": "물리피해_증가피해물리공격",
+      "nameKo": "1물리피해% 증가피해물리공격",
+      "nameEn": "1물리피해% 증가피해물리공격",
+      "type": "prefix",
+      "description": "물리피해(15—25)% 증가피해물리공격1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "물리",
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "물리피해(15—25)% 증가피해물리공격1"
+    },
+    {
+      "id": "1________________1_prefix",
+      "groupId": "화염피해추가피해원소화염공격",
+      "nameKo": "1화염피해~추가피해원소화염공격",
+      "nameEn": "1화염피해~추가피해원소화염공격",
+      "type": "prefix",
+      "description": "화염피해(9—14)~(15—22)추가피해원소화염공격1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "화염",
+        "원소",
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "화염피해(9—14)~(15—22)추가피해원소화염공격1"
+    },
+    {
+      "id": "1_____________1_prefix",
+      "groupId": "공격속도_증가공격속도",
+      "nameKo": "1공격속도% 증가공격속도",
+      "nameEn": "1공격속도% 증가공격속도",
+      "type": "prefix",
+      "description": "공격속도(6—8)% 증가공격속도1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "공격",
+        "속도"
+      ],
+      "minLevel": 1,
+      "values": "공격속도(6—8)% 증가공격속도1"
+    },
+    {
+      "id": "1____________________1_prefix",
+      "groupId": "치명타_피해_보너스피해공격치명타",
+      "nameKo": "1치명타 피해 보너스+%피해공격치명타",
+      "nameEn": "1치명타 피해 보너스+%피해공격치명타",
+      "type": "prefix",
+      "description": "치명타 피해 보너스+(5—10)%피해공격치명타1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "공격",
+        "치명타"
+      ],
+      "minLevel": 1,
+      "values": "치명타 피해 보너스+(5—10)%피해공격치명타1"
+    },
+    {
+      "id": "1_________________1_prefix",
+      "groupId": "명중시의_확률로힘줄_절단공격",
+      "nameKo": "1명중시%의 확률로힘줄 절단공격",
+      "nameEn": "1명중시%의 확률로힘줄 절단공격",
+      "type": "prefix",
+      "description": "명중시(10—15)%의 확률로힘줄 절단공격1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "공격",
+        "능력치"
+      ],
+      "minLevel": 1,
+      "values": "명중시(10—15)%의 확률로힘줄 절단공격1"
+    },
+    {
+      "id": "1___________________1_prefix",
+      "groupId": "명중_시의_확률로_적_실명_유발",
+      "nameKo": "1명중 시%의 확률로 적 실명 유발",
+      "nameEn": "1명중 시%의 확률로 적 실명 유발",
+      "type": "prefix",
+      "description": "명중 시(5—10)%의 확률로 적 실명 유발1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [],
+      "minLevel": 1,
+      "values": "명중 시(5—10)%의 확률로 적 실명 유발1"
+    },
+    {
+      "id": "1________1__________1_prefix",
+      "groupId": "활공격시_화살_개_추가_발사공격",
+      "nameKo": "1활공격시 화살 1개 추가 발사공격",
+      "nameEn": "1활공격시 화살 1개 추가 발사공격",
+      "type": "prefix",
+      "description": "활공격시 화살 1개 추가 발사공격1",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "활공격시 화살 1개 추가 발사공격1"
+    },
+    {
+      "id": "13_prefix",
+      "groupId": "맹독성_영역버프공격효과_범위물리카오스지속시간식물",
+      "nameKo": "맹독성 영역버프,공격,효과 범위,물리,카오스,지속시간,식물",
+      "nameEn": "맹독성 영역버프,공격,효과 범위,물리,카오스,지속시간,식물",
+      "type": "prefix",
+      "description": "맹독성 영역(13)버프,공격,효과 범위,물리,카오스,지속시간,식물",
+      "tier": 3,
+      "itemClasses": [
+        "Bows"
+      ],
+      "tags": [
+        "물리",
+        "카오스",
+        "공격"
+      ],
+      "minLevel": 13,
+      "values": "맹독성 영역(13)버프,공격,효과 범위,물리,카오스,지속시간,식물"
+    },
+    {
+      "id": "1___1__________1_prefix",
+      "groupId": "볼트_개_추가_장전공격",
+      "nameKo": "1볼트 1개 추가 장전공격",
+      "nameEn": "1볼트 1개 추가 장전공격",
+      "type": "prefix",
+      "description": "볼트 1개 추가 장전공격1",
+      "tier": 3,
+      "itemClasses": [
+        "Crossbows"
+      ],
+      "tags": [
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "볼트 1개 추가 장전공격1"
+    },
+    {
+      "id": "1______________________1_prefix",
+      "groupId": "이_무기_사용_시근접타격범위_증가공격",
+      "nameKo": "1이 무기 사용 시근접타격범위% 증가공격",
+      "nameEn": "1이 무기 사용 시근접타격범위% 증가공격",
+      "type": "prefix",
+      "description": "이 무기 사용 시근접타격범위(10—20)% 증가공격1",
+      "tier": 3,
+      "itemClasses": [
+        "One Hand Maces"
+      ],
+      "tags": [
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "이 무기 사용 시근접타격범위(10—20)% 증가공격1"
+    },
+    {
+      "id": "1_______________________1_prefix",
+      "groupId": "명중시의_확률로출혈유발물리공격상태_이상",
+      "nameKo": "1명중시%의 확률로출혈유발물리공격상태 이상",
+      "nameEn": "1명중시%의 확률로출혈유발물리공격상태 이상",
+      "type": "prefix",
+      "description": "명중시(10—15)%의 확률로출혈유발물리공격상태 이상1",
+      "tier": 3,
+      "itemClasses": [
+        "One Hand Maces"
+      ],
+      "tags": [
+        "물리",
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "명중시(10—15)%의 확률로출혈유발물리공격상태 이상1"
+    },
+    {
+      "id": "1_____1___1_prefix",
+      "groupId": "명중시격노획득",
+      "nameKo": "1명중시격노1획득",
+      "nameEn": "1명중시격노1획득",
+      "type": "prefix",
+      "description": "명중시격노1획득1",
+      "tier": 3,
+      "itemClasses": [
+        "One Hand Maces"
+      ],
+      "tags": [],
+      "minLevel": 1,
+      "values": "명중시격노1획득1"
+    },
+    {
+      "id": "1_____________________________1_prefix",
+      "groupId": "이_무기로명중시의_확률로중독유발카오스공격상태_이상",
+      "nameKo": "1이 무기로명중시%의 확률로중독유발카오스공격상태 이상",
+      "nameEn": "1이 무기로명중시%의 확률로중독유발카오스공격상태 이상",
+      "type": "prefix",
+      "description": "이 무기로명중시(10—15)%의 확률로중독유발카오스공격상태 이상1",
+      "tier": 3,
+      "itemClasses": [
+        "Spears"
+      ],
+      "tags": [
+        "카오스",
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "이 무기로명중시(10—15)%의 확률로중독유발카오스공격상태 이상1"
+    },
+    {
+      "id": "9_prefix",
+      "groupId": "보강하는_함성함성공격효과_범위근접발동물리지속시간폭발",
+      "nameKo": "보강하는 함성함성,공격,효과 범위,근접,발동,물리,지속시간,폭발",
+      "nameEn": "보강하는 함성함성,공격,효과 범위,근접,발동,물리,지속시간,폭발",
+      "type": "prefix",
+      "description": "보강하는 함성(9)함성,공격,효과 범위,근접,발동,물리,지속시간,폭발",
+      "tier": 3,
+      "itemClasses": [
+        "Shields"
+      ],
+      "tags": [
+        "물리",
+        "공격"
+      ],
+      "minLevel": 9,
+      "values": "보강하는 함성(9)함성,공격,효과 범위,근접,발동,물리,지속시간,폭발"
+    },
+    {
+      "id": "1_prefix",
+      "groupId": "방패_들기공격효과_범위근접물리집중_유지",
+      "nameKo": "방패 들기공격,효과 범위,근접,물리,집중 유지",
+      "nameEn": "방패 들기공격,효과 범위,근접,물리,집중 유지",
+      "type": "prefix",
+      "description": "방패 들기(1)공격,효과 범위,근접,물리,집중 유지",
+      "tier": 3,
+      "itemClasses": [
+        "Shields"
+      ],
+      "tags": [
+        "물리",
+        "공격"
+      ],
+      "minLevel": 1,
+      "values": "방패 들기(1)공격,효과 범위,근접,물리,집중 유지"
+    },
+    {
+      "id": "1_______3__________________1_prefix",
+      "groupId": "물리공격피해의를_생명력으로흡수생명력물리공격",
+      "nameKo": "1물리공격피해의3%를 생명력으로흡수생명력물리공격",
+      "nameEn": "1물리공격피해의3%를 생명력으로흡수생명력물리공격",
+      "type": "prefix",
+      "description": "물리공격피해의3%를 생명력으로흡수생명력물리공격1",
+      "tier": 3,
+      "itemClasses": [
+        "Amulets"
+      ],
+      "tags": [
+        "물리",
+        "공격",
+        "생명력"
+      ],
+      "minLevel": 1,
+      "values": "물리공격피해의3%를 생명력으로흡수생명력물리공격1"
+    },
+    {
+      "id": "1________2_______________1_prefix",
+      "groupId": "물리공격_피해의를_마나로흡수마나물리공격",
+      "nameKo": "1물리공격 피해의2%를 마나로흡수마나물리공격",
+      "nameEn": "1물리공격 피해의2%를 마나로흡수마나물리공격",
+      "type": "prefix",
+      "description": "물리공격 피해의2%를 마나로흡수마나물리공격1",
+      "tier": 3,
+      "itemClasses": [
+        "Amulets"
+      ],
+      "tags": [
+        "물리",
+        "공격",
+        "마나"
+      ],
+      "minLevel": 1,
+      "values": "물리공격 피해의2%를 마나로흡수마나물리공격1"
+    },
+    {
+      "id": "1____________1______1_prefix",
+      "groupId": "모든원소_저항_최대치원소저항",
+      "nameKo": "1모든원소 저항 최대치+1%원소저항",
+      "nameEn": "1모든원소 저항 최대치+1%원소저항",
+      "type": "prefix",
+      "description": "모든원소 저항 최대치+1%원소저항1",
+      "tier": 3,
+      "itemClasses": [
+        "Amulets"
+      ],
+      "tags": [
+        "원소",
+        "저항"
+      ],
+      "minLevel": 1,
+      "values": "모든원소 저항 최대치+1%원소저항1"
+    },
+    {
+      "id": "1_________1__1_prefix",
+      "groupId": "모든_스킬_레벨젬",
+      "nameKo": "1모든 스킬 레벨+1젬",
+      "nameEn": "1모든 스킬 레벨+1젬",
+      "type": "prefix",
+      "description": "모든 스킬 레벨+1젬1",
+      "tier": 3,
+      "itemClasses": [
+        "Amulets"
+      ],
+      "tags": [],
+      "minLevel": 1,
+      "values": "모든 스킬 레벨+1젬1"
+    },
+    {
+      "id": "1______1_prefix",
+      "groupId": "힘능력치",
+      "nameKo": "1힘+능력치",
+      "nameEn": "1힘+능력치",
+      "type": "prefix",
+      "description": "힘+(10—15)능력치1",
+      "tier": 3,
+      "itemClasses": [
+        "Amulets"
+      ],
+      "tags": [
+        "능력치"
+      ],
+      "minLevel": 1,
+      "values": "힘+(10—15)능력치1"
+    },
+    {
+      "id": "1_______1_prefix",
+      "groupId": "민첩능력치",
+      "nameKo": "1민첩+능력치",
+      "nameEn": "1민첩+능력치",
+      "type": "prefix",
+      "description": "민첩+(10—15)능력치1",
+      "tier": 3,
+      "itemClasses": [
+        "Amulets"
+      ],
+      "tags": [
+        "능력치"
+      ],
+      "minLevel": 1,
+      "values": "민첩+(10—15)능력치1"
+    },
+    {
+      "id": "1__________1_prefix",
+      "groupId": "마나_최대치마나",
+      "nameKo": "1마나 최대치+마나",
+      "nameEn": "1마나 최대치+마나",
+      "type": "prefix",
+      "description": "마나 최대치+(20—25)마나1",
+      "tier": 3,
+      "itemClasses": [
+        "Rings"
+      ],
+      "tags": [
+        "마나"
+      ],
+      "minLevel": 1,
+      "values": "마나 최대치+(20—25)마나1"
+    },
+    {
+      "id": "1_________1_prefix",
+      "groupId": "피해_증가피해",
+      "nameKo": "1피해% 증가피해",
+      "nameEn": "1피해% 증가피해",
+      "type": "prefix",
+      "description": "피해(20—30)% 증가피해1",
+      "tier": 3,
+      "itemClasses": [
+        "Rings"
+      ],
+      "tags": [],
+      "minLevel": 1,
+      "values": "피해(20—30)% 증가피해1"
+    },
+    {
+      "id": "1___________1_prefix",
+      "groupId": "방어도_증가방어력",
+      "nameKo": "1방어도% 증가방어력",
+      "nameEn": "1방어도% 증가방어력",
+      "type": "prefix",
+      "description": "방어도(15—25)% 증가방어력1",
+      "tier": 3,
+      "itemClasses": [
+        "Belts"
+      ],
+      "tags": [
+        "방어"
+      ],
+      "minLevel": 1,
+      "values": "방어도(15—25)% 증가방어력1"
+    },
+    {
+      "id": "1__________________1_prefix",
+      "groupId": "에너지_보호막최대치_증가방어력",
+      "nameKo": "1에너지 보호막최대치% 증가방어력",
+      "nameEn": "1에너지 보호막최대치% 증가방어력",
+      "type": "prefix",
+      "description": "에너지 보호막최대치(15—25)% 증가방어력1",
+      "tier": 3,
+      "itemClasses": [
+        "Belts"
+      ],
+      "tags": [
+        "방어",
+        "에너지_보호막"
+      ],
+      "minLevel": 1,
+      "values": "에너지 보호막최대치(15—25)% 증가방어력1"
+    }
+  ]
+}

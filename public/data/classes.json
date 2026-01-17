@@ -1,0 +1,149 @@
+{
+  "Amulets": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "Armours": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 79,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "Belts": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "Boots": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 74,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "Bows": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 81,
+    "sections": ["gear_weapons_bows"],
+    "tiersAvailable": [1, 2, 3]
+  },
+  "Bucklers": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": [],
+    "tiersAvailable": [1, 2]
+  },
+  "Crossbows": {
+    "capIlvl": null,
+    "group": "gear",
+    "minIlvl": null,
+    "sections": ["gear_weapons_crossbows"],
+    "tiersAvailable": [1, 2]
+  },
+  "Foci": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 65,
+    "sections": ["gear_weapons_foci"],
+    "tiersAvailable": [1, 2, 3]
+  },
+  "Gloves": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 78,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "Helmets": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 78,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "One Hand Maces": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": ["gear_weapons_one_Hand_Maces"],
+    "tiersAvailable": [1, 2]
+  },
+  "Quarterstaves": {
+    "capIlvl": null,
+    "group": "gear",
+    "minIlvl": null,
+    "sections": ["gear_weapons_quarterstaves"],
+    "tiersAvailable": [1, 2]
+  },
+  "Quivers": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": ["gear_weapons_quivers"],
+    "tiersAvailable": [1, 2]
+  },
+  "Rings": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "Sceptres": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 78,
+    "sections": ["gear_weapons_sceptres"],
+    "tiersAvailable": [1, 2]
+  },
+  "Shields": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": [],
+    "tiersAvailable": [1]
+  },
+  "Spears": {
+    "capIlvl": null,
+    "group": "gear",
+    "minIlvl": null,
+    "sections": ["gear_weapons_spears"],
+    "tiersAvailable": [1, 2]
+  },
+  "Staves": {
+    "capIlvl": 81,
+    "group": "gear",
+    "minIlvl": 79,
+    "sections": ["gear_weapons_staves"],
+    "tiersAvailable": [1, 2]
+  },
+  "Talismans": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": ["gear_weapons_talismans"],
+    "tiersAvailable": [1]
+  },
+  "Two Hand Maces": {
+    "capIlvl": 82,
+    "group": "gear",
+    "minIlvl": 75,
+    "sections": ["gear_weapons_two_Hand_Maces"],
+    "tiersAvailable": [1, 2]
+  },
+  "Wands": {
+    "capIlvl": 81,
+    "group": "gear",
+    "minIlvl": 79,
+    "sections": ["gear_weapons_wands"],
+    "tiersAvailable": [1, 2]
+  }
+}

@@ -2,29 +2,71 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { isAdmin } from "@/lib/admin-auth";
+import { isAdmin, signOut } from "@/lib/admin-auth";
+import { supabase } from "@/lib/supabase/client";
 import GameColorSettings from "./GameColorSettings";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [lang, setLang] = useState("ko");
   const [admin, setAdmin] = useState(false);
+  const [user, setUser] = useState(null);
   const [showColorSettings, setShowColorSettings] = useState(false);
+  const router = useRouter();
   
-  // localStorage에서 언어 설정 불러오기
   useEffect(() => {
     const savedLang = localStorage.getItem("lang") || "ko";
     setLang(savedLang);
-    setAdmin(isAdmin());
-    
-    // 관리자 상태 변경 이벤트 리스너
-    const handleAdminChange = () => {
-      setAdmin(isAdmin());
+    let isMounted = true;
+    console.log("[Header] 세션 로드 및 Auth 구독 시작");
+
+    const loadSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("[Header] 세션 로드 중 오류 발생:", error);
+          return;
+        }
+        if (!isMounted) return;
+        
+        const currentUser = data?.session?.user ?? null;
+        console.log("[Header] 초기 세션 확인 결과:", currentUser ? currentUser.email : "비로그인");
+        setUser(currentUser);
+        
+        if (currentUser) {
+          const adminStatus = await isAdmin();
+          if (isMounted) setAdmin(adminStatus);
+        }
+      } catch (err) {
+        if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+          return; // AbortError는 무시
+        }
+        console.error("[Header] loadSession 전체 오류:", err);
+      }
     };
-    
-    window.addEventListener("adminchange", handleAdminChange);
-    
+
+    loadSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("[Header] Auth 상태 변경 감지:", event);
+      if (!isMounted) return;
+      
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      
+      // SIGNED_IN 또는 초기 세션인 경우에만 관리자 여부 확인 (부하 감소)
+      if (currentUser && (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "USER_UPDATED")) {
+        const adminStatus = await isAdmin();
+        if (isMounted) setAdmin(adminStatus);
+      } else if (!currentUser) {
+        setAdmin(false);
+      }
+    });
+
     return () => {
-      window.removeEventListener("adminchange", handleAdminChange);
+      isMounted = false;
+      console.log("[Header] 컴포넌트 언마운트 - Auth 구독 해제");
+      listener?.subscription?.unsubscribe();
     };
   }, []);
 
@@ -34,6 +76,19 @@ export default function Header() {
     localStorage.setItem("lang", newLang);
     // 커스텀 이벤트 발생 (같은 페이지 내에서 언어 변경 알림)
     window.dispatchEvent(new CustomEvent("langchange"));
+  };
+
+  const handleSignOut = async () => {
+    setUser(null);
+    setAdmin(false);
+    setShowColorSettings(false);
+
+    const { error } = await signOut();
+    if (error) {
+      console.error("Sign out failed:", error);
+    }
+
+    // Avoid router.refresh() during sign-out to prevent AbortError in dev.
   };
 
   return (
@@ -47,12 +102,24 @@ export default function Header() {
             </Link>
           </div>
           <div className="header-right">
-            {/* 애드센스 심사를 위해 일시적으로 숨김 */}
-            {false && (
+            {/* 애드센스 심사 중이면 false로 바꾸세요 */}
+            {true && (
               <>
                 <button className="header-btn">광고 제거</button>
-                <button className="header-btn">로그인</button>
-                <button className="header-btn header-btn-primary">회원가입</button>
+                {user ? (
+                  <button className="header-btn" onClick={handleSignOut}>
+                    로그아웃
+                  </button>
+                ) : (
+                  <>
+                    <Link className="header-btn" href="/login">
+                      로그인
+                    </Link>
+                    <Link className="header-btn header-btn-primary" href="/login?mode=signup">
+                      회원가입
+                    </Link>
+                  </>
+                )}
               </>
             )}
             {admin && (

@@ -1,31 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { setAdmin, isAdmin } from "@/lib/admin-auth";
+import { isAdmin } from "@/lib/admin-auth";
 import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("tiers");
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
   
   useEffect(() => {
-    // TODO: 나중에 실제 로그인 시스템으로 교체 필요
-    // 현재는 데모용으로 localStorage 기반 관리자 인증 사용
-    // 실제 구현 시:
-    // 1. 로그인 페이지로 리다이렉트
-    // 2. 세션/토큰 기반 인증
-    // 3. 서버 사이드 권한 확인
-    
-    if (!isAdmin()) {
-      // 데모용: 개발 중에는 간단하게 관리자 설정 가능
-      // 프로덕션에서는 제거하고 실제 로그인 페이지로 리다이렉트
-      const shouldLogin = confirm("관리자 모드에 접근하려면 로그인이 필요합니다.\n\n(데모용: 관리자로 설정하시겠습니까?)");
-      if (shouldLogin) {
-        setAdmin(true);
-      } else {
-        router.push("/");
+    const guardAdmin = async () => {
+      const admin = await isAdmin();
+      if (!admin) {
+        router.replace("/login?redirect=/admin");
+        return;
       }
-    }
+      setCheckingAuth(false);
+    };
+
+    guardAdmin();
   }, [router]);
 
   const tabs = [
@@ -34,6 +28,16 @@ export default function AdminPage() {
     { id: "presets", label: "프리셋 관리" },
     { id: "users", label: "사용자 관리" },
   ];
+
+  if (checkingAuth) {
+    return (
+      <main className="container">
+        <div className="card">
+          <div className="cardBody">관리자 권한 확인 중...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="container">

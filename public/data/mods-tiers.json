@@ -1,0 +1,52 @@
+{
+  "A": ["added_phys_damage", "inc_phys_damage"],
+  "B": ["added_cold_damage", "inc_attack_speed"],
+  "C": ["added_fire_damage", "inc_critical_strike"],
+  "groups": {
+    "added_phys_damage": {
+      "id": "added_phys_damage",
+      "nameKo": "물리 피해 #~# 추가",
+      "nameEn": "Adds # to # Physical Damage",
+      "tags": ["피해", "물리", "공격"],
+      "type": "prefix",
+      "classes": ["One Hand Swords", "Two Hand Swords", "Bows", "One Hand Axes", "Two Hand Axes"],
+      "tiers": [
+        { "tier": 1, "nameKo": "빛을 뿜는", "nameEn": "Crystalising", "level": 75, "values": "26-39 ~ 44-66" },
+        { "tier": 2, "nameKo": "단조한", "nameEn": "Forged", "level": 65, "values": "21-31 ~ 36-53" }
+      ]
+    },
+    "inc_phys_damage": {
+      "id": "inc_phys_damage",
+      "nameKo": "물리 피해 % 증가",
+      "nameEn": "% Increased Physical Damage",
+      "tags": ["피해", "물리", "공격"],
+      "type": "prefix",
+      "classes": ["One Hand Swords", "Two Hand Swords", "Bows"],
+      "tiers": [
+        { "tier": 1, "nameKo": "강렬한", "nameEn": "Flaring", "level": 81, "values": "100-120%" }
+      ]
+    },
+    "inc_attack_speed": {
+      "id": "inc_attack_speed",
+      "nameKo": "공격 속도 % 증가",
+      "nameEn": "% Increased Attack Speed",
+      "tags": ["공격", "속도"],
+      "type": "suffix",
+      "classes": ["One Hand Swords", "Two Hand Swords", "Bows", "Claws", "Daggers"],
+      "tiers": [
+        { "tier": 1, "nameKo": "찬란한", "nameEn": "Radiant", "level": 78, "values": "20-25%" }
+      ]
+    },
+    "added_cold_damage": {
+      "id": "added_cold_damage",
+      "nameKo": "냉기 피해 #~# 추가",
+      "nameEn": "Adds # to # Cold Damage",
+      "tags": ["피해", "원소", "냉기", "공격"],
+      "type": "prefix",
+      "classes": ["Bows", "One Hand Swords", "Two Hand Swords"],
+      "tiers": [
+        { "tier": 1, "nameKo": "얼어붙은", "nameEn": "Frigid", "level": 81, "values": "72-81 ~ 110-123" }
+      ]
+    }
+  }
+}

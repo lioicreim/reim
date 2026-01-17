@@ -10,6 +10,8 @@
     "update-translations": "node scripts/update-translations.js"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.90.1",
     "@tiptap/extension-color": "^3.15.1",
     "@tiptap/extension-dropcursor": "^3.15.1",
     "@tiptap/extension-gapcursor": "^3.15.1",

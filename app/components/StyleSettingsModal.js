@@ -1903,7 +1903,7 @@ export default function StyleSettingsModal({
                             )}
                           </div>
                           
-                          {/* Sockets / Quality (Socket & Quality 전용 또는 일반 베이스 아이템) */}
+                          {/* Sockets / Quality / AreaLevel (Socket & Quality 전용 또는 일반 베이스 아이템) */}
                           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
                             {localConditions.sockets && (
                               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -1958,6 +1958,36 @@ export default function StyleSettingsModal({
                                   max="28"
                                 />
                                 <span style={{ fontSize: "12px", color: "var(--muted)" }}>%</span>
+                              </div>
+                            )}
+
+                            {section === "base_items_socket_quality" && localConditions.areaLevel && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <span className="style-setting-label" style={{ minWidth: "auto" }}>
+                                  {lang === "ko" ? "지역 레벨" : "Area Level"}
+                                </span>
+                                <select
+                                  className="condition-operator"
+                                  value={localConditions.areaLevel.operator || ">="}
+                                  onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
+                                  style={{ width: "50px", minWidth: "50px" }}
+                                >
+                                  <option value=">=">≥</option>
+                                  <option value="<=">≤</option>
+                                  <option value=">">&gt;</option>
+                                  <option value="<">&lt;</option>
+                                  <option value="==">==</option>
+                                </select>
+                                <select
+                                  className="condition-value"
+                                  value={localConditions.areaLevel.value || 1}
+                                  onChange={(e) => handleConditionChange("areaLevel", "value", parseInt(e.target.value) || 1)}
+                                  style={{ width: "70px" }}
+                                >
+                                  {Array.from({ length: 100 }, (_, i) => i + 1).map((v) => (
+                                    <option key={v} value={v}>{v}</option>
+                                  ))}
+                                </select>
                               </div>
                             )}
                           </div>
@@ -2372,7 +2402,7 @@ export default function StyleSettingsModal({
                           )}
 
                           {/* AreaLevel: 골드가 아닐 때만 표시 (골드는 위에서 처리) */}
-                          {areaLevelCondition && baseType !== "Gold" && (
+                          {areaLevelCondition && baseType !== "Gold" && section !== "base_items_socket_quality" && (
                               <div className="condition-row-with-slider">
                                 <div className="condition-label-wrapper">
                                   <span className="style-setting-label">지역 레벨</span>

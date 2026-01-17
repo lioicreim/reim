@@ -1,0 +1,133 @@
+{
+  "conditions": {
+    "ItemLevel": {
+      "code": "ItemLevel",
+      "name": "아이템 레벨",
+      "nameEn": "Item Level",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["gear", "all"]
+    },
+    "AreaLevel": {
+      "code": "AreaLevel",
+      "name": "지역 레벨",
+      "nameEn": "Area Level",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["gold", "currency", "gear", "all"]
+    },
+    "StackSize": {
+      "code": "StackSize",
+      "name": "수량",
+      "nameEn": "Stack Size",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["gold", "currency"],
+      "label": {
+        "ko": "골드",
+        "en": "Gold"
+      }
+    },
+    "Rarity": {
+      "code": "Rarity",
+      "name": "등급",
+      "nameEn": "Rarity",
+      "type": "select",
+      "operators": ["==", "!="],
+      "defaultOperator": "==",
+      "values": ["Normal", "Magic", "Rare", "Unique"],
+      "applicableClasses": ["chance", "gear", "all"]
+    },
+    "Corrupted": {
+      "code": "Corrupted",
+      "name": "타락",
+      "nameEn": "Corrupted",
+      "type": "boolean",
+      "operators": ["=="],
+      "defaultOperator": "==",
+      "values": [true, false],
+      "applicableClasses": ["chance", "gear", "all"]
+    },
+    "Quality": {
+      "code": "Quality",
+      "name": "퀄리티",
+      "nameEn": "Quality",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["gear", "all"]
+    },
+    "Sockets": {
+      "code": "Sockets",
+      "name": "소켓",
+      "nameEn": "Sockets",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["gear", "all"]
+    },
+    "UnidentifiedItemTier": {
+      "code": "UnidentifiedItemTier",
+      "name": "미감정 등급",
+      "nameEn": "Unidentified Item Tier",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["gear", "all"]
+    },
+    "Class": {
+      "code": "Class",
+      "name": "클래스",
+      "nameEn": "Class",
+      "type": "select",
+      "operators": ["==", "!="],
+      "defaultOperator": "==",
+      "applicableClasses": ["gear", "currency", "all"],
+      "isMultiple": true
+    },
+    "BaseType": {
+      "code": "BaseType",
+      "name": "베이스 타입",
+      "nameEn": "Base Type",
+      "type": "select",
+      "operators": ["==", "!="],
+      "defaultOperator": "==",
+      "applicableClasses": ["chance", "gear", "currency", "all"],
+      "isMultiple": true
+    },
+    "WaystoneTier": {
+      "code": "WaystoneTier",
+      "name": "경로석 티어",
+      "nameEn": "Waystone Tier",
+      "type": "number",
+      "operators": [">=", "<=", "==", ">", "<"],
+      "defaultOperator": ">=",
+      "applicableClasses": ["waystones", "all"]
+    }
+  },
+  "classConditions": {
+    "gold": {
+      "default": ["StackSize"],
+      "additional": ["AreaLevel"]
+    },
+    "currency": {
+      "default": ["StackSize"],
+      "additional": ["AreaLevel"]
+    },
+    "chance": {
+      "default": ["Rarity", "Corrupted"],
+      "additional": []
+    },
+    "gear": {
+      "default": ["ItemLevel", "Rarity"],
+      "additional": ["AreaLevel", "Quality", "Sockets", "UnidentifiedItemTier", "Corrupted", "Class", "BaseType"]
+    },
+    "waystones": {
+      "default": ["WaystoneTier"],
+      "additional": ["Corrupted", "Rarity", "ItemLevel", "Quality"]
+    }
+  }
+}

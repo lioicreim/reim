@@ -1,0 +1,110 @@
+{
+  "lastUpdated": "2026-01-17T00:00:00Z",
+  "modPresets": [
+    {
+      "id": "melee_physical_weapons",
+      "nameKo": "근접 물리 공격 무기",
+      "nameEn": "Melee Physical Attack Weapons",
+      "description": "물리 피해 기반 근접 공격 무기에 유용한 모드들",
+      "itemClasses": ["Bows", "Crossbows", "Spears", "One Hand Maces", "Two Hand Maces", "Quarterstaves", "Talismans"],
+      "baseTypes": [
+        "Artillery Bow", "Tribal Bow", "Adherent Bow", "Militant Bow",
+        "Blackfire Crossbow", "Piercing Crossbow", "Twin Crossbow", "Cannonade Crossbow",
+        "Morning Star", "Jade Club", "Kalguuran Forgehammer"
+      ],
+      "modGroups": {
+        "tier1_prefix": {
+          "label": "티어1 우수 접두 모드",
+          "mods": ["Dictator's", "Emperor's", "Flaring", "Merciless", "Tempered", "Tyrannical"]
+        },
+        "tier1_suffix": {
+          "label": "티어1 우수 접미 모드",
+          "mods": ["of Celebration", "of Destruction", "of Infamy", "of Unmaking", "of the Desperate", "of the Vampire"]
+        },
+        "tier2_good": {
+          "label": "티어2 우수 모드",
+          "mods": ["Conqueror's", "Cruel", "Razor-sharp", "of Calamity", "of Fame", "of Ferocity", "of Fury", "of Ruin", "of the Drought", "of the Lamprey"]
+        },
+        "excluded": {
+          "label": "제외할 모드 (원소 피해 등)",
+          "mods": ["Arcing", "Blasting", "Burning", "Burnished", "Buzzing", "Catalysing", "Chilled", "Crackling", "Discharging", "Empowering", "Flaming", "Freezing", "Frigid", "Frosted", "Frozen", "Glaciated"]
+        }
+      },
+      "filterRules": [
+        {
+          "id": "excellent",
+          "priority": 1,
+          "label": "Excellent (4+ good mods)",
+          "conditions": [
+            { "type": "HasExplicitMod", "operator": ">=", "count": 1, "modGroup": "tier1_prefix" },
+            { "type": "HasExplicitMod", "operator": ">=", "count": 1, "modGroup": "tier1_suffix" },
+            { "type": "HasExplicitMod", "operator": ">=", "count": 4, "modGroups": ["tier1_prefix", "tier1_suffix", "tier2_good"] },
+            { "type": "HasExplicitMod", "operator": "==", "count": 0, "modGroup": "excluded" }
+          ],
+          "style": {
+            "playEffect": "Purple",
+            "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+            "alertSound": 6,
+            "volume": 300
+          }
+        },
+        {
+          "id": "good",
+          "priority": 2,
+          "label": "Good (3+ good mods)",
+          "conditions": [
+            { "type": "HasExplicitMod", "operator": ">=", "count": 1, "modGroups": ["tier1_prefix", "tier1_suffix"] },
+            { "type": "HasExplicitMod", "operator": ">=", "count": 3, "modGroups": ["tier1_prefix", "tier1_suffix", "tier2_good"] },
+            { "type": "HasExplicitMod", "operator": "<=", "count": 1, "modGroup": "excluded" }
+          ],
+          "style": {
+            "playEffect": "Orange",
+            "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+            "alertSound": 2,
+            "volume": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "elemental_weapons",
+      "nameKo": "원소 피해 무기",
+      "nameEn": "Elemental Damage Weapons",
+      "description": "원소 피해 기반 무기에 유용한 모드들",
+      "itemClasses": ["Bows", "Crossbows", "Spears", "One Hand Maces", "Two Hand Maces"],
+      "baseTypes": [],
+      "modGroups": {
+        "tier1_elemental": {
+          "label": "티어1 원소 피해",
+          "mods": ["Carbonising", "Cremating", "Crystalising", "Devastating", "Electrocuting", "Entombing", "Vapourising"]
+        },
+        "tier1_suffix": {
+          "label": "티어1 우수 접미",
+          "mods": ["of Celebration", "of Destruction", "of Infamy", "of Unmaking"]
+        },
+        "tier2_elemental": {
+          "label": "티어2 원소 피해",
+          "mods": ["Blasting", "Discharging", "Overpowering", "Polar", "Unleashed", "of Calamity", "of Fame"]
+        }
+      },
+      "filterRules": [
+        {
+          "id": "excellent",
+          "priority": 1,
+          "label": "Excellent Elemental (4+ mods)",
+          "conditions": [
+            { "type": "HasExplicitMod", "operator": ">=", "count": 1, "modGroup": "tier1_elemental" },
+            { "type": "HasExplicitMod", "operator": ">=", "count": 1, "modGroup": "tier1_suffix" },
+            { "type": "HasExplicitMod", "operator": ">=", "count": 4, "modGroups": ["tier1_elemental", "tier1_suffix", "tier2_elemental"] }
+          ],
+          "style": {
+            "playEffect": "Purple",
+            "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+            "alertSound": 6,
+            "volume": 300
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "classes": {
+    "Wands": { "ko": "마법봉", "en": "Wands" },
+    "Staves": { "ko": "지팡이", "en": "Staves" },
+    "Foci": { "ko": "집중구", "en": "Foci" },
+    "Sceptres": { "ko": "셉터", "en": "Sceptres" },
+    "Bows": { "ko": "활", "en": "Bows" },
+    "Quivers": { "ko": "화살통", "en": "Quivers" },
+    "Crossbows": { "ko": "쇠뇌", "en": "Crossbows" },
+    "Quarterstaves": { "ko": "육척봉", "en": "Quarterstaves" },
+    "Spears": { "ko": "창", "en": "Spears" },
+    "Talismans": { "ko": "부적", "en": "Talismans" },
+    "One Hand Maces": { "ko": "한손 철퇴", "en": "One Hand Maces" },
+    "Two Hand Maces": { "ko": "양손 철퇴", "en": "Two Hand Maces" },
+    "Armours": { "ko": "갑옷", "en": "Armours" },
+    "Helmets": { "ko": "투구", "en": "Helmets" },
+    "Gloves": { "ko": "장갑", "en": "Gloves" },
+    "Boots": { "ko": "장화", "en": "Boots" },
+    "Shields": { "ko": "방패", "en": "Shields" },
+    "Bucklers": { "ko": "버클러", "en": "Bucklers" },
+    "Amulets": { "ko": "목걸이", "en": "Amulets" },
+    "Rings": { "ko": "반지", "en": "Rings" },
+    "Belts": { "ko": "벨트", "en": "Belts" }
+  },
+  "items": {}
+}

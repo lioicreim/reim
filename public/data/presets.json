@@ -1,0 +1,112 @@
+{
+  "presets": [
+    {
+      "id": "starter",
+      "name": "League Starter",
+      "nameKo": "리그 스타터",
+      "description": "새로운 리그 시작 / 신규 유저",
+      "descriptionKo": "새로운 리그를 시작하거나 신규 유저를 위한 필터입니다\nT1~T2 베이스 아이템을 보여주며, T3 아이템은 희귀 등급만 보여줍니다\n그외 화폐, 에센스, 징조 등은 모든 티어를 보여줍니다",
+      "itemLevel": {
+        "min": 79,
+        "useBaseMinIlvl": true
+      },
+      "rules": {
+        "showUnidentified": true,
+        "unidentifiedTiers": [1, 2, 3, 4, 5],
+        "gearTiers": [1, 2, 3, 4],
+        "currencyTiers": ["S", "A", "B", "C", "D", "E"],
+        "showNormalItems": true,
+        "showMagicItems": true,
+        "showRareItems": true
+      },
+      "isDefault": true
+    },
+    {
+      "id": "strict",
+      "name": "T1 - T14",
+      "nameKo": "T1 - T14",
+      "description": "엔드게임 진입한 플레이어를 위한 필터",
+      "descriptionKo": "엔드게임에 진입해서 T1-T14를 플레이할 때 유용한 필터입니다\nT1~T2 베이스 아이템을 보여주며 모두 표시하며 T3 이하의 아이템은 숨겨집니다\nE 티어 화폐는 숨겨집니다",
+      "itemLevel": {
+        "min": 79,
+        "useBaseMinIlvl": true
+      },
+      "rules": {
+        "showUnidentified": true,
+        "unidentifiedTiers": [3, 4, 5],
+        "gearTiers": [1, 2],
+        "gearTier3Rarity": "rare",
+        "currencyTiers": ["S", "A", "B", "C", "D"],
+        "showNormalItems": false,
+        "showMagicItems": false,
+        "showRareItems": true
+      }
+    },
+    {
+      "id": "verystrict",
+      "name": "T15 + 6 Mod",
+      "nameKo": "T15 + 6모드",
+      "description": "T15 경로석 파밍",
+      "descriptionKo": "본격적으로 T15 6모드 난이도를 플레이하는 숙련된 모험가를 위한 필터입니다\n장비: T1~T2 미감정 3등급 이상을 보여줍니다\nT2 아이템은 D, E 티어 화폐가 숨겨집니다.",
+      "itemLevel": {
+        "min": 79,
+        "useBaseMinIlvl": true
+      },
+      "rules": {
+        "showUnidentified": true,
+        "unidentifiedTiers": [4, 5],
+        "gearTiers": [1, 2],
+        "currencyTiers": ["S", "A", "B", "C"],
+        "showNormalItems": false,
+        "showMagicItems": false,
+        "showRareItems": true
+      }
+    },
+    {
+      "id": "uber",
+      "name": "Uber",
+      "nameKo": "고인물",
+      "description": "1-2 티어 화폐와 장비만 표시",
+      "descriptionKo": "성채 보스런을 즐기며 T1 장비만 취급하는 고인물을 위한 필터입니다\nD, E 티어 화폐가 숨겨집니다\n혈통 젬티어가 숨겨지며 에센스, 징조 등도 가장 낮은 티어를 숨겨줍니다",
+      "itemLevel": {
+        "min": 82,
+        "useBaseMinIlvl": true
+      },
+      "rules": {
+        "showUnidentified": true,
+        "unidentifiedTiers": [5],
+        "gearTiers": [1],
+        "currencyTiers": ["S", "A", "B", "C"],
+        "showNormalItems": false,
+        "showMagicItems": false,
+        "showRareItems": true
+      }
+    },
+    {
+      "id": "vaal",
+      "name": "Vaal",
+      "nameKo": "썩은물",
+      "description": "고자본 종결 빌드를 위한 필터",
+      "descriptionKo": "바알 사원을 탐험하며 디바인 이하는 취급하지 않는 학살자들을 위한 프리셋입니다\nT1 최대레벨(평균 81렙) 이상의 아이템만 보여주며\n대부분 화폐는 C 티어 이하를 숨겨줍니다",
+      "itemLevel": {
+        "min": 82,
+        "useBaseMinIlvl": true
+      },
+      "rules": {
+        "showUnidentified": true,
+        "unidentifiedTiers": [5],
+        "gearTiers": [1],
+        "currencyTiers": ["S", "A", "B"],
+        "showNormalItems": false,
+        "showMagicItems": false,
+        "showRareItems": true,
+        "soundSettings": {
+          "removeCurrencyC": true,
+          "removeGearT2T3": true,
+          "removeFlasks": true,
+          "removeWaystones": true
+        }
+      }
+    }
+  ]
+}

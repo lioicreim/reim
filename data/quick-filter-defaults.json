@@ -479,6 +479,34 @@
           "borderColor": { "r": 255, "g": 170, "b": 0, "a": 255 },
           "playEffect": "Orange"
         }
+      },
+      {
+        "id": "salvage_quality",
+        "enabled": true,
+        "name": "Salvage Quality Items",
+        "nameKo": "[분해용] 퀄리티 아이템",
+        "type": "show",
+        "conditions": {
+          "areaLevel": { "operator": "<", "value": 65 },
+          "quality": { "operator": ">=", "value": 15 }
+        },
+        "styles": {
+          "fontSize": 40
+        }
+      },
+      {
+        "id": "salvage_sockets",
+        "enabled": true,
+        "name": "Salvage Socket Items",
+        "nameKo": "[분해용] 소켓 아이템",
+        "type": "show",
+        "conditions": {
+          "areaLevel": { "operator": "<", "value": 65 },
+          "sockets": { "operator": ">=", "value": 1 }
+        },
+        "styles": {
+          "fontSize": 40
+        }
       }
     ]
   },
@@ -1264,6 +1292,24 @@
     "enabled": true,
     "rules": [
       {
+        "id": "special_itme_quest",
+        "enabled": true,
+        "name": "Quest Items",
+        "nameKo": "퀘스트 아이템",
+        "type": "show",
+        "conditions": {
+          "class": { "operator": "==", "value": ["Quest Items", "Instance Local Items"] }
+        },
+        "styles": {
+          "fontSize": 45,
+          "textColor": { "r": 74, "g": 230, "b": 58, "a": 255 },
+          "playEffect": "Green",
+          "minimapIcon": { "size": 0, "color": "Green", "shape": "Pentagon" },
+          "customSound": "custom_sound/3_currency_b.mp3",
+          "soundVolume": 300
+        }
+      },
+      {
         "id": "scroll_wisdom_leveling",
         "enabled": true,
         "name": "[레벨링] 주문 감정서",
@@ -1427,6 +1473,34 @@
   "leveling": {
     "enabled": true,
     "rules": [
+      {
+        "id": "leveling_weapons_armor",
+        "enabled": true,
+        "name": "Leveling | Weapons/Armors",
+        "nameKo": "무기/방어구",
+        "type": "show",
+        "conditions": {
+          "areaLevel": { "operator": "<=", "value": 65 }
+        },
+        "styles": {
+          "fontSize": 45
+        }
+      },
+      {
+        "id": "leveling_accessory",
+        "enabled": true,
+        "name": "Leveling | Accessories",
+        "nameKo": "장신구",
+        "type": "show",
+        "conditions": {
+          "areaLevel": { "operator": "<", "value": 65 },
+          "class": { "operator": "==", "value": ["Amulets", "Rings", "Belts"] },
+          "rarity": { "operator": "==", "value": ["Normal", "Magic", "Rare"] }
+        },
+        "styles": {
+          "fontSize": 45
+        }
+      },
       {
         "id": "leveling_currency_jeweller_orb",
         "enabled": true,

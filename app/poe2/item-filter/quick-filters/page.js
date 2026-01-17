@@ -45,6 +45,21 @@ export default function QuickFiltersPage() {
     rules: quickFilterDefaults.leveling?.rules || [],
   });
 
+  // 직업 선택 상태
+  const [levelingClassSelection, setLevelingClassSelection] = useState({
+    enabled: true, // 직업 선택 활성화 여부
+    class: "all", // "all", "warrior", "mercenary", "ranger", "huntress", "witch", "sorceress", "monk", "druid"
+    weaponTypes: [], // 다중 선택: 빈 배열이면 "전체", 아니면 선택된 무기들
+    armourTypes: [], // 다중 선택: 빈 배열이면 "전체", 아니면 선택된 방어구들
+    areaLevelOperator: "<=", // 지역 레벨 연산자
+    areaLevel: 65, // 지역 레벨 값
+    rarity: {
+      normal: false,
+      magic: true,
+      rare: true,
+    },
+  });
+
   const [isClient, setIsClient] = useState(false);
 
   // 클라이언트에서만 localStorage에서 값 불러오기
@@ -106,6 +121,89 @@ export default function QuickFiltersPage() {
       localStorage.setItem("quickFilter_gold", JSON.stringify(goldSettings));
     }
   }, [goldSettings, isClient]);
+
+  // 레벨링 설정 로드
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_leveling");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const defaultRules = quickFilterDefaults.leveling?.rules || [];
+          const savedRules = parsed.rules || [];
+
+          const mergedRules = savedRules.map((savedRule) => {
+            const defaultRule = defaultRules.find((r) => r.id === savedRule.id);
+            if (defaultRule) {
+              const mergedConditions = savedRule.conditions 
+                ? savedRule.conditions 
+                : (defaultRule.conditions || {});
+              return {
+                ...defaultRule,
+                ...savedRule,
+                conditions: mergedConditions,
+                name: defaultRule.name,
+                nameKo: defaultRule.nameKo,
+              };
+            }
+            return savedRule;
+          });
+
+          defaultRules.forEach((defaultRule) => {
+            if (!mergedRules.find((r) => r.id === defaultRule.id)) {
+              mergedRules.push(defaultRule);
+            }
+          });
+
+          setLevelingSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergedRules,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved leveling settings", e);
+        }
+      }
+    }
+  }, []);
+
+  // 레벨링 설정 저장
+  useEffect(() => {
+    if (isClient && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_leveling",
+        JSON.stringify(levelingSettings)
+      );
+    }
+  }, [levelingSettings, isClient]);
+
+  // 레벨링 직업 선택 로드
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_levelingClassSelection");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setLevelingClassSelection({
+            ...levelingClassSelection,
+            ...parsed,
+            enabled: parsed.enabled !== undefined ? parsed.enabled : levelingClassSelection.enabled,
+          });
+        } catch (e) {
+          console.error("Failed to parse saved leveling class selection", e);
+        }
+      }
+    }
+  }, []);
+
+  // 레벨링 직업 선택 저장
+  useEffect(() => {
+    if (isClient && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_levelingClassSelection",
+        JSON.stringify(levelingClassSelection)
+      );
+    }
+  }, [levelingClassSelection, isClient]);
 
   // 골드 규칙 활성화/비활성화
   const toggleGoldRule = (ruleId) => {
@@ -1477,6 +1575,17 @@ export default function QuickFiltersPage() {
       enabled: hasAnyEnabled || levelingSettings.enabled,
       rules: updatedRules,
     });
+
+    // 무기/방어구 규칙 토글 시 levelingClassSelection.enabled 동기화
+    if (ruleId === "leveling_weapons_armor") {
+      const targetRule = updatedRules.find(r => r.id === "leveling_weapons_armor");
+      if (targetRule) {
+        setLevelingClassSelection(prev => ({
+          ...prev,
+          enabled: targetRule.enabled
+        }));
+      }
+    }
   };
 
   // 레벨링 단계 섹션 접기/펴기 상태
@@ -1843,20 +1952,6 @@ export default function QuickFiltersPage() {
     "EV/ES",
   ];
 
-  // 직업 선택 상태
-  const [levelingClassSelection, setLevelingClassSelection] = useState({
-    enabled: true, // 직업 선택 활성화 여부
-    class: "all", // "all", "warrior", "mercenary", "ranger", "huntress", "witch", "sorceress", "monk", "druid"
-    weaponTypes: [], // 다중 선택: 빈 배열이면 "전체", 아니면 선택된 무기들
-    armourTypes: [], // 다중 선택: 빈 배열이면 "전체", 아니면 선택된 방어구들
-    areaLevelOperator: "<=", // 지역 레벨 연산자
-    areaLevel: 65, // 지역 레벨 값
-    rarity: {
-      normal: false,
-      magic: true,
-      rare: true,
-    },
-  });
 
   // 드롭다운 열림 상태
   const [showClassDropdown, setShowClassDropdown] = useState(false);
@@ -3253,60 +3348,6 @@ export default function QuickFiltersPage() {
             </button>
           </div>
 
-          {/* 아이템 희귀도 */}
-          <div className="leveling-rarity-section">
-            <span className="leveling-rarity-title">
-              {lang === "ko" ? "아이템 희귀도" : "Item Rarity"}
-            </span>
-            <label className="leveling-rarity-item">
-              <input
-                type="checkbox"
-                checked={levelingClassSelection.rarity.rare}
-                onChange={(e) => {
-                  setLevelingClassSelection({
-                    ...levelingClassSelection,
-                    rarity: {
-                      ...levelingClassSelection.rarity,
-                      rare: e.target.checked,
-                    },
-                  });
-                }}
-              />
-              <span>{lang === "ko" ? "희귀" : "Rare"}</span>
-            </label>
-            <label className="leveling-rarity-item">
-              <input
-                type="checkbox"
-                checked={levelingClassSelection.rarity.magic}
-                onChange={(e) => {
-                  setLevelingClassSelection({
-                    ...levelingClassSelection,
-                    rarity: {
-                      ...levelingClassSelection.rarity,
-                      magic: e.target.checked,
-                    },
-                  });
-                }}
-              />
-              <span>{lang === "ko" ? "마법" : "Magic"}</span>
-            </label>
-            <label className="leveling-rarity-item">
-              <input
-                type="checkbox"
-                checked={levelingClassSelection.rarity.normal}
-                onChange={(e) => {
-                  setLevelingClassSelection({
-                    ...levelingClassSelection,
-                    rarity: {
-                      ...levelingClassSelection.rarity,
-                      normal: e.target.checked,
-                    },
-                  });
-                }}
-              />
-              <span>{lang === "ko" ? "일반" : "Normal"}</span>
-            </label>
-          </div>
 
           {/* 레벨링 화폐 규칙 리스트 */}
           {levelingSettings.rules.length > 0 && (
@@ -3325,91 +3366,163 @@ export default function QuickFiltersPage() {
                 style={{ padding: "0", width: "100%" }}
               >
               {levelingSettings.rules.map((rule) => (
-                <div
-                  key={rule.id}
-                  className="filter-rule-item"
-                  style={{
-                    opacity:
-                      levelingSettings.enabled && rule.enabled ? 1 : 0.5,
-                    filter:
-                      levelingSettings.enabled && rule.enabled
-                        ? "none"
-                        : "grayscale(100%)",
-                    gap: "0",
-                    paddingRight: "16px",
-                  }}
-                >
+                <Fragment key={rule.id}>
                   <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flex: 1,
-                      gap: "8px",
-                      overflow: "visible",
-                      paddingLeft: "12px"
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={rule.enabled}
-                      onChange={() => toggleLevelingRule(rule.id)}
-                      style={{ cursor: "pointer", marginRight: "4px" }}
-                    />
-                    <span
-                      style={{
-                        fontSize: "14px",
-                        color: "var(--text-main)",
-                        whiteSpace: "nowrap",
-                        minWidth: "fit-content",
-                      }}
-                    >
-                      {lang === "ko" ? rule.nameKo : rule.name}
-                    </span>
-                    
-                    {/* 설정 요약 태그 */}
-                    {renderConfigSummary(rule)}
-
-                    {(() => {
-                      const status = getRuleStatus(rule);
-                      return (
-                        <span
-                          style={{
-                            fontSize: "14px",
-                            color: status.color,
-                            marginLeft: "auto",
-                            fontWeight: status.fontWeight,
-                            whiteSpace: "nowrap",
-                            minWidth: "fit-content",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {status.text}
-                        </span>
-                      );
-                    })()}
-                  </div>
-
-                  <button
-                    className="rule-edit-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditingRuleId(rule.id);
-                      setEditingRuleSection("leveling");
-                      setStyleModalOpen(true);
-                    }}
+                    className="filter-rule-item"
                     style={{
                       opacity:
                         levelingSettings.enabled && rule.enabled ? 1 : 0.5,
-                      cursor:
+                      filter:
                         levelingSettings.enabled && rule.enabled
-                          ? "pointer"
-                          : "not-allowed",
-                      flexShrink: 0,
+                          ? "none"
+                          : "grayscale(100%)",
+                      gap: "0",
+                      paddingRight: "16px",
+                      flexDirection: "column",
+                      alignItems: "stretch",
+                      paddingTop: rule.id === "leveling_weapons_armor" ? "12px" : "8px",
+                      paddingBottom: rule.id === "leveling_weapons_armor" ? "12px" : "8px",
                     }}
                   >
-                    {lang === "ko" ? "수정" : "Edit"}
-                  </button>
-                </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                        gap: "8px",
+                        overflow: "visible",
+                        paddingLeft: "12px"
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={rule.enabled}
+                        onChange={() => toggleLevelingRule(rule.id)}
+                        style={{ cursor: "pointer", marginRight: "4px" }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          color: "var(--text-main)",
+                          whiteSpace: "nowrap",
+                          minWidth: "fit-content",
+                        }}
+                      >
+                        {lang === "ko" ? rule.nameKo : rule.name}
+                      </span>
+                      
+                      {/* 설정 요약 태그 (무기/방어구 제외) */}
+                      {rule.id !== "leveling_weapons_armor" && renderConfigSummary(rule)}
+
+                      {(() => {
+                        const status = getRuleStatus(rule);
+                        return (
+                          <span
+                            style={{
+                              fontSize: "14px",
+                              color: status.color,
+                              marginLeft: "auto",
+                              fontWeight: status.fontWeight,
+                              whiteSpace: "nowrap",
+                              minWidth: "fit-content",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {status.text}
+                          </span>
+                        );
+                      })()}
+
+                      <button
+                        className="rule-edit-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingRuleId(rule.id);
+                          setEditingRuleSection("leveling");
+                          setStyleModalOpen(true);
+                        }}
+                        style={{
+                          opacity:
+                            levelingSettings.enabled && rule.enabled ? 1 : 0.5,
+                          cursor:
+                            levelingSettings.enabled && rule.enabled
+                              ? "pointer"
+                              : "not-allowed",
+                          flexShrink: 0,
+                          marginLeft: "8px"
+                        }}
+                      >
+                        {lang === "ko" ? "수정" : "Edit"}
+                      </button>
+                    </div>
+
+                    {/* 무기/방어구 규칙 하위의 희귀도 선택 UI */}
+                    {rule.id === "leveling_weapons_armor" && (
+                      <div 
+                        style={{ 
+                          display: "flex", 
+                          gap: "16px", 
+                          paddingLeft: "36px", 
+                          marginTop: "8px",
+                          fontSize: "13px",
+                          color: "var(--text-dim)"
+                        }}
+                      >
+                        <label className="leveling-rarity-item" style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={levelingClassSelection.rarity.rare}
+                            disabled={!rule.enabled}
+                            onChange={(e) => {
+                              setLevelingClassSelection({
+                                ...levelingClassSelection,
+                                rarity: {
+                                  ...levelingClassSelection.rarity,
+                                  rare: e.target.checked,
+                                },
+                              });
+                            }}
+                          />
+                          <span>{lang === "ko" ? "희귀" : "Rare"}</span>
+                        </label>
+                        <label className="leveling-rarity-item" style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={levelingClassSelection.rarity.magic}
+                            disabled={!rule.enabled}
+                            onChange={(e) => {
+                              setLevelingClassSelection({
+                                ...levelingClassSelection,
+                                rarity: {
+                                  ...levelingClassSelection.rarity,
+                                  magic: e.target.checked,
+                                },
+                              });
+                            }}
+                          />
+                          <span>{lang === "ko" ? "마법" : "Magic"}</span>
+                        </label>
+                        <label className="leveling-rarity-item" style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={levelingClassSelection.rarity.normal}
+                            disabled={!rule.enabled}
+                            onChange={(e) => {
+                              setLevelingClassSelection({
+                                ...levelingClassSelection,
+                                rarity: {
+                                  ...levelingClassSelection.rarity,
+                                  normal: e.target.checked,
+                                },
+                              });
+                            }}
+                          />
+                          <span>{lang === "ko" ? "일반" : "Normal"}</span>
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                </Fragment>
               ))}
             </div>
           </>
