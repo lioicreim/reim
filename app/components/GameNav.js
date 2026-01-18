@@ -36,8 +36,8 @@ export default function GameNav() {
     { id: "fellowship", name: "Fellowship", nameKo: "Fellowship" },
   ];
 
-  // 애드센스 심사 기간 동안 POE2만 표시
-  const games = allGames.filter(game => game.id === "poe2");
+  // 모든 게임 표시
+  const games = allGames;
 
   return (
     <nav className="game-nav">

@@ -1286,6 +1286,591 @@ export default function QuickFiltersPage() {
     });
   };
 
+  // 감정된 무기 설정 로드
+  const [identifiedWeaponsSettings, setIdentifiedWeaponsSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.identified_weapons?.rules || [],
+  });
+  const [isClientIdentifiedWeapons, setIsClientIdentifiedWeapons] = useState(false);
+  const [isIdentifiedWeaponsExpanded, setIsIdentifiedWeaponsExpanded] = useState(false);
+
+  const [identifiedCastingWeaponsSettings, setIdentifiedCastingWeaponsSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.identified_casting_weapons?.rules || [],
+  });
+  const [isClientIdentifiedCastingWeapons, setIsClientIdentifiedCastingWeapons] = useState(false);
+  const [isIdentifiedCastingWeaponsExpanded, setIsIdentifiedCastingWeaponsExpanded] = useState(false);
+
+  const [identifiedLifeArmourSettings, setIdentifiedLifeArmourSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.identified_life_armour?.rules || [],
+  });
+  const [isClientIdentifiedLifeArmour, setIsClientIdentifiedLifeArmour] = useState(false);
+  const [isIdentifiedLifeArmourExpanded, setIsIdentifiedLifeArmourExpanded] = useState(false);
+
+  const [identifiedESArmourSettings, setIdentifiedESArmourSettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.identified_es_armour?.rules || [],
+  });
+  const [isClientIdentifiedESArmour, setIsClientIdentifiedESArmour] = useState(false);
+  const [isIdentifiedESArmourExpanded, setIsIdentifiedESArmourExpanded] = useState(false);
+
+  const [identifiedJewellerySettings, setIdentifiedJewellerySettings] = useState({
+    enabled: true,
+    rules: quickFilterDefaults.identified_jewellery?.rules || [],
+  });
+  const [isClientIdentifiedJewellery, setIsClientIdentifiedJewellery] = useState(false);
+  const [isIdentifiedJewelleryExpanded, setIsIdentifiedJewelleryExpanded] = useState(false);
+
+  // 클라이언트에서만 localStorage에서 감정된 무기 설정 불러오기
+  useEffect(() => {
+    setIsClientIdentifiedWeapons(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_identifiedWeapons");
+      const defaultRules = quickFilterDefaults.identified_weapons?.rules || [];
+
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedRules = parsed.rules || [];
+
+          setIdentifiedWeaponsSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergeRulesWithDefaults(defaultRules, savedRules),
+          });
+        } catch (e) {
+          console.error("Failed to parse saved identified weapons settings", e);
+          setIdentifiedWeaponsSettings({
+            enabled: true,
+            rules: [...defaultRules],
+          });
+        }
+      } else {
+        setIdentifiedWeaponsSettings({
+          enabled: true,
+          rules: [...defaultRules],
+        });
+      }
+    }
+  }, []);
+
+  // 클라이언트에서만 localStorage에서 감정된 시전 무기 설정 불러오기
+  useEffect(() => {
+    setIsClientIdentifiedCastingWeapons(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_identifiedCastingWeapons");
+      const defaultRules = quickFilterDefaults.identified_casting_weapons?.rules || [];
+
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedRules = parsed.rules || [];
+
+          setIdentifiedCastingWeaponsSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergeRulesWithDefaults(defaultRules, savedRules),
+          });
+        } catch (e) {
+          console.error("Failed to parse saved identified casting weapons settings", e);
+          setIdentifiedCastingWeaponsSettings({
+            enabled: true,
+            rules: [...defaultRules],
+          });
+        }
+      } else {
+        setIdentifiedCastingWeaponsSettings({
+          enabled: true,
+          rules: [...defaultRules],
+        });
+      }
+    }
+  }, []);
+
+  // 클라이언트에서만 localStorage에서 감정된 생명력 방어구 설정 불러오기
+  useEffect(() => {
+    setIsClientIdentifiedLifeArmour(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_identifiedLifeArmour");
+      const defaultRules = quickFilterDefaults.identified_life_armour?.rules || [];
+
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedRules = parsed.rules || [];
+
+          setIdentifiedLifeArmourSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergeRulesWithDefaults(defaultRules, savedRules),
+          });
+        } catch (e) {
+          console.error("Failed to parse saved identified life armour settings", e);
+          setIdentifiedLifeArmourSettings({
+            enabled: true,
+            rules: [...defaultRules],
+          });
+        }
+      } else {
+        setIdentifiedLifeArmourSettings({
+          enabled: true,
+          rules: [...defaultRules],
+        });
+      }
+    }
+  }, []);
+
+  // 클라이언트에서만 localStorage에서 감정된 에너지 보호막 방어구 설정 불러오기
+  useEffect(() => {
+    setIsClientIdentifiedESArmour(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_identifiedESArmour");
+      const defaultRules = quickFilterDefaults.identified_es_armour?.rules || [];
+
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedRules = parsed.rules || [];
+
+          setIdentifiedESArmourSettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergeRulesWithDefaults(defaultRules, savedRules),
+          });
+        } catch (e) {
+          console.error("Failed to parse saved identified es armour settings", e);
+          setIdentifiedESArmourSettings({
+            enabled: true,
+            rules: [...defaultRules],
+          });
+        }
+      } else {
+        setIdentifiedESArmourSettings({
+          enabled: true,
+          rules: [...defaultRules],
+        });
+      }
+    }
+  }, []);
+
+  // 감정된 무기 설정 저장
+  useEffect(() => {
+    if (isClientIdentifiedWeapons && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_identifiedWeapons",
+        JSON.stringify(identifiedWeaponsSettings)
+      );
+    }
+  }, [identifiedWeaponsSettings, isClientIdentifiedWeapons]);
+
+  // 감정된 시전 무기 설정 저장
+  useEffect(() => {
+    if (isClientIdentifiedCastingWeapons && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_identifiedCastingWeapons",
+        JSON.stringify(identifiedCastingWeaponsSettings)
+      );
+    }
+  }, [identifiedCastingWeaponsSettings, isClientIdentifiedCastingWeapons]);
+
+  // 감정된 생명력 방어구 설정 저장
+  useEffect(() => {
+    if (isClientIdentifiedLifeArmour && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_identifiedLifeArmour",
+        JSON.stringify(identifiedLifeArmourSettings)
+      );
+    }
+  }, [identifiedLifeArmourSettings, isClientIdentifiedLifeArmour]);
+
+  // 클라이언트에서만 localStorage에서 감정된 장신구 설정 불러오기
+  useEffect(() => {
+    setIsClientIdentifiedJewellery(true);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("quickFilter_identifiedJewellery");
+      const defaultRules = quickFilterDefaults.identified_jewellery?.rules || [];
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedRules = parsed.rules || [];
+          setIdentifiedJewellerySettings({
+            enabled: parsed.enabled !== undefined ? parsed.enabled : true,
+            rules: mergeRulesWithDefaults(defaultRules, savedRules),
+          });
+        } catch (e) {
+          console.error("Failed to parse saved identified jewellery settings", e);
+          setIdentifiedJewellerySettings({ enabled: true, rules: [...defaultRules] });
+        }
+      } else {
+        setIdentifiedJewellerySettings({ enabled: true, rules: [...defaultRules] });
+      }
+    }
+  }, []);
+
+  // 감정된 에너지 보호막 방어구 설정 저장
+  useEffect(() => {
+    if (isClientIdentifiedESArmour && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_identifiedESArmour",
+        JSON.stringify(identifiedESArmourSettings)
+      );
+    }
+  }, [identifiedESArmourSettings, isClientIdentifiedESArmour]);
+
+  // 감정된 장신구 설정 저장
+  useEffect(() => {
+    if (isClientIdentifiedJewellery && typeof window !== "undefined") {
+      localStorage.setItem(
+        "quickFilter_identifiedJewellery",
+        JSON.stringify(identifiedJewellerySettings)
+      );
+    }
+  }, [identifiedJewellerySettings, isClientIdentifiedJewellery]);
+
+  // 감정된 무기 규칙 활성화/비활성화
+  const toggleIdentifiedWeaponsRule = (ruleId) => {
+    const updatedRules = identifiedWeaponsSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setIdentifiedWeaponsSettings({
+      ...identifiedWeaponsSettings,
+      enabled: hasAnyEnabled || identifiedWeaponsSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 감정된 무기 규칙 값 업데이트
+  const updateIdentifiedWeaponsRule = (ruleId, field, value) => {
+    setIdentifiedWeaponsSettings({
+      ...identifiedWeaponsSettings,
+      rules: identifiedWeaponsSettings.rules.map((rule) => {
+        if (rule.id === ruleId) {
+          if (field.includes(".")) {
+            const parts = field.split(".");
+            if (parts.length === 2) {
+              const [parent, child] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: value,
+                },
+              };
+            } else if (parts.length === 3) {
+              const [parent, child, grandchild] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: {
+                    ...rule[parent][child],
+                    [grandchild]: value,
+                  },
+                },
+              };
+            }
+          } else if (
+            field === "fontSize" ||
+            field === "textColor" ||
+            field === "borderColor" ||
+            field === "backgroundColor" ||
+            field === "playEffect" ||
+            field === "minimapIcon" ||
+            field === "customSound" ||
+            field === "playAlertSound"
+          ) {
+            return {
+              ...rule,
+              styles: {
+                ...(rule.styles || {}),
+                [field]: value,
+              },
+            };
+          } else {
+            return {
+              ...rule,
+              [field]: value,
+            };
+          }
+        }
+        return rule;
+      }),
+    });
+  };
+
+  // 감정된 시전 무기 규칙 활성화/비활성화
+  const toggleIdentifiedCastingWeaponsRule = (ruleId) => {
+    const updatedRules = identifiedCastingWeaponsSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setIdentifiedCastingWeaponsSettings({
+      ...identifiedCastingWeaponsSettings,
+      enabled: hasAnyEnabled || identifiedCastingWeaponsSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 감정된 시전 무기 규칙 값 업데이트
+  const updateIdentifiedCastingWeaponsRule = (ruleId, field, value) => {
+    setIdentifiedCastingWeaponsSettings({
+      ...identifiedCastingWeaponsSettings,
+      rules: identifiedCastingWeaponsSettings.rules.map((rule) => {
+        if (rule.id === ruleId) {
+          if (field.includes(".")) {
+            const parts = field.split(".");
+            if (parts.length === 2) {
+              const [parent, child] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: value,
+                },
+              };
+            } else if (parts.length === 3) {
+              const [parent, child, grandchild] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: {
+                    ...rule[parent][child],
+                    [grandchild]: value,
+                  },
+                },
+              };
+            }
+          } else if (
+            field === "fontSize" ||
+            field === "textColor" ||
+            field === "borderColor" ||
+            field === "backgroundColor" ||
+            field === "playEffect" ||
+            field === "minimapIcon" ||
+            field === "customSound" ||
+            field === "playAlertSound"
+          ) {
+            return {
+              ...rule,
+              styles: {
+                ...(rule.styles || {}),
+                [field]: value,
+              },
+            };
+          } else {
+            return {
+              ...rule,
+              [field]: value,
+            };
+          }
+        }
+        return rule;
+      }),
+    });
+  };
+
+  // 감정된 생명력 방어구 규칙 활성화/비활성화
+  const toggleIdentifiedLifeArmourRule = (ruleId) => {
+    const updatedRules = identifiedLifeArmourSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setIdentifiedLifeArmourSettings({
+      ...identifiedLifeArmourSettings,
+      enabled: hasAnyEnabled || identifiedLifeArmourSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 감정된 생명력 방어구 규칙 값 업데이트
+  const updateIdentifiedLifeArmourRule = (ruleId, field, value) => {
+    setIdentifiedLifeArmourSettings({
+      ...identifiedLifeArmourSettings,
+      rules: identifiedLifeArmourSettings.rules.map((rule) => {
+        if (rule.id === ruleId) {
+          if (field.includes(".")) {
+            const parts = field.split(".");
+            if (parts.length === 2) {
+              const [parent, child] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: value,
+                },
+              };
+            } else if (parts.length === 3) {
+              const [parent, child, grandchild] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: {
+                    ...rule[parent][child],
+                    [grandchild]: value,
+                  },
+                },
+              };
+            }
+          } else if (
+            field === "fontSize" ||
+            field === "textColor" ||
+            field === "borderColor" ||
+            field === "backgroundColor" ||
+            field === "playEffect" ||
+            field === "minimapIcon" ||
+            field === "customSound" ||
+            field === "playAlertSound"
+          ) {
+            return {
+              ...rule,
+              styles: {
+                ...(rule.styles || {}),
+                [field]: value,
+              },
+            };
+          } else {
+            return {
+              ...rule,
+              [field]: value,
+            };
+          }
+        }
+        return rule;
+      }),
+    });
+  };
+
+  // 감정된 에너지 보호막 방어구 규칙 활성화/비활성화
+  const toggleIdentifiedESArmourRule = (ruleId) => {
+    const updatedRules = identifiedESArmourSettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+
+    setIdentifiedESArmourSettings({
+      ...identifiedESArmourSettings,
+      enabled: hasAnyEnabled || identifiedESArmourSettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 감정된 에너지 보호막 방어구 규칙 값 업데이트
+  const updateIdentifiedESArmourRule = (ruleId, field, value) => {
+    setIdentifiedESArmourSettings({
+      ...identifiedESArmourSettings,
+      rules: identifiedESArmourSettings.rules.map((rule) => {
+        if (rule.id === ruleId) {
+          if (field.includes(".")) {
+            const parts = field.split(".");
+            if (parts.length === 2) {
+              const [parent, child] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: value,
+                },
+              };
+            } else if (parts.length === 3) {
+              const [parent, child, grandchild] = parts;
+              return {
+                ...rule,
+                [parent]: {
+                  ...rule[parent],
+                  [child]: {
+                    ...rule[parent][child],
+                    [grandchild]: value,
+                  },
+                },
+              };
+            }
+          } else if (
+            field === "fontSize" ||
+            field === "textColor" ||
+            field === "borderColor" ||
+            field === "backgroundColor" ||
+            field === "playEffect" ||
+            field === "minimapIcon" ||
+            field === "customSound" ||
+            field === "playAlertSound"
+          ) {
+            return {
+              ...rule,
+              styles: {
+                ...(rule.styles || {}),
+                [field]: value,
+              },
+            };
+          } else {
+            return {
+              ...rule,
+              [field]: value,
+            };
+          }
+        }
+        return rule;
+      }),
+    });
+  };
+
+  // 감정된 장신구 규칙 활성화/비활성화
+  const toggleIdentifiedJewelleryRule = (ruleId) => {
+    const updatedRules = identifiedJewellerySettings.rules.map((rule) =>
+      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
+    );
+    const hasAnyEnabled = updatedRules.some((rule) => rule.enabled);
+    setIdentifiedJewellerySettings({
+      ...identifiedJewellerySettings,
+      enabled: hasAnyEnabled || identifiedJewellerySettings.enabled,
+      rules: updatedRules,
+    });
+  };
+
+  // 감정된 장신구 규칙 값 업데이트
+  const updateIdentifiedJewelleryRule = (ruleId, field, value) => {
+    setIdentifiedJewellerySettings({
+      ...identifiedJewellerySettings,
+      rules: identifiedJewellerySettings.rules.map((rule) => {
+        if (rule.id === ruleId) {
+          if (field.includes(".")) {
+            const parts = field.split(".");
+            if (parts.length === 2) {
+              const [parent, child] = parts;
+              return { ...rule, [parent]: { ...rule[parent], [child]: value } };
+            } else if (parts.length === 3) {
+              const [parent, child, grandchild] = parts;
+              return { ...rule, [parent]: { ...rule[parent], [child]: { ...rule[parent][child], [grandchild]: value } } };
+            }
+          } else if (
+            field === "fontSize" ||
+            field === "textColor" ||
+            field === "borderColor" ||
+            field === "backgroundColor" ||
+            field === "playEffect" ||
+            field === "minimapIcon" ||
+            field === "customSound" ||
+            field === "playAlertSound"
+          ) {
+            return {
+              ...rule,
+              styles: { ...(rule.styles || {}), [field]: value },
+            };
+          } else {
+            return { ...rule, [field]: value };
+          }
+        }
+        return rule;
+      }),
+    });
+  };
+
   // 기타 섹션 접기/펼치기 상태
   const [isOthersExpanded, setIsOthersExpanded] = useState(false);
 
@@ -1664,6 +2249,11 @@ export default function QuickFiltersPage() {
   // 섹션 순서 관리 (오른쪽 열)
   const [rightColumnSections, setRightColumnSections] = useState([
     { id: "base_items", name: "베이스 아이템" },
+    { id: "identified_weapons", name: "감정된 무기" },
+    { id: "identified_casting_weapons", name: "감정된 시전 무기" },
+    { id: "identified_life_armour", name: "감정된 생명력 방어구" },
+    { id: "identified_es_armour", name: "감정된 에너지 보호막 방어구" },
+    { id: "identified_jewellery", name: "감정된 장신구" },
     { id: "base_items_socket_quality", name: "소켓 & 퀄리티" },
     { id: "jewels", name: "주얼" },
     { id: "vaultKeys", name: "금고실 열쇠" },
@@ -2066,6 +2656,11 @@ export default function QuickFiltersPage() {
         waystones: waystonesSettings,
         expedition: expeditionSettings,
         charms: charmsSettings,
+        identifiedWeapons: identifiedWeaponsSettings,
+        identifiedCastingWeapons: identifiedCastingWeaponsSettings,
+        identifiedLifeArmour: identifiedLifeArmourSettings,
+        identifiedESArmour: identifiedESArmourSettings,
+        identifiedJewellery: identifiedJewellerySettings,
       },
     });
   };
@@ -2185,6 +2780,11 @@ export default function QuickFiltersPage() {
       expedition: quickFilterDefaults.expedition,
       baseItems: quickFilterDefaults.base_items || { enabled: true, rules: [] },
       baseItemsSocketQuality: quickFilterDefaults.base_items_socket_quality || { enabled: true, rules: [] },
+      identifiedWeapons: quickFilterDefaults.identified_weapons || { enabled: true, rules: [] },
+      identifiedCastingWeapons: quickFilterDefaults.identified_casting_weapons || { enabled: true, rules: [] },
+      identifiedLifeArmour: quickFilterDefaults.identified_life_armour || { enabled: true, rules: [] },
+      identifiedESArmour: quickFilterDefaults.identified_es_armour || { enabled: true, rules: [] },
+      identifiedJewellery: quickFilterDefaults.identified_jewellery || { enabled: true, rules: [] },
     };
 
     if (typeof window === "undefined") return fallback;
@@ -2312,6 +2912,12 @@ export default function QuickFiltersPage() {
         baseItems: stored.baseItems || stored.base_items || quickFilterDefaults.base_items || { enabled: true, rules: [] },
         // 베이스 아이템 (소켓 & 퀄리티) 섹션
         baseItemsSocketQuality: stored.baseItemsSocketQuality || quickFilterDefaults.base_items_socket_quality || { enabled: true, rules: [] },
+        // 감정된 공격 무기 섹션
+        identifiedWeapons: stored.identifiedWeapons || quickFilterDefaults.identified_weapons || { enabled: true, rules: [] },
+        // 감정된 시전 무기 섹션
+        identifiedCastingWeapons: stored.identifiedCastingWeapons || quickFilterDefaults.identified_casting_weapons || { enabled: true, rules: [] },
+        // 감정된 생명력 방어구 섹션
+        identifiedLifeArmour: stored.identifiedLifeArmour || quickFilterDefaults.identified_life_armour || { enabled: true, rules: [] },
       };
     } catch (e) {
       console.error("Failed to parse quick filter default:", e);
@@ -2357,6 +2963,18 @@ export default function QuickFiltersPage() {
     if (baseline.baseItemsSocketQuality) {
       setBaseItemsSocketQualitySettings(baseline.baseItemsSocketQuality);
     }
+    // 감정된 공격 무기 섹션 초기화 추가
+    if (baseline.identifiedWeapons) {
+      setIdentifiedWeaponsSettings(baseline.identifiedWeapons);
+    }
+    // 감정된 시전 무기 섹션 초기화 추가
+    if (baseline.identifiedCastingWeapons) {
+      setIdentifiedCastingWeaponsSettings(baseline.identifiedCastingWeapons);
+    }
+    // 감정된 생명력 방어구 섹션 초기화 추가
+    if (baseline.identifiedLifeArmour) {
+      setIdentifiedLifeArmourSettings(baseline.identifiedLifeArmour);
+    }
 
     // 다른 페이지의 설정도 초기화
     if (typeof window !== "undefined") {
@@ -2380,6 +2998,18 @@ export default function QuickFiltersPage() {
       localStorage.setItem(
         "quickFilter_flasks",
         JSON.stringify(baseline.flasks)
+      );
+      localStorage.setItem(
+        "quickFilter_identifiedWeapons",
+        JSON.stringify(baseline.identifiedWeapons)
+      );
+      localStorage.setItem(
+        "quickFilter_identifiedCastingWeapons",
+        JSON.stringify(baseline.identifiedCastingWeapons)
+      );
+      localStorage.setItem(
+        "quickFilter_identifiedLifeArmour",
+        JSON.stringify(baseline.identifiedLifeArmour)
       );
       localStorage.setItem(
         "quickFilter_currency",
@@ -4814,6 +5444,811 @@ export default function QuickFiltersPage() {
     );
   };
 
+  // 감정된 무기 섹션 렌더링 함수
+  const renderIdentifiedWeaponsSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${
+          isIdentifiedWeaponsExpanded ? "section-header-expanded" : ""
+        }`}
+        onClick={() => setIsIdentifiedWeaponsExpanded(!isIdentifiedWeaponsExpanded)}
+      >
+        <label
+          className="section-checkbox"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={identifiedWeaponsSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              const newEnabled = e.target.checked;
+              setIdentifiedWeaponsSettings({
+                ...identifiedWeaponsSettings,
+                enabled: newEnabled,
+                rules: identifiedWeaponsSettings.rules.map((rule) => ({
+                  ...rule,
+                  enabled: newEnabled ? true : false,
+                })),
+              });
+            }}
+          />
+        </label>
+        <h3
+          className="section-title"
+          style={{
+            opacity: identifiedWeaponsSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "감정된 아이템 - 공격 무기" : "Identified - Attack Weapons"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isIdentifiedWeaponsExpanded ? (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isIdentifiedWeaponsExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          <div
+            style={{
+              padding: "12px 16px 0 16px",
+              color: "var(--muted)",
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>
+              {lang === "ko"
+                ? "감정된 레어 무기 중 물리/원소 공격력이 높은 아이템을 강조합니다."
+                : "Highlights identified rare weapons with high physical/elemental attack power."}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (
+                  window.confirm(
+                    lang === "ko"
+                      ? "이 섹션의 설정을 초기화하시겠습니까?"
+                      : "Reset this section to defaults?"
+                  )
+                ) {
+                  const defaultRules =
+                    quickFilterDefaults.identified_weapons?.rules || [];
+                  setIdentifiedWeaponsSettings({
+                    enabled: true,
+                    rules: JSON.parse(JSON.stringify(defaultRules)),
+                  });
+                }
+              }}
+              style={{
+                fontSize: "12px",
+                color: "#888",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid #333",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              {lang === "ko" ? "초기화" : "Reset"}
+            </button>
+          </div>
+          {identifiedWeaponsSettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: identifiedWeaponsSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter:
+                    identifiedWeaponsSettings.enabled && rule.enabled
+                      ? "none"
+                      : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flex: 1,
+                    gap: "8px",
+                    overflow: "hidden",
+                    paddingLeft: "12px"
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleIdentifiedWeaponsRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: "var(--text-main)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {lang === "ko" ? rule.nameKo : rule.name}
+                  </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
+
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: status.color,
+                      marginLeft: "auto",
+                      fontWeight: status.fontWeight,
+                      whiteSpace: "nowrap",
+                      minWidth: "fit-content",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {status.text}
+                  </span>
+                </div>
+
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("identified_weapons");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: identifiedWeaponsSettings.enabled ? 1 : 0.5,
+                    cursor: identifiedWeaponsSettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {lang === "ko" ? "수정" : "Edit"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  // 감정된 시전 무기 섹션 렌더링 함수
+  const renderIdentifiedCastingWeaponsSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${isIdentifiedCastingWeaponsExpanded ? "section-header-expanded" : ""}`}
+        onClick={() => setIsIdentifiedCastingWeaponsExpanded(!isIdentifiedCastingWeaponsExpanded)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            checked={identifiedCastingWeaponsSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              setIdentifiedCastingWeaponsSettings({
+                ...identifiedCastingWeaponsSettings,
+                enabled: e.target.checked,
+              });
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ cursor: "pointer" }}
+          />
+        </div>
+        <h3
+          className="section-title"
+          style={{
+            opacity: identifiedCastingWeaponsSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "감정된 아이템 - 시전 무기" : "Identified - Casting Weapons"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isIdentifiedCastingWeaponsExpanded ? (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isIdentifiedCastingWeaponsExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          <div
+            style={{
+              padding: "12px 16px 0 16px",
+              color: "var(--muted)",
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>
+              {lang === "ko"
+                ? "감정된 레어 시전 무기(지팡이, 마법봉, 셉터, 화살통)를 강조합니다."
+                : "Highlights identified rare casting weapons (Staves, Wands, Sceptres, Quivers)."}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (
+                  window.confirm(
+                    lang === "ko"
+                      ? "이 섹션의 설정을 초기화하시겠습니까?"
+                      : "Reset this section to defaults?"
+                  )
+                ) {
+                  const defaultRules =
+                    quickFilterDefaults.identified_casting_weapons?.rules || [];
+                  setIdentifiedCastingWeaponsSettings({
+                    enabled: true,
+                    rules: JSON.parse(JSON.stringify(defaultRules)),
+                  });
+                }
+              }}
+              style={{
+                fontSize: "12px",
+                color: "#888",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid #333",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              {lang === "ko" ? "초기화" : "Reset"}
+            </button>
+          </div>
+          {identifiedCastingWeaponsSettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: identifiedCastingWeaponsSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter:
+                    identifiedCastingWeaponsSettings.enabled && rule.enabled
+                      ? "none"
+                      : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flex: 1,
+                    gap: "8px",
+                    overflow: "hidden",
+                    paddingLeft: "12px"
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleIdentifiedCastingWeaponsRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: "var(--text-main)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {lang === "ko" ? rule.nameKo : rule.name}
+                  </span>
+
+                  {/* 설정 요약 태그 */}
+                  {renderConfigSummary(rule)}
+
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: status.color,
+                      marginLeft: "auto",
+                      fontWeight: status.fontWeight,
+                      whiteSpace: "nowrap",
+                      minWidth: "fit-content",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {status.text}
+                  </span>
+                </div>
+
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("identified_casting_weapons");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: identifiedCastingWeaponsSettings.enabled ? 1 : 0.5,
+                    cursor: identifiedCastingWeaponsSettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {lang === "ko" ? "수정" : "Edit"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  // 감정된 생명력 방어구 섹션 렌더링 함수
+  const renderIdentifiedLifeArmourSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${isIdentifiedLifeArmourExpanded ? "section-header-expanded" : ""}`}
+        onClick={() => setIsIdentifiedLifeArmourExpanded(!isIdentifiedLifeArmourExpanded)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            checked={identifiedLifeArmourSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              setIdentifiedLifeArmourSettings({
+                ...identifiedLifeArmourSettings,
+                enabled: e.target.checked,
+              });
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ cursor: "pointer" }}
+          />
+        </div>
+        <h3
+          className="section-title"
+          style={{
+            opacity: identifiedLifeArmourSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "감정된 아이템 - 생명력 방어구" : "Identified - Life Armour"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isIdentifiedLifeArmourExpanded ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isIdentifiedLifeArmourExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          <div
+            style={{
+              padding: "12px 16px 0 16px",
+              color: "var(--muted)",
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>
+              {lang === "ko"
+                ? "감정된 레어 방어구(갑옷, 투구, 장갑, 장화, 방패) 중 유효 생명력 옵션이 붙은 아이템을 강조합니다."
+                : "Highlights identified rare armours with life-related modifiers."}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(lang === "ko" ? "이 섹션의 설정을 초기화하시겠습니까?" : "Reset this section to defaults?")) {
+                  const defaultRules = quickFilterDefaults.identified_life_armour?.rules || [];
+                  setIdentifiedLifeArmourSettings({
+                    enabled: true,
+                    rules: JSON.parse(JSON.stringify(defaultRules)),
+                  });
+                }
+              }}
+              style={{
+                fontSize: "12px",
+                color: "#888",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid #333",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              {lang === "ko" ? "초기화" : "Reset"}
+            </button>
+          </div>
+          {identifiedLifeArmourSettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: identifiedLifeArmourSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter: identifiedLifeArmourSettings.enabled && rule.enabled ? "none" : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", flex: 1, gap: "8px", overflow: "hidden", paddingLeft: "12px" }}>
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleIdentifiedLifeArmourRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
+                  <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                    {lang === "ko" ? rule.nameKo : rule.name}
+                  </span>
+                  {renderConfigSummary(rule)}
+                  <span style={{ fontSize: "14px", color: status.color, marginLeft: "auto", fontWeight: status.fontWeight, whiteSpace: "nowrap", minWidth: "fit-content", flexShrink: 0 }}>
+                    {status.text}
+                  </span>
+                </div>
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("identified_life_armour");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: identifiedLifeArmourSettings.enabled ? 1 : 0.5,
+                    cursor: identifiedLifeArmourSettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {lang === "ko" ? "수정" : "Edit"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderIdentifiedESArmourSection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${isIdentifiedESArmourExpanded ? "section-header-expanded" : ""}`}
+        onClick={() => setIsIdentifiedESArmourExpanded(!isIdentifiedESArmourExpanded)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            checked={identifiedESArmourSettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              setIdentifiedESArmourSettings({
+                ...identifiedESArmourSettings,
+                enabled: e.target.checked,
+              });
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ cursor: "pointer" }}
+          />
+        </div>
+        <h3
+          className="section-title"
+          style={{
+            opacity: identifiedESArmourSettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "감정된 아이템 - 에너지 보호막 방어구" : "Identified - Energy Shield Armour"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isIdentifiedESArmourExpanded ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isIdentifiedESArmourExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          <div
+            style={{
+              padding: "12px 16px 0 16px",
+              color: "var(--muted)",
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>
+              {lang === "ko"
+                ? "감정된 레어 방어구(갑옷, 투구, 장갑, 장화, 방패) 중 유효 에너지 보호막 옵션이 붙은 아이템을 강조합니다."
+                : "Highlights identified rare armours with energy shield-related modifiers."}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(lang === "ko" ? "이 섹션의 설정을 초기화하시겠습니까?" : "Reset this section to defaults?")) {
+                  const defaultRules = quickFilterDefaults.identified_es_armour?.rules || [];
+                  setIdentifiedESArmourSettings({
+                    enabled: true,
+                    rules: JSON.parse(JSON.stringify(defaultRules)),
+                  });
+                }
+              }}
+              style={{
+                fontSize: "12px",
+                color: "#888",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid #333",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              {lang === "ko" ? "초기화" : "Reset"}
+            </button>
+          </div>
+          {identifiedESArmourSettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: identifiedESArmourSettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter: identifiedESArmourSettings.enabled && rule.enabled ? "none" : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", flex: 1, gap: "8px", overflow: "hidden", paddingLeft: "12px" }}>
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleIdentifiedESArmourRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
+                  <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                    {lang === "ko" ? rule.nameKo : rule.name}
+                  </span>
+                  {renderConfigSummary(rule)}
+                  <span style={{ fontSize: "14px", color: status.color, marginLeft: "auto", fontWeight: status.fontWeight, whiteSpace: "nowrap", minWidth: "fit-content", flexShrink: 0 }}>
+                    {status.text}
+                  </span>
+                </div>
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("identified_es_armour");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: identifiedESArmourSettings.enabled ? 1 : 0.5,
+                    cursor: identifiedESArmourSettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {lang === "ko" ? "수정" : "Edit"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderIdentifiedJewellerySection = () => (
+    <div className="quick-filter-section" style={{ marginTop: "0" }}>
+      <div
+        className={`section-header ${isIdentifiedJewelleryExpanded ? "section-header-expanded" : ""}`}
+        onClick={() => setIsIdentifiedJewelleryExpanded(!isIdentifiedJewelleryExpanded)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            checked={identifiedJewellerySettings.enabled}
+            onChange={(e) => {
+              e.stopPropagation();
+              setIdentifiedJewellerySettings({
+                ...identifiedJewellerySettings,
+                enabled: e.target.checked,
+              });
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ cursor: "pointer" }}
+          />
+        </div>
+        <h3
+          className="section-title"
+          style={{
+            opacity: identifiedJewellerySettings.enabled ? 1 : 0.5,
+          }}
+        >
+          {lang === "ko" ? "감정된 아이템 - 장신구" : "Identified - Jewellery"}
+        </h3>
+        <span className="section-toggle-icon">
+          {isIdentifiedJewelleryExpanded ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </span>
+      </div>
+      {isIdentifiedJewelleryExpanded && (
+        <div className="section-content" style={{ background: "#141414" }}>
+          <div
+            style={{
+              padding: "12px 16px 0 16px",
+              color: "var(--muted)",
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>
+              {lang === "ko"
+                ? "감정된 레어 장신구(벨트, 반지, 목걸이) 중 유효 옵션이 붙은 아이템을 강조합니다."
+                : "Highlights identified rare jewellery with useful modifiers."}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(lang === "ko" ? "이 섹션의 설정을 초기화하시겠습니까?" : "Reset this section to defaults?")) {
+                  const defaultRules = quickFilterDefaults.identified_jewellery?.rules || [];
+                  setIdentifiedJewellerySettings({
+                    enabled: true,
+                    rules: JSON.parse(JSON.stringify(defaultRules)),
+                  });
+                }
+              }}
+              style={{
+                fontSize: "12px",
+                color: "#888",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid #333",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              {lang === "ko" ? "초기화" : "Reset"}
+            </button>
+          </div>
+          {identifiedJewellerySettings.rules.map((rule) => {
+            const status = getRuleStatus(rule);
+            return (
+              <div
+                key={rule.id}
+                className="filter-rule-item"
+                style={{
+                  opacity: identifiedJewellerySettings.enabled && rule.enabled ? 1 : 0.5,
+                  filter: identifiedJewellerySettings.enabled && rule.enabled ? "none" : "grayscale(100%)",
+                  gap: "0",
+                  paddingRight: "16px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", flex: 1, gap: "8px", overflow: "hidden", paddingLeft: "12px" }}>
+                  <input
+                    type="checkbox"
+                    checked={rule.enabled}
+                    onChange={() => toggleIdentifiedJewelleryRule(rule.id)}
+                    style={{ cursor: "pointer", marginRight: "4px" }}
+                  />
+                  <span style={{ fontSize: "14px", color: "var(--text-main)", whiteSpace: "nowrap" }}>
+                    {lang === "ko" ? rule.nameKo : rule.name}
+                  </span>
+                  {renderConfigSummary(rule)}
+                  <span style={{ fontSize: "14px", color: status.color, marginLeft: "auto", fontWeight: status.fontWeight, whiteSpace: "nowrap", minWidth: "fit-content", flexShrink: 0 }}>
+                    {status.text}
+                  </span>
+                </div>
+                <button
+                  className="rule-edit-button"
+                  onClick={() => {
+                    setEditingRuleId(rule.id);
+                    setEditingRuleSection("identified_jewellery");
+                    setStyleModalOpen(true);
+                  }}
+                  style={{
+                    opacity: identifiedJewellerySettings.enabled ? 1 : 0.5,
+                    cursor: identifiedJewellerySettings.enabled ? "pointer" : "not-allowed",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {lang === "ko" ? "수정" : "Edit"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+
   // 베이스 아이템 (소켓 & 퀄리티) 섹션 렌더링 함수
   const renderBaseItemsSocketQualitySection = () => {
     // 티어 옵션
@@ -6417,6 +7852,16 @@ export default function QuickFiltersPage() {
                   return <div key={section.id}>{renderCharmsSection()}</div>;
                 } else if (section.id === "flasks") {
                   return <div key={section.id}>{renderFlasksSection()}</div>;
+                } else if (section.id === "identified_weapons") {
+                  return <div key={section.id}>{renderIdentifiedWeaponsSection()}</div>;
+                } else if (section.id === "identified_casting_weapons") {
+                  return <div key={section.id}>{renderIdentifiedCastingWeaponsSection()}</div>;
+                } else if (section.id === "identified_life_armour") {
+                  return <div key={section.id}>{renderIdentifiedLifeArmourSection()}</div>;
+                } else if (section.id === "identified_es_armour") {
+                  return <div key={section.id}>{renderIdentifiedESArmourSection()}</div>;
+                } else if (section.id === "identified_jewellery") {
+                  return <div key={section.id}>{renderIdentifiedJewellerySection()}</div>;
                 } else if (section.id === "others") {
                   return <div key={section.id}>{renderOthersSection()}</div>;
                 }
@@ -6429,6 +7874,21 @@ export default function QuickFiltersPage() {
               {rightColumnSections.map((section) => {
                 if (section.id === "base_items") {
                   return <div key={section.id}>{renderBaseItemsSection()}</div>;
+                }
+                if (section.id === "identified_weapons") {
+                  return <div key={section.id}>{renderIdentifiedWeaponsSection()}</div>;
+                }
+                if (section.id === "identified_casting_weapons") {
+                  return <div key={section.id}>{renderIdentifiedCastingWeaponsSection()}</div>;
+                }
+                if (section.id === "identified_life_armour") {
+                  return <div key={section.id}>{renderIdentifiedLifeArmourSection()}</div>;
+                }
+                if (section.id === "identified_es_armour") {
+                  return <div key={section.id}>{renderIdentifiedESArmourSection()}</div>;
+                }
+                if (section.id === "identified_jewellery") {
+                  return <div key={section.id}>{renderIdentifiedJewellerySection()}</div>;
                 }
                 if (section.id === "base_items_socket_quality") {
                   return <div key={section.id}>{renderBaseItemsSocketQualitySection()}</div>;

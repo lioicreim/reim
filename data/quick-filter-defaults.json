@@ -1360,7 +1360,7 @@
           "borderColor": { "r": 255, "g": 255, "b": 255, "a": 255 },
           "backgroundColor": { "r": 103, "g": 117, "b": 130, "a": 255 },
           "playEffect": "Yellow",
-          "customSound": "1 300",
+          "playAlertSound": { "id": 1, "volume": 300 },
           "minimapIcon": { "size": 1, "color": "Yellow", "shape": "Square" }
         }
       },
@@ -1645,6 +1645,733 @@
           "minimapIcon": { "size": 0, "color": "Orange", "shape": "Circle" },
           "customSound": "custom_sound/2_currency_a.mp3",
           "soundVolume": 300
+        }
+      }
+    ]
+  },
+  "identified_weapons": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "gear_identified_weapons_melee_physical_a",
+        "enabled": true,
+        "name": "근접 물리 공격 - 무기 A",
+        "nameKo": "근접 물리 공격 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_melee_physical_b",
+        "enabled": true,
+        "name": "근접 물리 공격 - 무기 B",
+        "nameKo": "근접 물리 공격 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_melee_elemental_a",
+        "enabled": true,
+        "name": "근접 원소 공격 - 무기 A",
+        "nameKo": "근접 원소 공격 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_melee_elemental_b",
+        "enabled": true,
+        "name": "근접 원소 공격 - 무기 B",
+        "nameKo": "근접 원소 공격 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_ranged_physical_a",
+        "enabled": true,
+        "name": "원거리 물리 공격 - 무기 A",
+        "nameKo": "원거리 물리 공격 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_ranged_physical_b",
+        "enabled": true,
+        "name": "원거리 물리 공격 - 무기 B",
+        "nameKo": "원거리 물리 공격 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_ranged_elemental_a",
+        "enabled": true,
+        "name": "원거리 원소 공격 - 무기 A",
+        "nameKo": "원거리 원소 공격 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_ranged_elemental_b",
+        "enabled": true,
+        "name": "원거리 원소 공격 - 무기 B",
+        "nameKo": "원거리 원소 공격 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      }
+    ]
+  },
+  "identified_casting_weapons": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "gear_identified_weapons_casting_chaos_a",
+        "enabled": true,
+        "name": "카오스 - 무기 A",
+        "nameKo": "카오스 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_chaos_b",
+        "enabled": true,
+        "name": "카오스 - 무기 B",
+        "nameKo": "카오스 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_cold_a",
+        "enabled": true,
+        "name": "냉기 - 무기 A",
+        "nameKo": "냉기 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_cold_b",
+        "enabled": true,
+        "name": "냉기 - 무기 B",
+        "nameKo": "냉기 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_fire_a",
+        "enabled": true,
+        "name": "화염 - 무기 A",
+        "nameKo": "화염 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_fire_b",
+        "enabled": true,
+        "name": "화염 - 무기 B",
+        "nameKo": "화염 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_lightning_a",
+        "enabled": true,
+        "name": "번개 - 무기 A",
+        "nameKo": "번개 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_lightning_b",
+        "enabled": true,
+        "name": "번개 - 무기 B",
+        "nameKo": "번개 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_minion_a",
+        "enabled": true,
+        "name": "소환 - 무기 A",
+        "nameKo": "소환 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_minion_b",
+        "enabled": true,
+        "name": "소환 - 무기 B",
+        "nameKo": "소환 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_physical_a",
+        "enabled": true,
+        "name": "물리 시전 - 무기 A",
+        "nameKo": "물리 시전 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_casting_physical_b",
+        "enabled": true,
+        "name": "물리 시전 - 무기 B",
+        "nameKo": "물리 시전 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_quivers_elemental_a",
+        "enabled": true,
+        "name": "화살통 원소 - 무기 A",
+        "nameKo": "화살통 원소 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_quivers_elemental_b",
+        "enabled": true,
+        "name": "화살통 원소 - 무기 B",
+        "nameKo": "화살통 원소 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_quivers_physical_a",
+        "enabled": true,
+        "name": "화살통 물리 - 무기 A",
+        "nameKo": "화살통 물리 - 무기 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_weapons_quivers_physical_b",
+        "enabled": true,
+        "name": "화살통 물리 - 무기 B",
+        "nameKo": "화살통 물리 - 무기 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      }
+    ]
+  },
+  "identified_life_armour": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "gear_identified_armours_body_life_a",
+        "enabled": true,
+        "name": "생명력 - 갑옷 A",
+        "nameKo": "생명력 - 갑옷 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_body_life_b",
+        "enabled": true,
+        "name": "생명력 - 갑옷 B",
+        "nameKo": "생명력 - 갑옷 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_shield_life_a",
+        "enabled": true,
+        "name": "생명력 - 방표 A",
+        "nameKo": "생명력 - 방패 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_shield_life_b",
+        "enabled": true,
+        "name": "생명력 - 방패 B",
+        "nameKo": "생명력 - 방패 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_helmets_life_a",
+        "enabled": true,
+        "name": "생명력 - 투구 A",
+        "nameKo": "생명력 - 투구 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_helmets_life_b",
+        "enabled": true,
+        "name": "생명력 - 투구 B",
+        "nameKo": "생명력 - 투구 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_gloves_life_a",
+        "enabled": true,
+        "name": "생명력 - 장갑 A",
+        "nameKo": "생명력 - 장갑 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_gloves_life_b",
+        "enabled": true,
+        "name": "생명력 - 장갑 B",
+        "nameKo": "생명력 - 장갑 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_boots_life_a",
+        "enabled": true,
+        "name": "생명력 - 장화 A",
+        "nameKo": "생명력 - 장화 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_boots_life_b",
+        "enabled": true,
+        "name": "생명력 - 장화 B",
+        "nameKo": "생명력 - 장화 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      }
+    ]
+  },
+  "identified_es_armour": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "gear_identified_armours_body_es_a",
+        "enabled": true,
+        "name": "에너지 보호막 - 갑옷 A",
+        "nameKo": "에너지 보호막 - 갑옷 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_body_es_b",
+        "enabled": true,
+        "name": "에너지 보호막 - 갑옷 B",
+        "nameKo": "에너지 보호막 - 갑옷 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_shield_es_a",
+        "enabled": true,
+        "name": "에너지 보호막 - 방패 A",
+        "nameKo": "에너지 보호막 - 방패 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_shield_es_b",
+        "enabled": true,
+        "name": "에너지 보호막 - 방패 B",
+        "nameKo": "에너지 보호막 - 방패 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_helmets_es_a",
+        "enabled": true,
+        "name": "에너지 보호막 - 투구 A",
+        "nameKo": "에너지 보호막 - 투구 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_helmets_es_b",
+        "enabled": true,
+        "name": "에너지 보호막 - 투구 B",
+        "nameKo": "에너지 보호막 - 투구 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_gloves_es_a",
+        "enabled": true,
+        "name": "에너지 보호막 - 장갑 A",
+        "nameKo": "에너지 보호막 - 장갑 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_gloves_es_b",
+        "enabled": true,
+        "name": "에너지 보호막 - 장갑 B",
+        "nameKo": "에너지 보호막 - 장갑 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_boots_es_a",
+        "enabled": true,
+        "name": "에너지 보호막 - 장화 A",
+        "nameKo": "에너지 보호막 - 장화 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_armours_boots_es_b",
+        "enabled": true,
+        "name": "에너지 보호막 - 장화 B",
+        "nameKo": "에너지 보호막 - 장화 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      }
+    ]
+  },
+  "identified_jewellery": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "gear_identified_jewellery_belts_a",
+        "enabled": true,
+        "name": "벨트 A",
+        "nameKo": "벨트 A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_belts_b",
+        "enabled": true,
+        "name": "벨트 B",
+        "nameKo": "벨트 B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_rings_a",
+        "enabled": true,
+        "name": "반지 (공격) A",
+        "nameKo": "반지 (공격) A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_rings_b",
+        "enabled": true,
+        "name": "반지 (공격) B",
+        "nameKo": "반지 (공격) B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_rings_casting_a",
+        "enabled": true,
+        "name": "반지 (시전) A",
+        "nameKo": "반지 (시전) A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_rings_casting_b",
+        "enabled": true,
+        "name": "반지 (시전) B",
+        "nameKo": "반지 (시전) B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_amulets_a",
+        "enabled": true,
+        "name": "목걸이 (공격) A",
+        "nameKo": "목걸이 (공격) A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_amulets_b",
+        "enabled": true,
+        "name": "목걸이 (공격) B",
+        "nameKo": "목걸이 (공격) B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_amulets_casting_a",
+        "enabled": true,
+        "name": "목걸이 (시전) A",
+        "nameKo": "목걸이 (시전) A",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Purple",
+          "minimapIcon": { "size": 1, "color": "Purple", "shape": "Kite" },
+          "playAlertSound": { "id": 6, "volume": 300 }
+        }
+      },
+      {
+        "id": "gear_identified_jewellery_amulets_casting_b",
+        "enabled": true,
+        "name": "목걸이 (시전) B",
+        "nameKo": "목걸이 (시전) B",
+        "type": "show",
+        "conditions": {},
+        "styles": {
+          "playEffect": "Orange",
+          "minimapIcon": { "size": 2, "color": "Orange", "shape": "Kite" },
+          "playAlertSound": { "id": 2, "volume": 200 }
         }
       }
     ]

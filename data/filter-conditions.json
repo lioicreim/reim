@@ -11,7 +11,7 @@
     },
     "AreaLevel": {
       "code": "AreaLevel",
-      "name": "지역 레벨",
+      "name": "지역",
       "nameEn": "Area Level",
       "type": "number",
       "operators": [">=", "<=", "==", ">", "<"],
@@ -25,11 +25,7 @@
       "type": "number",
       "operators": [">=", "<=", "==", ">", "<"],
       "defaultOperator": ">=",
-      "applicableClasses": ["gold", "currency"],
-      "label": {
-        "ko": "골드",
-        "en": "Gold"
-      }
+      "applicableClasses": ["gold", "currency"]
     },
     "Rarity": {
       "code": "Rarity",

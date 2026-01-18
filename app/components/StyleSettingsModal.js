@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import ColorPicker from "./ColorPicker";
 import ItemPreviewBox from "./ItemPreviewBox";
-import OperatorSlider from "./OperatorSlider";
 import NotificationModal from "./NotificationModal";
 import filterConditions from "@/data/filter-conditions.json";
 import dict from "@/data/dict.json";
@@ -67,9 +66,186 @@ const itemTierOptions = [
 const getPathTierDisplay = (areaLevel, lang = "ko") => {
   const tier = areaLevelToPathTier(areaLevel);
   if (tier) {
-    return lang === "ko" ? `T${tier} 경로석` : `T${tier} Path`;
+    return lang === "ko" ? `T${tier} 경로석 (${areaLevel})` : `T${tier} Path (${areaLevel})`;
   }
   return areaLevel.toString();
+};
+
+/* --------------------------------------------------------------------------
+ * ConditionRow: 표준화된 조건 설정 행 컴포넌트
+ * 체크박스 + 라벨 + 연산자 + 값(드롭다운/입력)
+ * -------------------------------------------------------------------------- */
+const ConditionRow = ({
+  label,
+  enabled,
+  onEnabledChange,
+  operator,
+  onOperatorChange,
+  value,
+  onValueChange,
+  operators = [">=", "<=", "==", ">", "<"],
+  type = "number", // number, select, boolean
+  options = [], // type="select"일 때 옵션
+  presets = [], // type="number"일 때 제공할 프리셋 { label, value }
+  min,
+  max,
+  unit = "",
+  placeholder = "",
+  disabled = false,
+  lang = "ko"
+}) => {
+  const [isCustomInput, setIsCustomInput] = useState(false);
+
+  // 초기 렌더링 시 값이 프리셋에 없으면 커스텀 모드로(단, 프리셋이 있을 때만)
+  useEffect(() => {
+    if (type === "number" && presets.length > 0 && value !== undefined && value !== null) {
+      const isInPresets = presets.some(p => p.value === value);
+      if (!isInPresets) {
+        setIsCustomInput(true);
+      } else {
+        setIsCustomInput(false);
+      }
+    }
+  }, [value, presets]); // 값 변경 시 모드 자동 감지 (중요: 외부에서 값 변경 시 반영)
+
+  // 커스텀 입력 모드 전환 핸들러
+  const handleToggleCustom = () => {
+    setIsCustomInput((prev) => !prev);
+  };
+
+  return (
+    <div className="condition-row" style={{ display: "flex", alignItems: "center", gap: "8px", opacity: disabled ? 0.5 : 1 }}>
+      {/* 체크박스 (Enabled 제어) */}
+      {onEnabledChange && (
+        <input
+          type="checkbox"
+          className="color-checkbox"
+          checked={enabled}
+          onChange={(e) => onEnabledChange(e.target.checked)}
+          disabled={disabled}
+        />
+      )}
+      
+      {/* 라벨 */}
+      <span className="style-setting-label" style={{ minWidth: "auto", color: enabled ? "var(--text-main)" : "var(--text-muted)" }}>
+        {label}
+      </span>
+
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", pointerEvents: enabled && !disabled ? "auto" : "none" }}>
+        {/* 연산자 (Operator) */}
+        <select
+          className="condition-operator"
+          value={operator}
+          onChange={(e) => onOperatorChange(e.target.value)}
+          disabled={!enabled || disabled}
+          style={{ width: "50px", minWidth: "50px" }}
+        >
+          {operators.map(op => (
+            <option key={op} value={op}>{op}</option>
+          ))}
+        </select>
+
+        {/* 값 입력 (Value) */}
+        {type === "boolean" ? (
+          <select
+            className="condition-value"
+            value={value ? "true" : "false"}
+            onChange={(e) => onValueChange(e.target.value === "true")}
+            disabled={!enabled || disabled}
+            style={{ width: "80px" }}
+          >
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        ) : type === "select" ? (
+          <select
+            className="condition-value"
+            value={typeof value === 'object' && value !== null ? (value.value || "") : (value ?? "")}
+            onChange={(e) => onValueChange(e.target.value)}
+            disabled={!enabled || disabled}
+            style={{ 
+              width: "100px", 
+              color: (() => {
+                const scalarValue = (typeof value === 'object' && value !== null) ? value.value : value;
+                return options.find(o => o.value === scalarValue)?.style?.color;
+              })()
+            }}
+          >
+            {options.map(opt => (
+              <option key={opt.value} value={opt.value} style={opt.style}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          // type === "number"
+          <>
+            {presets && presets.length > 0 && !isCustomInput ? (
+                // 프리셋 드롭다운 모드
+                <div style={{ display: "flex", gap: "4px" }}>
+                    <select
+                        className="condition-value"
+                        value={presets.some(p => p.value === value) ? value : "custom_trigger"}
+                        onChange={(e) => {
+                            if (e.target.value === "custom_trigger") {
+                                setIsCustomInput(true);
+                            } else {
+                                onValueChange(Number(e.target.value));
+                            }
+                        }}
+                        disabled={!enabled || disabled}
+                        style={{ width: "140px" }}
+                    >
+                        {presets.map(p => (
+                            <option key={p.value} value={p.value}>{p.label}</option>
+                        ))}
+                        <option value="custom_trigger">{lang === "ko" ? "직접 입력..." : "Custom..."}</option>
+                    </select>
+                </div>
+            ) : (
+               // 숫자 직접 입력 모드 (프리셋이 없거나 커스텀 모드일 때)
+               <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                <input
+                    type="number"
+                    className="condition-value"
+                    value={value ?? ""}
+                    onChange={(e) => onValueChange(Number(e.target.value) || 0)}
+                    disabled={!enabled || disabled}
+                    style={{ width: "80px" }}
+                    min={min}
+                    max={max}
+                    placeholder={placeholder}
+                />
+                {presets && presets.length > 0 && (
+                     <button
+                        onClick={() => setIsCustomInput(false)}
+                        style={{
+                            marginLeft: "4px",
+                            background: "var(--panel)",
+                            border: "1px solid var(--border)",
+                            borderRadius: "4px",
+                            color: "var(--text-muted)",
+                            cursor: "pointer",
+                            width: "24px",
+                            height: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "14px"
+                        }}
+                        title={lang === "ko" ? "목록 선택으로 돌아가기" : "Back to list"}
+                    >
+                        ↺
+                    </button>
+                )}
+               </div>
+            )}
+            {unit && <span style={{ fontSize: "12px", color: "var(--muted)", alignSelf: "center", marginLeft: "4px" }}>{unit}</span>}
+          </>
+        )}
+      </div>
+    </div>
+  );
 };
 
 const CustomSelect = ({
@@ -92,7 +268,8 @@ const CustomSelect = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedOption = options.find((o) => o.value === value);
+  const scalarValue = (typeof value === 'object' && value !== null) ? (value.value || "") : (value ?? "");
+  const selectedOption = options.find((o) => o.value === scalarValue);
 
   return (
     <div className={`custom-select ${disabled ? "disabled" : ""}`} ref={ref}>
@@ -103,8 +280,8 @@ const CustomSelect = ({
         <span>
           {selectedOption
             ? selectedOption.label
-            : value
-            ? value.replace("custom_sound/", "")
+            : scalarValue
+            ? scalarValue.replace("custom_sound/", "")
             : placeholder}
         </span>
         <span className="arrow">▼</span>
@@ -115,11 +292,13 @@ const CustomSelect = ({
             <div
               key={option.value}
               className={`custom-select-option ${
-                option.value === value ? "selected" : ""
-              }`}
+                option.value === scalarValue ? "selected" : ""
+              } ${option.disabled ? "disabled" : ""}`}
               onClick={() => {
-                onChange(option.value);
-                setIsOpen(false);
+                if (!option.disabled) {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }
               }}
             >
               {option.label}
@@ -179,10 +358,16 @@ const CustomSelect = ({
         .custom-select-option:last-child {
           border-bottom: none;
         }
-        .custom-select-option:hover,
+        .custom-select-option:hover:not(.disabled),
         .custom-select-option.selected {
           background: var(--poe2-primary, #3b82f6);
           color: white;
+        }
+        .custom-select-option.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          background: transparent;
+          color: #777;
         }
         .arrow {
           font-size: 10px;
@@ -227,6 +412,8 @@ export default function StyleSettingsModal({
   section = null, // 현재 편집 중인 섹션 (예: "base_items", "gold", "currency" 등)
   hideConditions = false // 조건 설정 UI 숨김 여부 (gold_default 등)
 }) {
+  const [lang, setLang] = useState("ko");
+
   // 인게임 기본값 상수
   const DEFAULT_TEXT_COLOR = { r: 171, g: 159, b: 130, a: 255 }; // #ab9f82
   const DEFAULT_BORDER_COLOR = { r: 10, g: 13, b: 17, a: 255 }; // #0a0d11
@@ -244,6 +431,51 @@ export default function StyleSettingsModal({
     1: "custom_sound/2_currency_a.mp3",
     2: "custom_sound/3_currency_b.mp3", // B, C 모두 slot 2
   };
+
+  // 프리셋 정의
+  const areaLevelPresets = [
+    ...Array.from({ length: 16 }, (_, i) => {
+      const tier = i + 1;
+      const level = 64 + tier;
+      return {
+        value: level,
+        label: lang === "ko" ? `T${tier} 경로석 (${level})` : `Waystone T${tier} (${level})`
+      };
+    }),
+    ...[81, 82, 83, 84, 85, 86].map(level => ({ value: level, label: `${level}` }))
+  ];
+
+  const stackSizePresets = [
+    { value: 1, label: "1" },
+    { value: 10, label: "10" },
+    { value: 20, label: "20" },
+    { value: 40, label: "40" },
+    { value: 50, label: "50" },
+    { value: 100, label: "100" },
+    { value: 200, label: "200" },
+    { value: 500, label: "500" },
+    { value: 1000, label: "1,000" },
+    { value: 5000, label: "5,000" },
+    { value: 10000, label: "10,000" },
+  ];
+
+  const qualityPresets = [
+    { value: 0, label: "+0%" },
+    { value: 10, label: "+10%" },
+    { value: 20, label: "+20%" },
+    { value: 23, label: "+23%" },
+    { value: 28, label: "+28%" },
+    { value: 30, label: "+30%" },
+  ];
+
+  const itemLevelPresets = [
+    { value: 81, label: "81" },
+    { value: 82, label: "82" },
+    { value: 83, label: "83" },
+    { value: 84, label: "84" },
+    { value: 85, label: "85" },
+    { value: 100, label: "100" },
+  ];
   
   /* -------------------------------
    * quality input ref
@@ -321,7 +553,6 @@ export default function StyleSettingsModal({
 
   const [localConditions, setLocalConditions] = useState(conditions || {});
   const [areaLevelInputMode, setAreaLevelInputMode] = useState(false);
-  const [lang, setLang] = useState("ko");
   const [localRuleType, setLocalRuleType] = useState(ruleType || "show");
   
   // 초기 스타일 저장 (모달 열 때의 값)
@@ -351,6 +582,7 @@ export default function StyleSettingsModal({
 
   // 커스텀 사운드 옵션 (localStorage에서 로드)
   const [pcSoundOptions, setPcSoundOptions] = useState([]);
+  const [soundSettings, setSoundSettings] = useState([]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -358,12 +590,14 @@ export default function StyleSettingsModal({
       if (saved) {
         try {
           const settings = JSON.parse(saved);
+          setSoundSettings(settings);
           const options = settings.map((s) => ({
             value: s.pcFile?.startsWith("custom_sound/")
               ? s.pcFile
               : `custom_sound/${s.pcFile}`,
-            label: s.pcFile?.replace("custom_sound/", ""),
-            labelEn: s.pcFile?.replace("custom_sound/", ""),
+            label: s.pcFile?.replace("custom_sound/", "") + (s.enabled === false ? (lang === "ko" ? " (비활성화됨)" : " (Disabled)") : ""),
+            labelEn: s.pcFile?.replace("custom_sound/", "") + (s.enabled === false ? " (Disabled)" : ""),
+            disabled: s.enabled === false
           }));
           setPcSoundOptions(options);
         } catch (e) {
@@ -372,6 +606,31 @@ export default function StyleSettingsModal({
       }
     }
   }, [isOpen]); // 모달 열릴 때마다 갱신
+
+  // 현재 사운드가 글로벌 설정에서 활성화되어 있는지 체크하는 함수
+  const isSndEnabledGlobally = (styles) => {
+    if (!soundSettings || soundSettings.length === 0) return true;
+    
+    // PC 사운드 체크
+    if (styles.customSound) {
+      const file = styles.customSound.startsWith("custom_sound/") ? styles.customSound : `custom_sound/${styles.customSound}`;
+      const setting = soundSettings.find(s => {
+        if (!s.pcFile) return false;
+        const sFile = s.pcFile.startsWith("custom_sound/") ? s.pcFile : `custom_sound/${s.pcFile}`;
+        return sFile === file;
+      });
+      if (setting && setting.enabled === false) return false;
+    }
+    
+    // PS5/인게임 사운드 체크
+    if (styles.ps5Sound) {
+        const id = Number(styles.ps5Sound);
+        const setting = soundSettings.find(s => (Number(s.ingameId) === id || Number(s.ps5Slot) === id));
+        if (setting && setting.enabled === false) return false;
+    }
+    
+    return true;
+  };
 
   // 언어 설정 불러오기
   useEffect(() => {
@@ -393,6 +652,30 @@ export default function StyleSettingsModal({
       };
     }
   }, []);
+
+  // 글로벌 사운드 비활성화 연동 (동기화)
+  useEffect(() => {
+    // soundSettings가 로드되었고 모달이 열려있을 때만 실행
+    if (isOpen && soundSettings && soundSettings.length > 0) {
+      // 현재 로컬 스타일에 설정된 사운드 추출
+      const currentSound = localStyles.customSound;
+      const currentPs5Sound = localStyles.ps5Sound;
+
+      if (currentSound || currentPs5Sound) {
+        if (!isSndEnabledGlobally(localStyles)) {
+          // 글로벌 설정에서 비활성화된 사운드라면, 이 규칙에서도 사운드 체크 해제
+          setLocalStyles(prev => ({
+            ...prev,
+            customSound: null,
+            ps5Sound: null,
+            soundPlatform: null,
+            soundType: "default"
+          }));
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, soundSettings, localStyles.customSound, localStyles.ps5Sound]);
 
   // 모달이 열릴 때만 초기화 (무한 루프 방지)
   useEffect(() => {
@@ -725,7 +1008,15 @@ export default function StyleSettingsModal({
       nameEn: condition.nameEn,
       type: condition.type,
       operator: condition.defaultOperator,
-      value: condition.type === "boolean" ? condition.values[0] : (condition.type === "select" ? condition.values?.[0] : 0),
+      value: (() => {
+        if (condition.type === "boolean") return condition.values?.[0] ?? false;
+        if (condition.type === "select") {
+             const val = condition.values?.[0];
+             if (typeof val === 'object' && val !== null) return val.value;
+             return val ?? "";
+        }
+        return 0;
+      })(),
       values: condition.values || null,
       label: condition.label || null // StackSize의 경우 "골드" 라벨 저장
     };
@@ -961,7 +1252,7 @@ export default function StyleSettingsModal({
               <div className="rule-mode-row">
                 <select
                   className="style-select rule-mode-select"
-                  value={onEnabledChange && !enabled ? "disabled" : localRuleType}
+                  value={onEnabledChange && !enabled ? "disabled" : (localRuleType ?? "")}
                   onChange={(e) => {
                     const val = e.target.value;
 
@@ -1142,7 +1433,7 @@ export default function StyleSettingsModal({
                 </label>
                 <select
                   className="style-select minimap-inline-select"
-                  value={localStyles.minimapIcon?.size ?? ""}
+                  value={(typeof localStyles.minimapIcon?.size === 'object' ? localStyles.minimapIcon?.size?.value : localStyles.minimapIcon?.size) ?? ""}
                   onChange={(e) => handleMinimapIconChange("size", e.target.value ? parseInt(e.target.value) : null)}
                   disabled={localStyles.minimapIcon?.size === null && localStyles.minimapIcon?.color === null && localStyles.minimapIcon?.shape === null}
                 >
@@ -1154,7 +1445,7 @@ export default function StyleSettingsModal({
                 </select>
                 <select
                   className="style-select color-select minimap-inline-select"
-                  value={localStyles.minimapIcon?.color || ""}
+                  value={(typeof localStyles.minimapIcon?.color === 'object' ? localStyles.minimapIcon?.color?.value : localStyles.minimapIcon?.color) || ""}
                   onChange={(e) => handleMinimapIconChange("color", e.target.value || null)}
                   style={{
                     color: localStyles.minimapIcon?.color ? colorValueMap[localStyles.minimapIcon.color] || "var(--text)" : "var(--text)"
@@ -1179,7 +1470,7 @@ export default function StyleSettingsModal({
                 </select>
                 <select
                   className="style-select minimap-inline-select"
-                  value={localStyles.minimapIcon?.shape || ""}
+                  value={(typeof localStyles.minimapIcon?.shape === 'object' ? localStyles.minimapIcon?.shape?.value : localStyles.minimapIcon?.shape) || ""}
                   onChange={(e) => handleMinimapIconChange("shape", e.target.value || null)}
                   disabled={localStyles.minimapIcon?.size === null && localStyles.minimapIcon?.color === null && localStyles.minimapIcon?.shape === null}
                 >
@@ -1207,7 +1498,7 @@ export default function StyleSettingsModal({
                 </label>
                 <select
                   className="style-select minimap-inline-select"
-                  value={localStyles.playEffect || ""}
+                  value={(typeof localStyles.playEffect === 'object' ? localStyles.playEffect?.value : localStyles.playEffect) || ""}
                   onChange={(e) => handleStyleChange("playEffect", e.target.value || null)}
                   style={{
                     color: localStyles.playEffect ? colorValueMap[localStyles.playEffect] || "var(--text)" : "var(--text)"
@@ -1263,10 +1554,26 @@ export default function StyleSettingsModal({
                         }));
                       } else {
                         // 둘 다 없으면 기본 PC 사운드 설정 (한 번에 업데이트)
+                        // 글로벌 설정에서 활성화된 사운드를 우선 찾음
+                        const defaultSound = "custom_sound/1_currency_s.mp3";
+                        const isDefaultEnabled = soundSettings.find(s => {
+                          const sFile = s.pcFile?.startsWith("custom_sound/") ? s.pcFile : `custom_sound/${s.pcFile}`;
+                          return sFile === defaultSound;
+                        })?.enabled !== false;
+                        
+                        let fallbackSound = defaultSound;
+                        if (!isDefaultEnabled) {
+                           // 기본 소리가 꺼져있으면 켜져있는 첫번째 소리를 찾음
+                           const firstEnabled = soundSettings.find(s => s.enabled !== false);
+                           if (firstEnabled) {
+                             fallbackSound = firstEnabled.pcFile?.startsWith("custom_sound/") ? firstEnabled.pcFile : `custom_sound/${firstEnabled.pcFile}`;
+                           }
+                        }
+
                         setLocalStyles(prev => ({
                           ...prev,
                           soundType: "custom",
-                          customSound: "custom_sound/1_currency_s.mp3",
+                          customSound: fallbackSound,
                           soundPlatform: "PC",
                           ps5Sound: null,
                           ps5SoundVolume: 300
@@ -1372,7 +1679,7 @@ export default function StyleSettingsModal({
                 {/* 볼륨 드롭다운: 이제 모든 사운드 모드에서 표시 */}
                 <select
                   className="style-select sound-volume-select"
-                  value={localStyles.ps5SoundVolume || 300}
+                  value={(typeof localStyles.ps5SoundVolume === 'object' ? localStyles.ps5SoundVolume?.value : localStyles.ps5SoundVolume) || 300}
                   onChange={(e) => handleStyleChange("ps5SoundVolume", parseInt(e.target.value))}
                   disabled={localStyles.customSound === null && localStyles.ps5Sound === null}
                 >
@@ -1385,7 +1692,7 @@ export default function StyleSettingsModal({
                 </select>
 
                 {/* 커스텀 모드: 드롭다운 선택 */}
-                {localStyles.soundType === "custom" && (
+                {localStyles.soundType === "custom" && (localStyles.customSound !== null || localStyles.ps5Sound !== null) && (
                   <div className="custom-sound-input-wrapper" style={{ flex: 1 }}>
                     <CustomSelect
                       value={localStyles.customSound || ""}
@@ -1398,12 +1705,14 @@ export default function StyleSettingsModal({
                 )}
 
                 {/* 기본 모드: 슬롯 드롭다운 표시 */}
-                {localStyles.soundType === "default" && (
+                {localStyles.soundType === "default" && (localStyles.customSound !== null || localStyles.ps5Sound !== null) && (
                   <select
                     className="style-select sound-select"
-                    value={localStyles.soundType === "default"
-                      ? (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound ? "" : (localStyles.ps5Sound ? "" : (localStyles.customSound || ""))))
-                      : (localStyles.soundPlatform === "PS5" ? (localStyles.ps5Sound || "") : (localStyles.customSound || ""))}
+                    value={(() => {
+                      const isPS5 = localStyles.soundPlatform === "PS5";
+                      const val = isPS5 ? localStyles.ps5Sound : localStyles.customSound;
+                      return (typeof val === 'object' && val !== null) ? (val.value || "") : (val ?? "");
+                    })()}
                     onChange={(e) => {
                       const value = e.target.value;
                       if (!value) return;
@@ -1433,7 +1742,7 @@ export default function StyleSettingsModal({
             {/* 퀄리티 조건 설정 (별도 그룹으로 이동) */}
             {(localConditions.quality !== undefined || title === "퀄리티") && (
               <div className="style-setting-group">
-                <div className="quality-condition-ui" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div className="quality-condition-ui">
                   {(() => {
                     const qualityCondition = localConditions.quality;
                     const defaultOperator =
@@ -1441,67 +1750,41 @@ export default function StyleSettingsModal({
                       (title.includes("없는") || title.includes("숨김"))
                         ? "<"
                         : ">";
-                    const qualityOperator =
-                      typeof qualityCondition === "object"
-                        ? qualityCondition.operator || defaultOperator
-                        : defaultOperator;
-                    const qualityValue =
-                      typeof qualityCondition === "object"
-                        ? (qualityCondition.value ?? qualityCondition.min ?? 1)
-                        : (qualityCondition ?? 1);
+                    const currentOperator = typeof qualityCondition === "object" ? qualityCondition.operator || defaultOperator : defaultOperator;
+                    const currentValue = typeof qualityCondition === "object" ? (qualityCondition.value ?? qualityCondition.min ?? 1) : (qualityCondition ?? 1);
+
                     return (
-                      <>
-                  <input
-                    type="checkbox"
-                    id="quality-checkbox"
-                    className="color-checkbox"
-                    checked={localConditions.quality !== undefined && localConditions.quality !== null}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        handleConditionChange("quality", "operator", defaultOperator);
-                        handleConditionChange("quality", "value", 1);
-                      } else {
-                        const newConditions = { ...localConditions };
-                        delete newConditions.quality;
-                        setLocalConditions(newConditions);
-                      }
-                    }}
-                  />
-                  <label htmlFor="quality-checkbox" className="style-setting-label-inline">
-                      <span>{lang === "ko" ? "퀄리티" : "Quality"}</span>
-                  </label>
-                  <select
-                    className="style-select"
-                    value={qualityOperator}
-                    onChange={(e) => handleConditionChange("quality", "operator", e.target.value)}
-                    disabled={localConditions.quality === undefined || localConditions.quality === null}
-                    style={{ width: "52px" }}
-                  >
-                    <option value=">=">&gt;=</option>
-                    <option value=">">&gt;</option>
-                    <option value="==">==</option>
-                    <option value="<=">&lt;=</option>
-                    <option value="<">&lt;</option>
-                  </select>
-                  <input
-                    ref={qualityInputRef}
-                    type="number"
-                    className="font-size-input"
-                    style={{ width: "60px" }}
-                    value={qualityValue}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value) || 0;
-                      const newConditions = { ...localConditions };
-                      if (typeof newConditions.quality === 'object') {
-                          newConditions.quality = { ...newConditions.quality, value: val };
-                      } else {
-                          newConditions.quality = { operator: defaultOperator, value: val };
-                      }
-                      setLocalConditions(newConditions);
-                    }}
-                    disabled={localConditions.quality === undefined || localConditions.quality === null}
-                  />
-                      </>
+                      <ConditionRow
+                        label={lang === "ko" ? "퀄리티" : "Quality"}
+                        enabled={localConditions.quality !== undefined && localConditions.quality !== null}
+                        onEnabledChange={(checked) => {
+                             if (checked) {
+                                handleConditionChange("quality", "operator", defaultOperator);
+                                handleConditionChange("quality", "value", 1);
+                             } else {
+                                const newConditions = { ...localConditions };
+                                delete newConditions.quality;
+                                setLocalConditions(newConditions);
+                             }
+                        }}
+                        operator={currentOperator}
+                        onOperatorChange={(val) => handleConditionChange("quality", "operator", val)}
+                        value={currentValue}
+                        onValueChange={(val) => {
+                             const newConditions = { ...localConditions };
+                             if (typeof newConditions.quality === 'object') {
+                                 newConditions.quality = { ...newConditions.quality, value: val };
+                             } else {
+                                 newConditions.quality = { operator: defaultOperator, value: val };
+                             }
+                             setLocalConditions(newConditions);
+                        }}
+                        type="number"
+                        presets={qualityPresets}
+                        unit="%"
+                        min={0}
+                        lang={lang}
+                      />
                     );
                   })()}
                 </div>
@@ -1511,26 +1794,12 @@ export default function StyleSettingsModal({
             {/* 아이템 레벨 조건 설정 */}
             {localConditions.itemLevel !== undefined && (
               <div className="style-setting-group">
-                <div className="quality-condition-ui" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  {(() => {
-                    const itemLevelCondition = localConditions.itemLevel;
-                    const itemLevelOperator =
-                      typeof itemLevelCondition === "object"
-                        ? itemLevelCondition.operator || ">="
-                        : ">=";
-                    const itemLevelValue =
-                      typeof itemLevelCondition === "object"
-                        ? (itemLevelCondition.value ?? 83)
-                        : (itemLevelCondition ?? 83);
-                    return (
-                      <>
-                        <input
-                          type="checkbox"
-                          id="itemlevel-checkbox"
-                          className="color-checkbox"
-                          checked={localConditions.itemLevel !== undefined && localConditions.itemLevel !== null}
-                          onChange={(e) => {
-                            if (e.target.checked) {
+                <div className="quality-condition-ui">
+                   <ConditionRow
+                      label={lang === "ko" ? "아이템 레벨" : "Item Level"}
+                      enabled={localConditions.itemLevel !== undefined && localConditions.itemLevel !== null}
+                      onEnabledChange={(checked) => {
+                            if (checked) {
                               const newConditions = {
                                 ...localConditions,
                                 itemLevel: { operator: ">=", value: 83 },
@@ -1541,46 +1810,16 @@ export default function StyleSettingsModal({
                               delete newConditions.itemLevel;
                               setLocalConditions(newConditions);
                             }
-                          }}
-                        />
-                        <label htmlFor="itemlevel-checkbox" className="style-setting-label-inline">
-                          <span>{lang === "ko" ? "아이템 레벨" : "Item Level"}</span>
-                        </label>
-                        <select
-                          className="style-select"
-                          value={itemLevelOperator}
-                          onChange={(e) => handleConditionChange("itemLevel", "operator", e.target.value)}
-                          disabled={localConditions.itemLevel === undefined || localConditions.itemLevel === null}
-                          style={{ width: "52px" }}
-                        >
-                          <option value=">=">&gt;=</option>
-                          <option value=">">&gt;</option>
-                          <option value="==">==</option>
-                          <option value="<=">&lt;=</option>
-                          <option value="<">&lt;</option>
-                        </select>
-                        <input
-                          type="number"
-                          className="font-size-input"
-                          style={{ width: "60px" }}
-                          value={itemLevelValue}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value) || 0;
-                            const newConditions = { ...localConditions };
-                            if (typeof newConditions.itemLevel === "object") {
-                              newConditions.itemLevel = { ...newConditions.itemLevel, value: val };
-                            } else {
-                              newConditions.itemLevel = { operator: ">=", value: val };
-                            }
-                            setLocalConditions(newConditions);
-                          }}
-                          disabled={localConditions.itemLevel === undefined || localConditions.itemLevel === null}
-                          min="1"
-                          max="100"
-                        />
-                      </>
-                    );
-                  })()}
+                      }}
+                      operator={localConditions.itemLevel?.operator || ">="}
+                      onOperatorChange={(val) => handleConditionChange("itemLevel", "operator", val)}
+                      value={localConditions.itemLevel?.value ?? 83}
+                      onValueChange={(val) => handleConditionChange("itemLevel", "value", val)}
+                      presets={itemLevelPresets}
+                      min={1}
+                      max={100}
+                      lang={lang}
+                   />
                 </div>
               </div>
             )}
@@ -1837,7 +2076,7 @@ export default function StyleSettingsModal({
                                 </span>
                                 <select
                                   className="condition-value"
-                                  value={itemTierCondition.value || "all"}
+                                  value={(typeof itemTierCondition.value === 'object' ? itemTierCondition.value.value : itemTierCondition.value) || "all"}
                                   onChange={(e) => handleConditionChange("itemTier", "value", e.target.value)}
                                   style={{ width: "80px" }}
                                 >
@@ -1858,7 +2097,7 @@ export default function StyleSettingsModal({
                                 </span>
                                 <select
                                   className="condition-value"
-                                  value={levelTypeCondition.value || "MIN_ILVL"}
+                                  value={(typeof levelTypeCondition.value === 'object' ? levelTypeCondition.value.value : levelTypeCondition.value) || "MIN_ILVL"}
                                   onChange={(e) => handleConditionChange("levelType", "value", e.target.value)}
                                   style={{ width: "100px" }}
                                 >
@@ -1891,7 +2130,7 @@ export default function StyleSettingsModal({
                                 </select>
                                 <select
                                   className="condition-value"
-                                  value={unidentifiedItemTierCondition.value || 1}
+                                  value={(typeof unidentifiedItemTierCondition.value === 'object' ? unidentifiedItemTierCondition.value.value : unidentifiedItemTierCondition.value) || 1}
                                   onChange={(e) => handleConditionChange("unidentifiedItemTier", "value", parseInt(e.target.value))}
                                   style={{ width: "60px" }}
                                 >
@@ -1922,7 +2161,7 @@ export default function StyleSettingsModal({
                                 </select>
                                 <select
                                   className="condition-value"
-                                  value={localConditions.sockets.value || 0}
+                                  value={(typeof localConditions.sockets.value === 'object' ? localConditions.sockets.value.value : localConditions.sockets.value) || 0}
                                   onChange={(e) => handleConditionChange("sockets", "value", parseInt(e.target.value))}
                                   style={{ width: "60px" }}
                                 >
@@ -1980,7 +2219,7 @@ export default function StyleSettingsModal({
                                 </select>
                                 <select
                                   className="condition-value"
-                                  value={localConditions.areaLevel.value || 1}
+                                  value={(typeof localConditions.areaLevel?.value === 'object' ? localConditions.areaLevel?.value?.value : localConditions.areaLevel?.value) || 1}
                                   onChange={(e) => handleConditionChange("areaLevel", "value", parseInt(e.target.value) || 1)}
                                   style={{ width: "70px" }}
                                 >
@@ -2215,6 +2454,24 @@ export default function StyleSettingsModal({
                         </div>
                         )}
 
+                        {/* StackSize: 골드/감별 주문서 아닐 때만 표시 (ConditionRow 적용) */}
+                        {!isScrollOfWisdom && baseType !== "Gold" && localConditions.stackSize && (
+                           <div style={{ marginBottom: "8px" }}>
+                              <ConditionRow
+                                  label={lang === "ko" ? "수량" : "Stack Size"}
+                                  enabled={true}
+                                  operator={localConditions.stackSize.operator || ">="}
+                                  onOperatorChange={(val) => handleConditionChange("stackSize", "operator", val)}
+                                  value={localConditions.stackSize.value || 0}
+                                  onValueChange={(val) => handleConditionChange("stackSize", "value", val)}
+                                  presets={stackSizePresets}
+                                  min={0}
+                                  max={10000}
+                                  lang={lang}
+                              />
+                           </div>
+                        )}
+
                         {/* Gold 타입이면 전용 UI 표시 (hideConditions가 false일 때만) */}
                         {baseType === "Gold" && !hideConditions && (
                              <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "8px" }}>
@@ -2357,80 +2614,24 @@ export default function StyleSettingsModal({
                              </div>
                         )}
 
-                        {/* 기본 렌더링 (골드/감별 주문서 아닐 때만 렌더링하도록 조건 추가) */}
-                        {!isScrollOfWisdom && baseType !== "Gold" && (
-                          <>
-                            {localConditions.stackSize && (
-                            <div className="condition-row-inline">
-                                <span className="style-setting-label">
-                                    {lang === "ko" ? "스택 수량" : "Stack Size"}
-                                </span>
-                                <select
-                                  className="condition-operator-compact"
-                                  value={localConditions.stackSize.operator || ">="}
-                                  onChange={(e) => handleConditionChange("stackSize", "operator", e.target.value)}
-                                >
-                                  <option value=">=">≥</option>
-                                  <option value="<=">≤</option>
-                                  <option value=">">&gt;</option>
-                                  <option value="<">&lt;</option>
-                                  <option value="==">==</option>
-                                </select>
-                                
-                                {baseType === "Currency" ? (
-                                    <input
-                                      type="number"
-                                      className="condition-value"
-                                      value={localConditions.stackSize.value || 0}
-                                      onChange={(e) => handleConditionChange("stackSize", "value", parseInt(e.target.value) || 0)}
-                                      style={{ width: "80px", marginLeft: "8px" }}
-                                    />
-                                ) : (
-                                  <div className="condition-slider-wrapper-inline">
-                                    <OperatorSlider
-                                      value={localConditions.stackSize.value || 0}
-                                      onChange={(newValue) => handleConditionChange("stackSize", "value", newValue)}
-                                      operator={localConditions.stackSize.operator || ">="}
-                                      min={0}
-                                      max={10000}
-                                      step={10}
-                                      label="" 
-                                    />
-                                  </div>
-                                )}
-                            </div>
-                          )}
+
 
                           {/* AreaLevel: 골드가 아닐 때만 표시 (골드는 위에서 처리) */}
                           {areaLevelCondition && baseType !== "Gold" && section !== "base_items_socket_quality" && (
-                              <div className="condition-row-with-slider">
-                                <div className="condition-label-wrapper">
-                                  <span className="style-setting-label">지역 레벨</span>
-                                  <select
-                                    className="condition-operator"
-                                    value={localConditions.areaLevel?.operator || ">="}
-                                    onChange={(e) => handleConditionChange("areaLevel", "operator", e.target.value)}
-                                  >
-                                    <option value=">=">≥</option>
-                                    <option value="<=">≤</option>
-                                    <option value=">">&gt;</option>
-                                    <option value="<">&lt;</option>
-                                    <option value="==">==</option>
-                                  </select>
-                                </div>
-                                <div className="condition-slider-wrapper">
-                                    <OperatorSlider
-                                      value={localConditions.areaLevel?.value || 1}
-                                      onChange={(newValue) => {
-                                        handleConditionChange("areaLevel", "value", newValue);
-                                      }}
+                                <div style={{ marginTop: "8px" }}>
+                                  <ConditionRow
+                                      label={lang === "ko" ? "지역" : "Area Level"}
+                                      enabled={true} 
                                       operator={localConditions.areaLevel?.operator || ">="}
+                                      onOperatorChange={(val) => handleConditionChange("areaLevel", "operator", val)}
+                                      value={localConditions.areaLevel?.value || 1}
+                                      onValueChange={(val) => handleConditionChange("areaLevel", "value", val)}
+                                      presets={areaLevelPresets}
                                       min={1}
                                       max={100}
-                                      step={1}
-                                    />
+                                      lang={lang}
+                                  />
                                 </div>
-                              </div>
                           )}
 
                           {/* Corrupted/Rarity 조건: 한 줄에 배치 */}
@@ -2465,7 +2666,7 @@ export default function StyleSettingsModal({
                                   </select>
                                   <select
                                     className="condition-value"
-                                    value={localConditions.corrupted?.value === true ? "True" : "False"}
+                                    value={(typeof localConditions.corrupted?.value === 'object' ? localConditions.corrupted.value.value : localConditions.corrupted?.value) === true ? "True" : "False"}
                                     onChange={(e) => {
                                       const newValue = e.target.value === "True";
                                       setLocalConditions(prev => ({
@@ -2519,7 +2720,7 @@ export default function StyleSettingsModal({
                                   </select>
                                   <select
                                     className="condition-value"
-                                    value={localConditions.rarity?.value || "Normal"}
+                                    value={(typeof localConditions.rarity?.value === 'object' ? localConditions.rarity.value.value : localConditions.rarity?.value) || "Normal"}
                                     onChange={(e) => {
                                       setLocalConditions(prev => ({
                                         ...prev,
@@ -2530,12 +2731,15 @@ export default function StyleSettingsModal({
                                     style={{ 
                                       width: "100px", 
                                       opacity: localConditions.rarity?.enabled === false ? 0.5 : 1,
-                                      color: localConditions.rarity?.enabled === false 
-                                        ? undefined 
-                                        : (localConditions.rarity?.value === "Normal" ? "#FFFFFF" 
-                                          : localConditions.rarity?.value === "Magic" ? "#8888FF" 
-                                          : localConditions.rarity?.value === "Rare" ? "#FFFF77" 
-                                          : "#AF6025")
+                                      color: (() => {
+                                        if (localConditions.rarity?.enabled === false) return undefined;
+                                        const val = typeof localConditions.rarity?.value === 'object' ? localConditions.rarity.value.value : localConditions.rarity?.value;
+                                        if (val === "Normal") return "#FFFFFF";
+                                        if (val === "Magic") return "#8888FF";
+                                        if (val === "Rare") return "#FFFF77";
+                                        if (val === "Unique") return "#AF6025";
+                                        return "#FFFFFF";
+                                      })()
                                     }}
                                   >
                                     <option value="Normal" style={{ color: "#FFFFFF" }}>{lang === "ko" ? "일반" : "Normal"}</option>
@@ -2674,8 +2878,6 @@ export default function StyleSettingsModal({
                               </div>
                             </div>
                           )}
-                        </>
-                      )}
                     </>
                   );
                 })()}
@@ -2709,78 +2911,46 @@ export default function StyleSettingsModal({
                             </button>
                           </div>
                           <div className="rule-controls">
-                            {/* 연산자 */}
-                            <div className="rule-controls-row">
-                              <select
-                                className="rule-operator"
-                                value={rule.operator}
-                                onChange={(e) => handleRuleChange(rule.id, "operator", e.target.value)}
-                              >
-                                {condition.operators.map((op) => (
-                                  <option key={op} value={op}>{op}</option>
-                                ))}
-                              </select>
+                            {(() => {
+                                // Presets 준비
+                                let currentPresets = [];
+                                if (condition.code === "AreaLevel") currentPresets = areaLevelPresets;
+                                else if (condition.code === "StackSize") currentPresets = stackSizePresets;
+                                else if (condition.code === "ItemLevel") currentPresets = itemLevelPresets;
+                                else if (condition.code === "Quality") currentPresets = qualityPresets;
 
-                              {/* 값 입력 - number 타입이 아닌 경우 기존 input 사용 */}
-                              {condition.type !== "number" && condition.type === "select" && condition.values && (
-                                <select
-                                  className="rule-value"
-                                  value={rule.value || ""}
-                                  onChange={(e) => handleRuleChange(rule.id, "value", e.target.value)}
-                                >
-                                  {condition.values.map((val) => (
-                                    <option key={val} value={val}>{val}</option>
-                                  ))}
-                                </select>
-                              )}
+                                // Options 준비 (select 타입용)
+                                // Rarity 등은 values가 단순 문자열 배열임
+                                const currentOptions = condition.values 
+                                  ? condition.values.map(v => {
+                                      if (typeof v === 'object') return v; // 이미 객체면 그대로
+                                      // Rarity 등 특수 케이스 번역
+                                      let label = v;
+                                      let style = {};
+                                      if (condition.code === "Rarity") {
+                                          if (v === "Normal") { label = lang === "ko" ? "일반" : "Normal"; style = { color: "#FFFFFF" }; }
+                                          else if (v === "Magic") { label = lang === "ko" ? "마법" : "Magic"; style = { color: "#8888FF" }; }
+                                          else if (v === "Rare") { label = lang === "ko" ? "희귀" : "Rare"; style = { color: "#FFFF77" }; }
+                                          else if (v === "Unique") { label = lang === "ko" ? "유니크" : "Unique"; style = { color: "#AF6025" }; }
+                                      }
+                                      return { value: v, label, style };
+                                  }) 
+                                  : [];
 
-                              {condition.type === "boolean" && (
-                                <select
-                                  className="rule-value"
-                                  value={rule.value ? "true" : "false"}
-                                  onChange={(e) => handleRuleChange(rule.id, "value", e.target.value === "true")}
-                                >
-                                  <option value="true">True</option>
-                                  <option value="false">False</option>
-                                </select>
-                              )}
-                            </div>
-
-                            {/* 값 입력 - number 타입인 경우 슬라이더 사용 */}
-                            {condition.type === "number" && (() => {
-                              // 조건별 기본 min/max/step 설정
-                              const getRangeForCondition = (code) => {
-                                switch (code) {
-                                  case "StackSize":
-                                    return { min: 0, max: 10000, step: 10 };
-                                  case "AreaLevel":
-                                    return { min: 1, max: 100, step: 1 };
-                                  case "ItemLevel":
-                                    return { min: 1, max: 82, step: 1 };
-                                  case "Quality":
-                                    return { min: 0, max: 28, step: 1 };
-                                  case "Sockets":
-                                    return { min: 0, max: 3, step: 1 };
-                                  case "UnidentifiedItemTier":
-                                    return { min: 1, max: 5, step: 1 };
-                                  default:
-                                    return { min: 0, max: 100, step: 1 };
-                                }
-                              };
-                              const range = getRangeForCondition(condition.code);
-                              
-                              return (
-                                <div className="rule-slider-wrapper">
-                                  <OperatorSlider
-                                    value={rule.value || range.min}
-                                    onChange={(newValue) => handleRuleChange(rule.id, "value", newValue)}
-                                    operator={rule.operator}
-                                    min={range.min}
-                                    max={range.max}
-                                    step={range.step}
-                                  />
-                                </div>
-                              );
+                                return (
+                                    <ConditionRow
+                                        label={null} // 헤더에 이름이 있으므로 라벨 생략
+                                        enabled={true}
+                                        operator={rule.operator}
+                                        onOperatorChange={(val) => handleRuleChange(rule.id, "operator", val)}
+                                        value={rule.value}
+                                        onValueChange={(val) => handleRuleChange(rule.id, "value", val)}
+                                        type={condition.type}
+                                        presets={currentPresets}
+                                        options={currentOptions}
+                                        lang={lang}
+                                    />
+                                );
                             })()}
                           </div>
                         </div>
